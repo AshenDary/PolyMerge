@@ -2,21 +2,24 @@
   "name": "polymerge-backend",
   "version": "0.1.0",
   "private": true,
-  "description": "Fastify API for PolyMerge polypill formulation workflows.",
-  "main": "src/server.js",
+  "type": "module",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "scripts": {
-    "dev": "nodemon src/server.js",
+    "dev": "node --watch src/server.js",
     "start": "node src/server.js",
     "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate dev"
+    "prisma:migrate": "prisma migrate dev",
+    "test": "node --test"
   },
   "dependencies": {
-    "@prisma/client": "^5.22.0",
-    "dotenv": "^16.4.5",
-    "fastify": "^4.28.1"
+    "@fastify/cors": "^9.0.1",
+    "@prisma/client": "^5.9.1",
+    "dotenv": "^16.4.1",
+    "fastify": "^4.26.0"
   },
   "devDependencies": {
-    "nodemon": "^3.1.7",
-    "prisma": "^5.22.0"
+    "prisma": "^5.9.1"
   }
 }

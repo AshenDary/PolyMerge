@@ -2,15 +2,41 @@ version: '3.8'
 
 services:
   neo4j:
-    image: neo4j:latest
+    image: neo4j:5.15
     container_name: polymerge_neo4j
     ports:
-      - "7474:7474" # HTTP
+      - "7474:7474" # HTTP browser
       - "7687:7687" # Bolt
     environment:
       - NEO4J_AUTH=neo4j/password
     volumes:
       - neo4j_data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:7474 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Was missing entirely, even though .env / schema.prisma both require it.
+  mysql:
+    image: mysql:8.0
+    container_name: polymerge_mysql
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=polymerge
+      - MYSQL_USER=polymerge
+      - MYSQL_PASSWORD=polymerge
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./docker/mysql/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 volumes:
   neo4j_data:
+  mysql_data:

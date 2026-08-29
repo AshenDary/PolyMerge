@@ -1,0 +1,20 @@
+.PHONY: up down install backend ml migrate
+
+up: ## Start Neo4j + MySQL containers
+	docker-compose up -d
+
+down: ## Stop containers
+	docker-compose down
+
+install: ## Install backend + ml_engine dependencies
+	cd backend && npm install
+	cd ml_engine && python3 -m pip install -r requirements.txt
+
+migrate: ## Apply Prisma schema to MySQL
+	cd backend && set -a; . ../.env; set +a; npx prisma migrate dev --name init
+
+backend: ## Run Fastify dev server
+	cd backend && npm run dev
+
+ml: ## Run FastAPI dev server
+	cd ml_engine && python3 -m uvicorn main:app --reload --port 8000

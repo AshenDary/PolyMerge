@@ -3,13 +3,29 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
+  provider          = "mysql"
+  url               = env("DATABASE_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
 }
 
+model User {
+  id        Int        @id @default(autoincrement())
+  email     String     @unique
+  name      String?
+  createdAt DateTime   @default(now())
+  queries   QueryLog[]
+}
+
+// Logs every formulation-search request for audit/traceability.
+// Required because PolyMerge is a decision-support tool, not an autonomous
+// prescriber -- every suggestion returned to a researcher must be traceable
+// back to its inputs and outputs.
 model QueryLog {
-  id              Int      @id @default(autoincrement())
-  query           String   @db.Text
-  responseSummary String?  @db.Text
-  createdAt       DateTime @default(now())
+  id             Int      @id @default(autoincrement())
+  userId         Int?
+  user           User?    @relation(fields: [userId], references: [id])
+  targetDiseases Json // disease IDs sent to the combination search
+  resultDrugSet  Json // minimal safe drug set returned
+  mlEngineMs     Int? // latency of the ML engine call, for perf tracking
+  createdAt      DateTime @default(now())
 }

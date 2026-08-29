@@ -1,63 +1,63 @@
-require("dotenv").config();
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const Fastify = require("fastify");
-const { PrismaClient } = require("@prisma/client");
+import Fastify from 'fastify';
+import cors from '@fastify/cors';
+import dotenv from 'dotenv';
 
-const prisma = new PrismaClient();
-const server = Fastify({
-  logger: true,
+import { checkHardContraindications } from './rules/contraindications.js';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+// Single shared .env lives at the repo root, not inside backend/.
+dotenv.config({ path: path.resolve(__dirname, '../../.env') });
+
+const PORT = Number(process.env.PORT) || 3000;
+const HOST = process.env.HOST || '0.0.0.0';
+const ML_SERVICE_URL = process.env.ML_SERVICE_URL || 'http://localhost:8000';
+
+const app = Fastify({ logger: true });
+
+await app.register(cors, {
+  origin: process.env.CORS_ORIGIN || true,
 });
 
-const port = Number(process.env.PORT || 3000);
-const mlServiceUrl = process.env.ML_SERVICE_URL || "http://localhost:8000";
+// Liveness check consumed by docker-compose / uptime monitors.
+app.get('/health', async () => ({ status: 'ok', service: 'polymerge-backend' }));
 
-server.get("/health", async () => ({
-  status: "ok",
-  service: "polymerge-backend",
-  mlServiceUrl,
-}));
-
-server.post("/formulations/search", async (request, reply) => {
-  const { diseases = [], constraints = {} } = request.body || {};
+// Proxies a drug-set request to the ML engine, then applies hard-coded
+// safety fallbacks BEFORE returning anything to the client. Per project
+// rules, severe contraindications (e.g. MAOI + SSRI) must be blocked here
+// independent of what the neural net scored.
+app.post('/api/combinations/search', async (request, reply) => {
+  const { diseases } = request.body ?? {};
 
   if (!Array.isArray(diseases) || diseases.length === 0) {
-    return reply.code(400).send({
-      error: "At least one disease must be provided.",
-    });
+    return reply.code(400).send({ error: 'diseases[] is required' });
   }
 
-  const queryLog = await prisma.queryLog.create({
-    data: {
-      query: JSON.stringify({ diseases, constraints }),
-    },
-  });
-
-  return reply.code(202).send({
-    queryId: queryLog.id,
-    status: "accepted",
-    message: "Formulation search queued for ML evaluation.",
-  });
-});
-
-async function start() {
+  let mlResult;
   try {
-    await server.listen({ port, host: "0.0.0.0" });
-  } catch (error) {
-    server.log.error(error);
-    process.exit(1);
+    const res = await fetch(`${ML_SERVICE_URL}/predict/combination`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ diseases }),
+    });
+    if (!res.ok) throw new Error(`ML engine responded ${res.status}`);
+    mlResult = await res.json();
+  } catch (err) {
+    request.log.error(err, 'ML engine call failed');
+    return reply.code(502).send({ error: 'ML engine unavailable' });
   }
-}
 
-process.on("SIGINT", async () => {
-  await prisma.$disconnect();
-  await server.close();
-  process.exit(0);
+  const violation = checkHardContraindications(mlResult.drugSet ?? []);
+  if (violation) {
+    return reply.code(422).send({ error: 'Blocked by hard safety rule', reason: violation });
+  }
+
+  return mlResult;
 });
 
-process.on("SIGTERM", async () => {
-  await prisma.$disconnect();
-  await server.close();
-  process.exit(0);
+app.listen({ port: PORT, host: HOST }).catch((err) => {
+  app.log.error(err);
+  process.exit(1);
 });
-
-start();
