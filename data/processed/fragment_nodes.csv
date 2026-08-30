@@ -1,0 +1,3416 @@
+id,name,kind
+Compound::DB00120,L-Phenylalanine,Compound
+Compound::DB00168,Aspartame,Compound
+Compound::DB00175,Pravastatin,Compound
+Compound::DB00177,Valsartan,Compound
+Compound::DB00178,Ramipril,Compound
+Compound::DB00181,Baclofen,Compound
+Compound::DB00182,Amphetamine,Compound
+Compound::DB00186,Lorazepam,Compound
+Compound::DB00187,Esmolol,Compound
+Compound::DB00188,Bortezomib,Compound
+Compound::DB00190,Carbidopa,Compound
+Compound::DB00192,Indecainide,Compound
+Compound::DB00195,Betaxolol,Compound
+Compound::DB00204,Dofetilide,Compound
+Compound::DB00206,Reserpine,Compound
+Compound::DB00208,Ticlopidine,Compound
+Compound::DB00214,Torasemide,Compound
+Compound::DB00221,Isoetarine,Compound
+Compound::DB00222,Glimepiride,Compound
+Compound::DB00226,Guanadrel,Compound
+Compound::DB00227,Lovastatin,Compound
+Compound::DB00232,Methyclothiazide,Compound
+Compound::DB00233,Aminosalicylic Acid,Compound
+Compound::DB00243,Ranolazine,Compound
+Compound::DB00244,Mesalazine,Compound
+Compound::DB00247,Methysergide,Compound
+Compound::DB00264,Metoprolol,Compound
+Compound::DB00270,Isradipine,Compound
+Compound::DB00275,Olmesartan,Compound
+Compound::DB00284,Acarbose,Compound
+Compound::DB00289,Atomoxetine,Compound
+Compound::DB00310,Chlorthalidone,Compound
+Compound::DB00320,Dihydroergotamine,Compound
+Compound::DB00328,Indomethacin,Compound
+Compound::DB00331,Metformin,Compound
+Compound::DB00335,Atenolol,Compound
+Compound::DB00343,Diltiazem,Compound
+Compound::DB00346,Alfuzosin,Compound
+Compound::DB00350,Minoxidil,Compound
+Compound::DB00351,Megestrol acetate,Compound
+Compound::DB00353,Methylergometrine,Compound
+Compound::DB00368,Norepinephrine,Compound
+Compound::DB00373,Timolol,Compound
+Compound::DB00374,Treprostinil,Compound
+Compound::DB00378,Dydrogesterone,Compound
+Compound::DB00381,Amlodipine,Compound
+Compound::DB00384,Triamterene,Compound
+Compound::DB00391,Sulpiride,Compound
+Compound::DB00393,Nimodipine,Compound
+Compound::DB00396,Progesterone,Compound
+Compound::DB00401,Nisoldipine,Compound
+Compound::DB00412,Rosiglitazone,Compound
+Compound::DB00419,Miglustat,Compound
+Compound::DB00420,Promazine,Compound
+Compound::DB00421,Spironolactone,Compound
+Compound::DB00423,Methocarbamol,Compound
+Compound::DB00436,Bendroflumethiazide,Compound
+Compound::DB00452,Framycetin,Compound
+Compound::DB00457,Prazosin,Compound
+Compound::DB00458,Imipramine,Compound
+Compound::DB00464,Sodium Tetradecyl Sulfate,Compound
+Compound::DB00476,Duloxetine,Compound
+Compound::DB00477,Chlorpromazine,Compound
+Compound::DB00479,Amikacin,Compound
+Compound::DB00484,Brimonidine,Compound
+Compound::DB00489,Sotalol,Compound
+Compound::DB00491,Miglitol,Compound
+Compound::DB00492,Fosinopril,Compound
+Compound::DB00507,Nitazoxanide,Compound
+Compound::DB00508,Triflupromazine,Compound
+Compound::DB00519,Trandolapril,Compound
+Compound::DB00521,Carteolol,Compound
+Compound::DB00524,Metolazone,Compound
+Compound::DB00528,Lercanidipine,Compound
+Compound::DB00542,Benazepril,Compound
+Compound::DB00549,Zafirlukast,Compound
+Compound::DB00555,Lamotrigine,Compound
+Compound::DB00562,Benzthiazide,Compound
+Compound::DB00571,Propranolol,Compound
+Compound::DB00573,Fenoprofen,Compound
+Compound::DB00575,Clonidine,Compound
+Compound::DB00579,Mazindol,Compound
+Compound::DB00581,Lactulose,Compound
+Compound::DB00584,Enalapril,Compound
+Compound::DB00586,Diclofenac,Compound
+Compound::DB00590,Doxazosin,Compound
+Compound::DB00594,Amiloride,Compound
+Compound::DB00598,Labetalol,Compound
+Compound::DB00603,Medroxyprogesterone Acetate,Compound
+Compound::DB00606,Cyclothiazide,Compound
+Compound::DB00612,Bisoprolol,Compound
+Compound::DB00621,Oxandrolone,Compound
+Compound::DB00622,Nicardipine,Compound
+Compound::DB00624,Testosterone,Compound
+Compound::DB00627,Niacin,Compound
+Compound::DB00629,Guanabenz,Compound
+Compound::DB00634,Sulfacetamide,Compound
+Compound::DB00636,Clofibrate,Compound
+Compound::DB00641,Simvastatin,Compound
+Compound::DB00647,Dextropropoxyphene,Compound
+Compound::DB00657,Mecamylamine,Compound
+Compound::DB00661,Verapamil,Compound
+Compound::DB00662,Trimethobenzamide,Compound
+Compound::DB00668,Epinephrine,Compound
+Compound::DB00672,Chlorpropamide,Compound
+Compound::DB00676,Benzyl Benzoate,Compound
+Compound::DB00678,Losartan,Compound
+Compound::DB00687,Fludrocortisone,Compound
+Compound::DB00691,Moexipril,Compound
+Compound::DB00695,Furosemide,Compound
+Compound::DB00696,Ergotamine,Compound
+Compound::DB00697,Tizanidine,Compound
+Compound::DB00700,Eplerenone,Compound
+Compound::DB00706,Tamsulosin,Compound
+Compound::DB00712,Flurbiprofen,Compound
+Compound::DB00722,Lisinopril,Compound
+Compound::DB00726,Trimipramine,Compound
+Compound::DB00731,Nateglinide,Compound
+Compound::DB00741,Hydrocortisone,Compound
+Compound::DB00758,Clopidogrel,Compound
+Compound::DB00765,Metyrosine,Compound
+Compound::DB00769,Hydrocortamate,Compound
+Compound::DB00774,Hydroflumethiazide,Compound
+Compound::DB00775,Tirofiban,Compound
+Compound::DB00776,Oxcarbazepine,Compound
+Compound::DB00777,Propiomazine,Compound
+Compound::DB00784,Mefenamic acid,Compound
+Compound::DB00790,Perindopril,Compound
+Compound::DB00792,Tripelennamine,Compound
+Compound::DB00796,Candesartan,Compound
+Compound::DB00800,Fenoldopam,Compound
+Compound::DB00808,Indapamide,Compound
+Compound::DB00813,Fentanyl,Compound
+Compound::DB00839,Tolazamide,Compound
+Compound::DB00841,Dobutamine,Compound
+Compound::DB00843,Donepezil,Compound
+Compound::DB00856,Chlorphenesin,Compound
+Compound::DB00857,Terbinafine,Compound
+Compound::DB00865,Benzphetamine,Compound
+Compound::DB00866,Alprenolol,Compound
+Compound::DB00867,Ritodrine,Compound
+Compound::DB00872,Conivaptan,Compound
+Compound::DB00874,Guaifenesin,Compound
+Compound::DB00876,Eprosartan,Compound
+Compound::DB00880,Chlorothiazide,Compound
+Compound::DB00881,Quinapril,Compound
+Compound::DB00887,Bumetanide,Compound
+Compound::DB00894,Testolactone,Compound
+Compound::DB00903,Ethacrynic acid,Compound
+Compound::DB00912,Repaglinide,Compound
+Compound::DB00925,Phenoxybenzamine,Compound
+Compound::DB00936,Salicylic acid,Compound
+Compound::DB00938,Salmeterol,Compound
+Compound::DB00939,Meclofenamic acid,Compound
+Compound::DB00945,Acetylsalicylic acid,Compound
+Compound::DB00960,Pindolol,Compound
+Compound::DB00964,Apraclonidine,Compound
+Compound::DB00966,Telmisartan,Compound
+Compound::DB00968,Methyldopa,Compound
+Compound::DB00973,Ezetimibe,Compound
+Compound::DB00983,Formoterol,Compound
+Compound::DB00988,Dopamine,Compound
+Compound::DB00994,Neomycin,Compound
+Compound::DB00999,Hydrochlorothiazide,Compound
+Compound::DB01001,Salbutamol,Compound
+Compound::DB01009,Ketoprofen,Compound
+Compound::DB01011,Metyrapone,Compound
+Compound::DB01012,Cinacalcet,Compound
+Compound::DB01016,Glyburide,Compound
+Compound::DB01018,Guanfacine,Compound
+Compound::DB01021,Trichlormethiazide,Compound
+Compound::DB01023,Felodipine,Compound
+Compound::DB01029,Irbesartan,Compound
+Compound::DB01032,Probenecid,Compound
+Compound::DB01036,Tolterodine,Compound
+Compound::DB01039,Fenofibrate,Compound
+Compound::DB01049,Ergoloid mesylate,Compound
+Compound::DB01050,Ibuprofen,Compound
+Compound::DB01054,Nitrendipine,Compound
+Compound::DB01064,Isoprenaline,Compound
+Compound::DB01067,Glipizide,Compound
+Compound::DB01068,Clonazepam,Compound
+Compound::DB01069,Promethazine,Compound
+Compound::DB01075,Diphenhydramine,Compound
+Compound::DB01076,Atorvastatin,Compound
+Compound::DB01083,Orlistat,Compound
+Compound::DB01089,Deserpidine,Compound
+Compound::DB01095,Fluvastatin,Compound
+Compound::DB01098,Rosuvastatin,Compound
+Compound::DB01100,Pimozide,Compound
+Compound::DB01102,Arbutamine,Compound
+Compound::DB01113,Papaverine,Compound
+Compound::DB01115,Nifedipine,Compound
+Compound::DB01116,Trimethaphan,Compound
+Compound::DB01119,Diazoxide,Compound
+Compound::DB01120,Gliclazide,Compound
+Compound::DB01121,Phenacemide,Compound
+Compound::DB01124,Tolbutamide,Compound
+Compound::DB01125,Anisindione,Compound
+Compound::DB01132,Pioglitazone,Compound
+Compound::DB01136,Carvedilol,Compound
+Compound::DB01144,Diclofenamide,Compound
+Compound::DB01146,Diphenylpyraline,Compound
+Compound::DB01151,Desipramine,Compound
+Compound::DB01162,Terazosin,Compound
+Compound::DB01170,Guanethidine,Compound
+Compound::DB01172,Kanamycin,Compound
+Compound::DB01176,Cyclizine,Compound
+Compound::DB01180,Rescinnamine,Compound
+Compound::DB01182,Propafenone,Compound
+Compound::DB01185,Fluoxymesterone,Compound
+Compound::DB01193,Acebutolol,Compound
+Compound::DB01197,Captopril,Compound
+Compound::DB01200,Bromocriptine,Compound
+Compound::DB01203,Nadolol,Compound
+Compound::DB01210,Levobunolol,Compound
+Compound::DB01214,Metipranolol,Compound
+Compound::DB01228,Encainide,Compound
+Compound::DB01231,Diphenidol,Compound
+Compound::DB01235,L-DOPA,Compound
+Compound::DB01241,Gemfibrozil,Compound
+Compound::DB01244,Bepridil,Compound
+Compound::DB01246,Alimemazine,Compound
+Compound::DB01251,Gliquidone,Compound
+Compound::DB01252,Mitiglinide,Compound
+Compound::DB01253,Ergonovine,Compound
+Compound::DB01255,Lisdexamfetamine,Compound
+Compound::DB01261,Sitagliptin,Compound
+Compound::DB01274,Arformoterol,Compound
+Compound::DB01275,Hydralazine,Compound
+Compound::DB01288,Fenoterol,Compound
+Compound::DB01289,Glisoxepide,Compound
+Compound::DB01291,Pirbuterol,Compound
+Compound::DB01295,Bevantolol,Compound
+Compound::DB01297,Practolol,Compound
+Compound::DB01324,Polythiazide,Compound
+Compound::DB01325,Quinethazone,Compound
+Compound::DB01340,Cilazapril,Compound
+Compound::DB01342,Forasartan,Compound
+Compound::DB01348,Spirapril,Compound
+Compound::DB01349,Tasosartan,Compound
+Compound::DB01359,Penbutolol,Compound
+Compound::DB01380,Cortisone acetate,Compound
+Compound::DB01392,Yohimbine,Compound
+Compound::DB01393,Bezafibrate,Compound
+Compound::DB01395,Drospirenone,Compound
+Compound::DB01398,Salicylate-sodium,Compound
+Compound::DB01399,Salsalate,Compound
+Compound::DB01403,Methotrimeprazine,Compound
+Compound::DB01411,Pranlukast,Compound
+Compound::DB01420,Testosterone Propionate,Compound
+Compound::DB01421,Paromomycin,Compound
+Compound::DB01428,Oxybenzone,Compound
+Compound::DB01429,Aprindine,Compound
+Compound::DB01511,Delorazepam,Compound
+Compound::DB01576,Dextroamphetamine,Compound
+Compound::DB01577,Methamphetamine,Compound
+Compound::DB01580,Oxprenolol,Compound
+Compound::DB01591,Solifenacin,Compound
+Compound::DB01609,Deferasirox,Compound
+Compound::DB01614,Acepromazine,Compound
+Compound::DB01615,Aceprometazine,Compound
+Compound::DB01616,Alverine,Compound
+Compound::DB04841,Flunarizine,Compound
+Compound::DB04842,Fluspirilene,Compound
+Compound::DB04861,Nebivolol,Compound
+Compound::DB04877,Voacamine,Compound
+Compound::DB04920,Clevidipine,Compound
+Compound::DB04948,Lofexidine,Compound
+Compound::DB06203,Alogliptin,Compound
+Compound::DB06209,Prasugrel,Compound
+Compound::DB06218,Lacosamide,Compound
+Compound::DB06262,Droxidopa,Compound
+Compound::DB06274,Alvimopan,Compound
+Compound::DB06689,Ethanolamine Oleate,Compound
+Compound::DB06691,Mepyramine,Compound
+Compound::DB06707,Levonordefrin,Compound
+Compound::DB06710,Methyltestosterone,Compound
+Compound::DB06711,Naphazoline,Compound
+Compound::DB06712,Nilvadipine,Compound
+Compound::DB08797,Salicylamide,Compound
+Compound::DB08799,Antazoline,Compound
+Compound::DB08800,Chloropyramine,Compound
+Compound::DB08807,Bopindolol,Compound
+Compound::DB08808,Bupranolol,Compound
+Compound::DB08811,Tofisopam,Compound
+Compound::DB08816,Ticagrelor,Compound
+Compound::DB08822,Azilsartan medoxomil,Compound
+Compound::DB08860,Pitavastatin,Compound
+Compound::DB08882,Linagliptin,Compound
+Compound::DB08893,Mirabegron,Compound
+Compound::DB08941,Isoxsuprine,Compound
+Compound::DB08954,Ifenprodil,Compound
+Compound::DB08983,Etofibrate,Compound
+Compound::DB08990,Eprazinone,Compound
+Compound::DB08996,Dimetacrine,Compound
+Compound::DB08998,Demexiptiline,Compound
+Compound::DB09000,Cyamemazine,Compound
+Compound::DB09015,Potassium Canrenoate,Compound
+Disease::DOID:0050425,restless legs syndrome,Disease
+Disease::DOID:10763,hypertension,Disease
+Disease::DOID:1094,attention deficit hyperactivity disorder,Disease
+Disease::DOID:11119,Gilles de la Tourette syndrome,Disease
+Disease::DOID:11612,polycystic ovary syndrome,Disease
+Disease::DOID:11714,gestational diabetes,Disease
+Disease::DOID:12849,autistic disorder,Disease
+Disease::DOID:12930,dilated cardiomyopathy,Disease
+Disease::DOID:13189,gout,Disease
+Disease::DOID:13378,Kawasaki disease,Disease
+Disease::DOID:14221,metabolic syndrome X,Disease
+Disease::DOID:14330,Parkinson's disease,Disease
+Disease::DOID:1686,glaucoma,Disease
+Disease::DOID:1936,atherosclerosis,Disease
+Disease::DOID:3393,coronary artery disease,Disease
+Disease::DOID:418,systemic scleroderma,Disease
+Disease::DOID:585,nephrolithiasis,Disease
+Disease::DOID:6364,migraine,Disease
+Disease::DOID:7148,rheumatoid arthritis,Disease
+Disease::DOID:784,chronic kidney failure,Disease
+Disease::DOID:8398,osteoarthritis,Disease
+Disease::DOID:9074,systemic lupus erythematosus,Disease
+Disease::DOID:9352,type 2 diabetes mellitus,Disease
+Disease::DOID:9744,type 1 diabetes mellitus,Disease
+Disease::DOID:9970,obesity,Disease
+Gene::10007,GNPDA1,Gene
+Gene::10013,HDAC6,Gene
+Gene::100287932,TIMM23,Gene
+Gene::10038,PARP2,Gene
+Gene::10039,PARP3,Gene
+Gene::10043,TOM1,Gene
+Gene::10049,DNAJB6,Gene
+Gene::10051,SMC4,Gene
+Gene::10057,ABCC5,Gene
+Gene::10058,ABCB6,Gene
+Gene::10059,DNM1L,Gene
+Gene::10060,ABCC9,Gene
+Gene::10061,ABCF2,Gene
+Gene::100861540,CYP3A7-CYP3A51P,Gene
+Gene::10099,TSPAN3,Gene
+Gene::10112,KIF20A,Gene
+Gene::10123,ARL4C,Gene
+Gene::10131,TRAP1,Gene
+Gene::10137,RBM12,Gene
+Gene::10146,G3BP1,Gene
+Gene::10153,CEBPZ,Gene
+Gene::10165,SLC25A13,Gene
+Gene::10180,RBM6,Gene
+Gene::1019,CDK4,Gene
+Gene::10190,TXNDC9,Gene
+Gene::10196,PRMT3,Gene
+Gene::10197,PSME3,Gene
+Gene::10206,TRIM13,Gene
+Gene::1021,CDK6,Gene
+Gene::10212,DDX39A,Gene
+Gene::1022,CDK7,Gene
+Gene::10221,TRIB1,Gene
+Gene::10237,SLC35B1,Gene
+Gene::10248,POP7,Gene
+Gene::10257,ABCC4,Gene
+Gene::1026,CDKN1A,Gene
+Gene::10273,STUB1,Gene
+Gene::10276,NET1,Gene
+Gene::10282,BET1,Gene
+Gene::10285,SMNDC1,Gene
+Gene::10320,IKZF1,Gene
+Gene::10328,EMC8,Gene
+Gene::1033,CDKN3,Gene
+Gene::10347,ABCA7,Gene
+Gene::10351,ABCA8,Gene
+Gene::10362,HMG20B,Gene
+Gene::10365,KLF2,Gene
+Gene::10379,IRF9,Gene
+Gene::10398,MYL9,Gene
+Gene::10409,BASP1,Gene
+Gene::10419,PRMT5,Gene
+Gene::10434,LYPLA1,Gene
+Gene::10436,EMG1,Gene
+Gene::10452,TOMM40,Gene
+Gene::10460,TACC3,Gene
+Gene::10465,PPIH,Gene
+Gene::10482,NXF1,Gene
+Gene::10491,CRTAP,Gene
+Gene::10493,VAT1,Gene
+Gene::1050,CEBPA,Gene
+Gene::1051,CEBPB,Gene
+Gene::10513,APPBP2,Gene
+Gene::1052,CEBPD,Gene
+Gene::10523,CHERP,Gene
+Gene::10524,KAT5,Gene
+Gene::10525,HYOU1,Gene
+Gene::10528,NOP56,Gene
+Gene::10541,ANP32B,Gene
+Gene::10551,AGR2,Gene
+Gene::10556,RPP30,Gene
+Gene::10557,RPP38,Gene
+Gene::10559,SLC35A1,Gene
+Gene::10567,RABAC1,Gene
+Gene::10572,SIVA1,Gene
+Gene::1058,CENPA,Gene
+Gene::10589,DRAP1,Gene
+Gene::10599,SLCO1B1,Gene
+Gene::10606,PAICS,Gene
+Gene::10610,ST6GALNAC2,Gene
+Gene::10628,TXNIP,Gene
+Gene::10635,RAD51AP1,Gene
+Gene::10641,NPRL2,Gene
+Gene::1066,CES1,Gene
+Gene::10668,CGRRF1,Gene
+Gene::10682,EBP,Gene
+Gene::10695,CNPY3,Gene
+Gene::1070,CETN3,Gene
+Gene::10730,YME1L1,Gene
+Gene::10775,POP4,Gene
+Gene::10776,ARPP19,Gene
+Gene::10782,ZNF274,Gene
+Gene::10797,MTHFD2,Gene
+Gene::1080,CFTR,Gene
+Gene::10810,WASF3,Gene
+Gene::10813,UTP14A,Gene
+Gene::10818,FRS2,Gene
+Gene::10826,FAXDC2,Gene
+Gene::10849,CD3EAP,Gene
+Gene::10864,SLC22A7,Gene
+Gene::10885,WDR3,Gene
+Gene::10898,CPSF4,Gene
+Gene::10903,MTMR11,Gene
+Gene::10904,BLCAP,Gene
+Gene::10915,TCERG1,Gene
+Gene::10926,DBF4,Gene
+Gene::10940,POP1,Gene
+Gene::10953,TOMM34,Gene
+Gene::10954,PDIA5,Gene
+Gene::10956,OS9,Gene
+Gene::10957,PNRC1,Gene
+Gene::10962,MLLT11,Gene
+Gene::10969,EBNA1BP2,Gene
+Gene::10973,ASCC3,Gene
+Gene::11000,SLC27A3,Gene
+Gene::11001,SLC27A2,Gene
+Gene::11004,KIF2C,Gene
+Gene::11031,RAB31,Gene
+Gene::11041,B4GAT1,Gene
+Gene::11044,PAPD7,Gene
+Gene::1105,CHD1,Gene
+Gene::11065,UBE2C,Gene
+Gene::11072,DUSP14,Gene
+Gene::11073,TOPBP1,Gene
+Gene::11078,TRIOBP,Gene
+Gene::11098,PRSS23,Gene
+Gene::11130,ZWINT,Gene
+Gene::11151,CORO1A,Gene
+Gene::11152,WDR45,Gene
+Gene::11157,LSM6,Gene
+Gene::11161,C14orf1,Gene
+Gene::11182,SLC2A6,Gene
+Gene::11188,NISCH,Gene
+Gene::11197,WIF1,Gene
+Gene::11200,CHEK2,Gene
+Gene::11222,MRPL3,Gene
+Gene::1123,CHN1,Gene
+Gene::11230,PRAF2,Gene
+Gene::11232,POLG2,Gene
+Gene::11238,CA5B,Gene
+Gene::11264,PXMP4,Gene
+Gene::1128,CHRM1,Gene
+Gene::11284,PNKP,Gene
+Gene::1129,CHRM2,Gene
+Gene::11309,SLCO2B1,Gene
+Gene::1131,CHRM3,Gene
+Gene::11319,ECD,Gene
+Gene::1132,CHRM4,Gene
+Gene::11325,DDX42,Gene
+Gene::1133,CHRM5,Gene
+Gene::11335,CBX3,Gene
+Gene::11339,OIP5,Gene
+Gene::11340,EXOSC8,Gene
+Gene::11344,TWF2,Gene
+Gene::1135,CHRNA2,Gene
+Gene::1136,CHRNA3,Gene
+Gene::114049,WBSCR22,Gene
+Gene::1143,CHRNB4,Gene
+Gene::114884,OSBPL10,Gene
+Gene::115817,DHRS1,Gene
+Gene::116085,SLC22A12,Gene
+Gene::116832,RPL39L,Gene
+Gene::12,SERPINA3,Gene
+Gene::1212,CLTB,Gene
+Gene::1213,CLTC,Gene
+Gene::1244,ABCC2,Gene
+Gene::126328,NDUFA11,Gene
+Gene::1301,COL11A1,Gene
+Gene::1312,COMT,Gene
+Gene::132,ADK,Gene
+Gene::133,ADM,Gene
+Gene::1373,CPS1,Gene
+Gene::1374,CPT1A,Gene
+Gene::1385,CREB1,Gene
+Gene::1396,CRIP1,Gene
+Gene::1399,CRKL,Gene
+Gene::142,PARP1,Gene
+Gene::1429,CRYZ,Gene
+Gene::1434,CSE1L,Gene
+Gene::1459,CSNK2A2,Gene
+Gene::146,ADRA1D,Gene
+Gene::1465,CSRP1,Gene
+Gene::146909,KIF18B,Gene
+Gene::147,ADRA1B,Gene
+Gene::1475,CSTA,Gene
+Gene::1479,CSTF3,Gene
+Gene::148,ADRA1A,Gene
+Gene::148022,TICAM1,Gene
+Gene::1490,CTGF,Gene
+Gene::150,ADRA2A,Gene
+Gene::1500,CTNND1,Gene
+Gene::1503,CTPS1,Gene
+Gene::1509,CTSD,Gene
+Gene::151,ADRA2B,Gene
+Gene::1514,CTSL,Gene
+Gene::152,ADRA2C,Gene
+Gene::153,ADRB1,Gene
+Gene::1537,CYC1,Gene
+Gene::154,ADRB2,Gene
+Gene::1543,CYP1A1,Gene
+Gene::1544,CYP1A2,Gene
+Gene::1545,CYP1B1,Gene
+Gene::1548,CYP2A6,Gene
+Gene::155,ADRB3,Gene
+Gene::1551,CYP3A7,Gene
+Gene::1555,CYP2B6,Gene
+Gene::1557,CYP2C19,Gene
+Gene::1558,CYP2C8,Gene
+Gene::1559,CYP2C9,Gene
+Gene::1562,CYP2C18,Gene
+Gene::1565,CYP2D6,Gene
+Gene::1571,CYP2E1,Gene
+Gene::1576,CYP3A4,Gene
+Gene::1577,CYP3A5,Gene
+Gene::1584,CYP11B1,Gene
+Gene::158471,PRUNE2,Gene
+Gene::1585,CYP11B2,Gene
+Gene::1595,CYP51A1,Gene
+Gene::16,AARS,Gene
+Gene::160728,SLC5A8,Gene
+Gene::1633,DCK,Gene
+Gene::1636,ACE,Gene
+Gene::1643,DDB2,Gene
+Gene::1644,DDC,Gene
+Gene::1645,AKR1C1,Gene
+Gene::1646,AKR1C2,Gene
+Gene::1647,GADD45A,Gene
+Gene::1649,DDIT3,Gene
+Gene::1662,DDX10,Gene
+Gene::1666,DECR1,Gene
+Gene::1672,DEFB1,Gene
+Gene::1676,DFFA,Gene
+Gene::1677,DFFB,Gene
+Gene::169611,OLFML2A,Gene
+Gene::1717,DHCR7,Gene
+Gene::1718,DHCR24,Gene
+Gene::1723,DHODH,Gene
+Gene::1727,CYB5R3,Gene
+Gene::1738,DLD,Gene
+Gene::1759,DNM1,Gene
+Gene::1786,DNMT1,Gene
+Gene::1788,DNMT3A,Gene
+Gene::1802,DPH2,Gene
+Gene::1803,DPP4,Gene
+Gene::1812,DRD1,Gene
+Gene::1813,DRD2,Gene
+Gene::1814,DRD3,Gene
+Gene::1815,DRD4,Gene
+Gene::1816,DRD5,Gene
+Gene::1831,TSC22D3,Gene
+Gene::1841,DTYMK,Gene
+Gene::1846,DUSP4,Gene
+Gene::185,AGTR1,Gene
+Gene::1861,TOR1A,Gene
+Gene::1891,ECH1,Gene
+Gene::19,ABCA1,Gene
+Gene::1906,EDN1,Gene
+Gene::1909,EDNRA,Gene
+Gene::1917,EEF1A2,Gene
+Gene::1950,EGF,Gene
+Gene::1958,EGR1,Gene
+Gene::196,AHR,Gene
+Gene::1978,EIF4EBP1,Gene
+Gene::1983,EIF5,Gene
+Gene::1994,ELAVL1,Gene
+Gene::200081,TXLNA,Gene
+Gene::200734,SPRED2,Gene
+Gene::201254,STRA13,Gene
+Gene::2034,EPAS1,Gene
+Gene::2037,EPB41L2,Gene
+Gene::2042,EPHA3,Gene
+Gene::2065,ERBB3,Gene
+Gene::2109,ETFB,Gene
+Gene::211,ALAS1,Gene
+Gene::2113,ETS1,Gene
+Gene::213,ALB,Gene
+Gene::2131,EXT1,Gene
+Gene::2146,EZH2,Gene
+Gene::2147,F2,Gene
+Gene::2167,FABP4,Gene
+Gene::2171,FABP5,Gene
+Gene::2182,ACSL4,Gene
+Gene::2185,PTK2B,Gene
+Gene::2194,FASN,Gene
+Gene::221955,DAGLB,Gene
+Gene::2222,FDFT1,Gene
+Gene::2224,FDPS,Gene
+Gene::222962,SLC29A4,Gene
+Gene::2237,FEN1,Gene
+Gene::2263,FGFR2,Gene
+Gene::2264,FGFR4,Gene
+Gene::2274,FHL2,Gene
+Gene::22794,CASC3,Gene
+Gene::22796,COG2,Gene
+Gene::22809,ATF5,Gene
+Gene::22827,PUF60,Gene
+Gene::22856,CHSY1,Gene
+Gene::2287,FKBP3,Gene
+Gene::22875,ENPP4,Gene
+Gene::2288,FKBP4,Gene
+Gene::22887,FOXJ3,Gene
+Gene::22889,KIAA0907,Gene
+Gene::22905,EPN2,Gene
+Gene::22908,SACM1L,Gene
+Gene::22926,ATF6,Gene
+Gene::22934,RPIA,Gene
+Gene::22948,CCT5,Gene
+Gene::23,ABCF1,Gene
+Gene::230,ALDOC,Gene
+Gene::23029,RBM34,Gene
+Gene::23038,WDTC1,Gene
+Gene::23042,PDXDC1,Gene
+Gene::23047,PDS5B,Gene
+Gene::23076,RRP1B,Gene
+Gene::23082,PPRC1,Gene
+Gene::23089,PEG10,Gene
+Gene::2309,FOXO3,Gene
+Gene::23091,ZC3H13,Gene
+Gene::23097,CDK19,Gene
+Gene::23113,CUL9,Gene
+Gene::23129,PLXND1,Gene
+Gene::23131,GPATCH8,Gene
+Gene::23152,CIC,Gene
+Gene::23160,WDR43,Gene
+Gene::23161,SNX13,Gene
+Gene::23165,NUP205,Gene
+Gene::23180,RFTN1,Gene
+Gene::23193,GANAB,Gene
+Gene::23200,ATP11B,Gene
+Gene::23210,JMJD6,Gene
+Gene::23212,RRS1,Gene
+Gene::23214,XPO6,Gene
+Gene::23223,RRP12,Gene
+Gene::23224,SYNE2,Gene
+Gene::23244,PDS5A,Gene
+Gene::23246,BOP1,Gene
+Gene::23271,CAMSAP2,Gene
+Gene::23326,USP22,Gene
+Gene::23335,WDR7,Gene
+Gene::23338,JADE2,Gene
+Gene::23344,ESYT1,Gene
+Gene::23368,PPP1R13B,Gene
+Gene::23371,TNS2,Gene
+Gene::23378,RRP8,Gene
+Gene::23383,MAU2,Gene
+Gene::23386,NUDCD3,Gene
+Gene::23397,NCAPH,Gene
+Gene::23404,EXOSC2,Gene
+Gene::23406,COTL1,Gene
+Gene::23421,ITGB3BP,Gene
+Gene::23443,SLC35A3,Gene
+Gene::23475,QPRT,Gene
+Gene::23512,SUZ12,Gene
+Gene::23522,KAT6B,Gene
+Gene::23530,NNT,Gene
+Gene::23555,TSPAN15,Gene
+Gene::2356,FPGS,Gene
+Gene::23564,DDAH2,Gene
+Gene::23576,DDAH1,Gene
+Gene::23585,TMEM50A,Gene
+Gene::23588,KLHDC2,Gene
+Gene::23590,PDSS1,Gene
+Gene::23597,ACOT9,Gene
+Gene::23609,MKRN2,Gene
+Gene::23623,RUSC1,Gene
+Gene::23632,CA14,Gene
+Gene::23635,SSBP2,Gene
+Gene::23636,NUP62,Gene
+Gene::23647,ARFIP2,Gene
+Gene::23649,POLA2,Gene
+Gene::23657,SLC7A11,Gene
+Gene::23658,LSM5,Gene
+Gene::23659,PLA2G15,Gene
+Gene::23670,TMEM2,Gene
+Gene::23787,MTCH1,Gene
+Gene::2395,FXN,Gene
+Gene::24147,FJX1,Gene
+Gene::24149,ZNF318,Gene
+Gene::25,ABL1,Gene
+Gene::2523,FUT1,Gene
+Gene::2548,GAA,Gene
+Gene::2553,GABPB1,Gene
+Gene::256364,EML3,Gene
+Gene::25844,YIPF3,Gene
+Gene::25915,NDUFAF3,Gene
+Gene::25926,NOL11,Gene
+Gene::25949,SYF2,Gene
+Gene::2595,GANC,Gene
+Gene::25966,C2CD2,Gene
+Gene::25976,TIPARP,Gene
+Gene::25987,TSKU,Gene
+Gene::26,AOC1,Gene
+Gene::26001,RNF167,Gene
+Gene::26007,TKFC,Gene
+Gene::26020,LRP10,Gene
+Gene::26057,ANKRD17,Gene
+Gene::26090,ABHD12,Gene
+Gene::26136,TES,Gene
+Gene::26155,NOC2L,Gene
+Gene::26227,PHGDH,Gene
+Gene::2624,GATA2,Gene
+Gene::26277,TINF2,Gene
+Gene::26292,MYCBP,Gene
+Gene::26354,GNL3,Gene
+Gene::26471,NUPR1,Gene
+Gene::26511,CHIC2,Gene
+Gene::26519,TIMM10,Gene
+Gene::26520,TIMM9,Gene
+Gene::2664,GDI1,Gene
+Gene::2673,GFPT1,Gene
+Gene::2690,GHR,Gene
+Gene::26959,HBP1,Gene
+Gene::2697,GJA1,Gene
+Gene::26973,CHORDC1,Gene
+Gene::26993,AKAP8L,Gene
+Gene::27122,DKK3,Gene
+Gene::27175,TUBG2,Gene
+Gene::27242,TNFRSF21,Gene
+Gene::27244,SESN1,Gene
+Gene::27258,LSM3,Gene
+Gene::27292,DIMT1,Gene
+Gene::2730,GCLM,Gene
+Gene::27332,ZNF638,Gene
+Gene::27336,HTATSF1,Gene
+Gene::27338,UBE2S,Gene
+Gene::27340,UTP20,Gene
+Gene::27341,RRP7A,Gene
+Gene::27346,TMEM97,Gene
+Gene::2745,GLRX,Gene
+Gene::276,AMY1A,Gene
+Gene::2762,GMDS,Gene
+Gene::2769,GNA15,Gene
+Gene::277,AMY1B,Gene
+Gene::2771,GNAI2,Gene
+Gene::2778,GNAS,Gene
+Gene::278,AMY1C,Gene
+Gene::279,AMY2A,Gene
+Gene::2804,GOLGB1,Gene
+Gene::2817,GPC1,Gene
+Gene::28234,SLCO1B3,Gene
+Gene::2852,GPER1,Gene
+Gene::2886,GRB7,Gene
+Gene::2887,GRB10,Gene
+Gene::28957,MRPS28,Gene
+Gene::2896,GRN,Gene
+Gene::28960,DCPS,Gene
+Gene::28969,BZW2,Gene
+Gene::28977,MRPL42,Gene
+Gene::28998,MRPL13,Gene
+Gene::290,ANPEP,Gene
+Gene::29078,NDUFAF4,Gene
+Gene::2908,NR3C1,Gene
+Gene::29082,CHMP4A,Gene
+Gene::29083,GTPBP8,Gene
+Gene::291,SLC25A4,Gene
+Gene::29103,DNAJC15,Gene
+Gene::29107,NXT1,Gene
+Gene::2920,CXCL2,Gene
+Gene::2934,GSN,Gene
+Gene::2935,GSPT1,Gene
+Gene::2939,GSTA2,Gene
+Gene::2941,GSTA4,Gene
+Gene::2958,GTF2A2,Gene
+Gene::29763,PACSIN3,Gene
+Gene::29881,NPC1L1,Gene
+Gene::29883,CNOT7,Gene
+Gene::29890,RBM15B,Gene
+Gene::29902,FAM216A,Gene
+Gene::29911,HOOK2,Gene
+Gene::29916,SNX11,Gene
+Gene::29919,C18orf8,Gene
+Gene::29925,GMPPB,Gene
+Gene::29978,UBQLN2,Gene
+Gene::3028,HSD17B10,Gene
+Gene::3033,HADH,Gene
+Gene::3043,HBB,Gene
+Gene::3066,HDAC2,Gene
+Gene::307,ANXA4,Gene
+Gene::30836,DNTTIP2,Gene
+Gene::30846,EHD2,Gene
+Gene::3091,HIF1A,Gene
+Gene::310,ANXA7,Gene
+Gene::3104,ZBTB48,Gene
+Gene::3105,HLA-A,Gene
+Gene::3106,HLA-B,Gene
+Gene::3107,HLA-C,Gene
+Gene::3108,HLA-DMA,Gene
+Gene::3122,HLA-DRA,Gene
+Gene::3134,HLA-F,Gene
+Gene::3135,HLA-G,Gene
+Gene::3156,HMGCR,Gene
+Gene::3157,HMGCS1,Gene
+Gene::3162,HMOX1,Gene
+Gene::3223,HOXC6,Gene
+Gene::323,APBB2,Gene
+Gene::3251,HPRT1,Gene
+Gene::3276,PRMT1,Gene
+Gene::3300,DNAJB2,Gene
+Gene::3303,HSPA1A,Gene
+Gene::3309,HSPA5,Gene
+Gene::3312,HSPA8,Gene
+Gene::3315,HSPB1,Gene
+Gene::332,BIRC5,Gene
+Gene::3329,HSPD1,Gene
+Gene::3336,HSPE1,Gene
+Gene::3337,DNAJB1,Gene
+Gene::3339,HSPG2,Gene
+Gene::3340,NDST1,Gene
+Gene::3350,HTR1A,Gene
+Gene::3351,HTR1B,Gene
+Gene::3352,HTR1D,Gene
+Gene::3356,HTR2A,Gene
+Gene::3357,HTR2B,Gene
+Gene::3358,HTR2C,Gene
+Gene::3362,HTR6,Gene
+Gene::3363,HTR7,Gene
+Gene::3376,IARS,Gene
+Gene::338442,HCAR2,Gene
+Gene::3385,ICAM3,Gene
+Gene::3396,ICT1,Gene
+Gene::3417,IDH1,Gene
+Gene::3422,IDI1,Gene
+Gene::3454,IFNAR1,Gene
+Gene::347902,AMIGO2,Gene
+Gene::3480,IGF1R,Gene
+Gene::3486,IGFBP3,Gene
+Gene::3491,CYR61,Gene
+Gene::3508,IGHMBP2,Gene
+Gene::355,FAS,Gene
+Gene::3551,IKBKB,Gene
+Gene::3553,IL1B,Gene
+Gene::3566,IL4R,Gene
+Gene::3576,CXCL8,Gene
+Gene::3597,IL13RA1,Gene
+Gene::3612,IMPA1,Gene
+Gene::3628,INPP1,Gene
+Gene::3638,INSIG1,Gene
+Gene::367,AR,Gene
+Gene::3674,ITGA2B,Gene
+Gene::3678,ITGA5,Gene
+Gene::3682,ITGAE,Gene
+Gene::3683,ITGAL,Gene
+Gene::3689,ITGB2,Gene
+Gene::3690,ITGB3,Gene
+Gene::37,ACADVL,Gene
+Gene::3720,JARID2,Gene
+Gene::3725,JUN,Gene
+Gene::3728,JUP,Gene
+Gene::3736,KCNA1,Gene
+Gene::374291,NDUFS7,Gene
+Gene::3753,KCNE1,Gene
+Gene::375346,TMEM110,Gene
+Gene::3757,KCNH2,Gene
+Gene::3758,KCNJ1,Gene
+Gene::3762,KCNJ5,Gene
+Gene::3767,KCNJ11,Gene
+Gene::3778,KCNMA1,Gene
+Gene::3784,KCNQ1,Gene
+Gene::3797,KIF3C,Gene
+Gene::3815,KIT,Gene
+Gene::3838,KPNA2,Gene
+Gene::3853,KRT6A,Gene
+Gene::3855,KRT7,Gene
+Gene::387,RHOA,Gene
+Gene::3875,KRT18,Gene
+Gene::387509,GPR153,Gene
+Gene::388650,FAM69A,Gene
+Gene::3895,KTN1,Gene
+Gene::39,ACAT2,Gene
+Gene::390,RND3,Gene
+Gene::3909,LAMA3,Gene
+Gene::392,ARHGAP1,Gene
+Gene::3930,LBR,Gene
+Gene::3945,LDHB,Gene
+Gene::3949,LDLR,Gene
+Gene::3978,LIG1,Gene
+Gene::3988,LIPA,Gene
+Gene::3992,FADS1,Gene
+Gene::40,ASIC2,Gene
+Gene::4043,LRPAP1,Gene
+Gene::4047,LSS,Gene
+Gene::4048,LTA4H,Gene
+Gene::4085,MAD2L1,Gene
+Gene::41,ASIC1,Gene
+Gene::4118,MAL,Gene
+Gene::4125,MAN2B1,Gene
+Gene::4154,MBNL1,Gene
+Gene::4171,MCM2,Gene
+Gene::4172,MCM3,Gene
+Gene::4173,MCM4,Gene
+Gene::4175,MCM6,Gene
+Gene::4176,MCM7,Gene
+Gene::4200,ME2,Gene
+Gene::4216,MAP3K4,Gene
+Gene::4232,MEST,Gene
+Gene::4240,MFGE8,Gene
+Gene::4258,MGST2,Gene
+Gene::4282,MIF,Gene
+Gene::4292,MLH1,Gene
+Gene::4303,FOXO4,Gene
+Gene::4306,NR3C2,Gene
+Gene::4312,MMP1,Gene
+Gene::4313,MMP2,Gene
+Gene::4318,MMP9,Gene
+Gene::4331,MNAT1,Gene
+Gene::4335,MNT,Gene
+Gene::4363,ABCC1,Gene
+Gene::440,ASNS,Gene
+Gene::4478,MSN,Gene
+Gene::4482,MSRA,Gene
+Gene::4495,MT1G,Gene
+Gene::4502,MT2A,Gene
+Gene::4504,MT3,Gene
+Gene::4522,MTHFD1,Gene
+Gene::4524,MTHFR,Gene
+Gene::4535,ND1,Gene
+Gene::4536,ND2,Gene
+Gene::4537,ND3,Gene
+Gene::4538,ND4,Gene
+Gene::4539,ND4L,Gene
+Gene::4540,ND5,Gene
+Gene::4541,ND6,Gene
+Gene::4582,MUC1,Gene
+Gene::4597,MVD,Gene
+Gene::4605,MYBL2,Gene
+Gene::4609,MYC,Gene
+Gene::4616,GADD45B,Gene
+Gene::4651,MYO10,Gene
+Gene::466,ATF1,Gene
+Gene::467,ATF3,Gene
+Gene::4686,NCBP1,Gene
+Gene::4694,NDUFA1,Gene
+Gene::4695,NDUFA2,Gene
+Gene::4696,NDUFA3,Gene
+Gene::4697,NDUFA4,Gene
+Gene::4698,NDUFA5,Gene
+Gene::47,ACLY,Gene
+Gene::4700,NDUFA6,Gene
+Gene::4701,NDUFA7,Gene
+Gene::4702,NDUFA8,Gene
+Gene::4704,NDUFA9,Gene
+Gene::4705,NDUFA10,Gene
+Gene::4706,NDUFAB1,Gene
+Gene::4707,NDUFB1,Gene
+Gene::4708,NDUFB2,Gene
+Gene::4709,NDUFB3,Gene
+Gene::4710,NDUFB4,Gene
+Gene::4711,NDUFB5,Gene
+Gene::4712,NDUFB6,Gene
+Gene::4713,NDUFB7,Gene
+Gene::4714,NDUFB8,Gene
+Gene::4715,NDUFB9,Gene
+Gene::4716,NDUFB10,Gene
+Gene::4717,NDUFC1,Gene
+Gene::4718,NDUFC2,Gene
+Gene::4719,NDUFS1,Gene
+Gene::4720,NDUFS2,Gene
+Gene::4722,NDUFS3,Gene
+Gene::4723,NDUFV1,Gene
+Gene::4724,NDUFS4,Gene
+Gene::4725,NDUFS5,Gene
+Gene::4726,NDUFS6,Gene
+Gene::4728,NDUFS8,Gene
+Gene::4729,NDUFV2,Gene
+Gene::4731,NDUFV3,Gene
+Gene::4758,NEU1,Gene
+Gene::476,ATP1A1,Gene
+Gene::4775,NFATC3,Gene
+Gene::4776,NFATC4,Gene
+Gene::4783,NFIL3,Gene
+Gene::4792,NFKBIA,Gene
+Gene::4794,NFKBIE,Gene
+Gene::4817,NIT1,Gene
+Gene::4830,NME1,Gene
+Gene::4833,NME4,Gene
+Gene::4837,NNMT,Gene
+Gene::4839,NOP2,Gene
+Gene::4850,CNOT4,Gene
+Gene::4851,NOTCH1,Gene
+Gene::4860,PNP,Gene
+Gene::4864,NPC1,Gene
+Gene::4879,NPPB,Gene
+Gene::4885,NPTX2,Gene
+Gene::4925,NUCB2,Gene
+Gene::4927,NUP88,Gene
+Gene::4931,NVL,Gene
+Gene::4998,ORC1,Gene
+Gene::4999,ORC2,Gene
+Gene::5004,ORM1,Gene
+Gene::5018,OXA1L,Gene
+Gene::5019,OXCT1,Gene
+Gene::5033,P4HA1,Gene
+Gene::5036,PA2G4,Gene
+Gene::5037,PEBP1,Gene
+Gene::5054,SERPINE1,Gene
+Gene::5058,PAK1,Gene
+Gene::50628,GEMIN4,Gene
+Gene::50810,HDGFRP3,Gene
+Gene::50814,NSDHL,Gene
+Gene::5096,PCCB,Gene
+Gene::51001,MTERF3,Gene
+Gene::51005,AMDHD2,Gene
+Gene::51015,ISOC1,Gene
+Gene::51018,RRP15,Gene
+Gene::51021,MRPS16,Gene
+Gene::51026,GOLT1B,Gene
+Gene::51031,GLOD4,Gene
+Gene::51053,GMNN,Gene
+Gene::51056,LAP3,Gene
+Gene::5106,PCK2,Gene
+Gene::51070,NOSIP,Gene
+Gene::51075,TMX2,Gene
+Gene::51079,NDUFA13,Gene
+Gene::5108,PCM1,Gene
+Gene::51081,MRPS7,Gene
+Gene::51096,UTP18,Gene
+Gene::51103,NDUFAF1,Gene
+Gene::51106,TFB1M,Gene
+Gene::5111,PCNA,Gene
+Gene::51115,RMDN1,Gene
+Gene::51116,MRPS2,Gene
+Gene::51121,RPL26L1,Gene
+Gene::51154,MRTO4,Gene
+Gene::51170,HSD17B11,Gene
+Gene::51171,HSD17B14,Gene
+Gene::51182,HSPA14,Gene
+Gene::51184,GPN3,Gene
+Gene::51202,DDX47,Gene
+Gene::51203,NUSAP1,Gene
+Gene::51257,MARCH2,Gene
+Gene::51278,IER5,Gene
+Gene::51282,SCAND1,Gene
+Gene::51293,CD320,Gene
+Gene::51319,RSRC1,Gene
+Gene::5136,PDE1A,Gene
+Gene::51362,CDC40,Gene
+Gene::51375,SNX7,Gene
+Gene::51379,CRLF3,Gene
+Gene::51382,ATP6V1D,Gene
+Gene::51385,ZNF589,Gene
+Gene::51388,NIP7,Gene
+Gene::51422,PRKAG2,Gene
+Gene::51441,YTHDF2,Gene
+Gene::51466,EVL,Gene
+Gene::51478,HSD17B7,Gene
+Gene::51491,NOP16,Gene
+Gene::51495,HACD3,Gene
+Gene::51514,DTL,Gene
+Gene::5153,PDE1B,Gene
+Gene::51599,LSR,Gene
+Gene::5164,PDK2,Gene
+Gene::51646,YPEL5,Gene
+Gene::51650,MRPS33,Gene
+Gene::51651,PTRH2,Gene
+Gene::51659,GINS2,Gene
+Gene::51691,LSM8,Gene
+Gene::51719,CAB39,Gene
+Gene::51728,POLR3K,Gene
+Gene::5198,PFAS,Gene
+Gene::5201,PFDN1,Gene
+Gene::5223,PGAM1,Gene
+Gene::5226,PGD,Gene
+Gene::5241,PGR,Gene
+Gene::5243,ABCB1,Gene
+Gene::5252,PHF1,Gene
+Gene::5255,PHKA1,Gene
+Gene::5257,PHKB,Gene
+Gene::5261,PHKG2,Gene
+Gene::5300,PIN1,Gene
+Gene::5321,PLA2G4A,Gene
+Gene::5328,PLAU,Gene
+Gene::533,ATP6V0B,Gene
+Gene::5331,PLCB3,Gene
+Gene::5347,PLK1,Gene
+Gene::5359,PLSCR1,Gene
+Gene::5366,PMAIP1,Gene
+Gene::5373,PMM2,Gene
+Gene::5393,EXOSC9,Gene
+Gene::5406,PNLIP,Gene
+Gene::54069,MIS18A,Gene
+Gene::54107,POLE3,Gene
+Gene::54205,CYCS,Gene
+Gene::5427,POLE2,Gene
+Gene::5438,POLR2I,Gene
+Gene::5440,POLR2K,Gene
+Gene::54438,GFOD1,Gene
+Gene::54442,KCTD5,Gene
+Gene::5446,PON3,Gene
+Gene::54475,NLE1,Gene
+Gene::54499,TMCO1,Gene
+Gene::54504,CPVL,Gene
+Gene::54512,EXOSC4,Gene
+Gene::54517,PUS7,Gene
+Gene::54521,WDR44,Gene
+Gene::54539,NDUFB11,Gene
+Gene::54541,DDIT4,Gene
+Gene::54575,UGT1A10,Gene
+Gene::54600,UGT1A9,Gene
+Gene::54623,PAF1,Gene
+Gene::5464,PPA1,Gene
+Gene::5465,PPARA,Gene
+Gene::54658,UGT1A1,Gene
+Gene::54659,UGT1A3,Gene
+Gene::5467,PPARD,Gene
+Gene::5468,PPARG,Gene
+Gene::54680,ZNHIT6,Gene
+Gene::5471,PPAT,Gene
+Gene::54733,SLC35F2,Gene
+Gene::54807,ZNF586,Gene
+Gene::54821,ERCC6L,Gene
+Gene::54881,TEX10,Gene
+Gene::54908,SPDL1,Gene
+Gene::54927,CHCHD3,Gene
+Gene::54929,TMEM161A,Gene
+Gene::54962,TIPIN,Gene
+Gene::5498,PPOX,Gene
+Gene::55003,PAK1IP1,Gene
+Gene::55008,HERC6,Gene
+Gene::55012,PPP2R3C,Gene
+Gene::55038,CDCA4,Gene
+Gene::55055,ZWILCH,Gene
+Gene::55062,WIPI1,Gene
+Gene::55108,BSDC1,Gene
+Gene::55127,HEATR1,Gene
+Gene::55129,ANO10,Gene
+Gene::55131,RBM28,Gene
+Gene::55143,CDCA8,Gene
+Gene::55146,ZDHHC4,Gene
+Gene::55148,UBR7,Gene
+Gene::55149,MTPAP,Gene
+Gene::55152,DALRD3,Gene
+Gene::55159,RFWD3,Gene
+Gene::55161,TMEM33,Gene
+Gene::5520,PPP2R2A,Gene
+Gene::55209,SETD5,Gene
+Gene::55215,FANCI,Gene
+Gene::55219,TMEM57,Gene
+Gene::55226,NAT10,Gene
+Gene::55244,SLC47A1,Gene
+Gene::5525,PPP2R5A,Gene
+Gene::55256,ADI1,Gene
+Gene::5526,PPP2R5B,Gene
+Gene::5529,PPP2R5E,Gene
+Gene::55299,BRIX1,Gene
+Gene::55324,ABCF3,Gene
+Gene::55355,HJURP,Gene
+Gene::55367,PIDD1,Gene
+Gene::55388,MCM10,Gene
+Gene::5557,PRIM1,Gene
+Gene::55585,UBE2Q1,Gene
+Gene::55608,ANKRD10,Gene
+Gene::55621,TRMT1,Gene
+Gene::55635,DEPDC1,Gene
+Gene::5564,PRKAB1,Gene
+Gene::55651,NHP2,Gene
+Gene::5566,PRKACA,Gene
+Gene::55699,IARS2,Gene
+Gene::55706,NDC1,Gene
+Gene::55723,ASF1B,Gene
+Gene::55748,CNDP2,Gene
+Gene::55759,WDR12,Gene
+Gene::55793,FAM63A,Gene
+Gene::55794,DDX28,Gene
+Gene::55799,CACNA2D3,Gene
+Gene::5580,PRKCD,Gene
+Gene::55818,KDM3A,Gene
+Gene::55823,VPS11,Gene
+Gene::5583,PRKCH,Gene
+Gene::55837,EAPP,Gene
+Gene::55839,CENPN,Gene
+Gene::55867,SLC22A11,Gene
+Gene::55893,ZNF395,Gene
+Gene::5591,PRKDC,Gene
+Gene::55957,LIN37,Gene
+Gene::55958,KLHL9,Gene
+Gene::55967,NDUFA12,Gene
+Gene::5613,PRKX,Gene
+Gene::5627,PROS1,Gene
+Gene::5654,HTRA1,Gene
+Gene::56606,SLC2A9,Gene
+Gene::56650,CLDND1,Gene
+Gene::56652,C10orf2,Gene
+Gene::56654,NPDC1,Gene
+Gene::5684,PSMA3,Gene
+Gene::56889,TM9SF3,Gene
+Gene::56901,NDUFA4L2,Gene
+Gene::56915,EXOSC5,Gene
+Gene::56924,PAK6,Gene
+Gene::56943,ENY2,Gene
+Gene::5696,PSMB8,Gene
+Gene::56967,C14orf132,Gene
+Gene::5698,PSMB9,Gene
+Gene::5699,PSMB10,Gene
+Gene::56992,KIF15,Gene
+Gene::56997,ADCK3,Gene
+Gene::57001,SDHAF3,Gene
+Gene::57016,AKR1B10,Gene
+Gene::57019,CIAPIN1,Gene
+Gene::5708,PSMD2,Gene
+Gene::57128,LYRM4,Gene
+Gene::57140,RNPEPL1,Gene
+Gene::5715,PSMD9,Gene
+Gene::57178,ZMIZ1,Gene
+Gene::57192,MCOLN1,Gene
+Gene::5720,PSME1,Gene
+Gene::5721,PSME2,Gene
+Gene::57326,PBXIP1,Gene
+Gene::57405,SPC25,Gene
+Gene::57406,ABHD6,Gene
+Gene::5742,PTGS1,Gene
+Gene::5743,PTGS2,Gene
+Gene::57468,SLC12A5,Gene
+Gene::57658,CALCOCO1,Gene
+Gene::5770,PTPN1,Gene
+Gene::57761,TRIB3,Gene
+Gene::57763,ANKRA2,Gene
+Gene::5777,PTPN6,Gene
+Gene::57804,POLD4,Gene
+Gene::5782,PTPN12,Gene
+Gene::57827,C6orf47,Gene
+Gene::5796,PTPRK,Gene
+Gene::5800,PTPRO,Gene
+Gene::581,BAX,Gene
+Gene::58190,CTDSP1,Gene
+Gene::5829,PXN,Gene
+Gene::5831,PYCR1,Gene
+Gene::58472,SQRDL,Gene
+Gene::58478,ENOPH1,Gene
+Gene::58533,SNX6,Gene
+Gene::5863,RGL2,Gene
+Gene::5869,RAB5B,Gene
+Gene::5888,RAD51,Gene
+Gene::5891,MOK,Gene
+Gene::5898,RALA,Gene
+Gene::590,BCHE,Gene
+Gene::5900,RALGDS,Gene
+Gene::5901,RAN,Gene
+Gene::5909,RAP1GAP,Gene
+Gene::5925,RB1,Gene
+Gene::5927,KDM5A,Gene
+Gene::59272,ACE2,Gene
+Gene::595,CCND1,Gene
+Gene::5965,RECQL,Gene
+Gene::5971,RELB,Gene
+Gene::5972,REN,Gene
+Gene::5982,RFC2,Gene
+Gene::5983,RFC3,Gene
+Gene::5985,RFC5,Gene
+Gene::5997,RGS2,Gene
+Gene::6015,RING1,Gene
+Gene::60343,FAM3A,Gene
+Gene::6048,RNF5,Gene
+Gene::60528,ELAC2,Gene
+Gene::6059,ABCE1,Gene
+Gene::6094,ROM1,Gene
+Gene::6119,RPA3,Gene
+Gene::6166,RPL36AL,Gene
+Gene::6182,MRPL12,Gene
+Gene::6184,RPN1,Gene
+Gene::6192,RPS4Y1,Gene
+Gene::6197,RPS6KA3,Gene
+Gene::622,BDH1,Gene
+Gene::6251,RSU1,Gene
+Gene::6253,RTN2,Gene
+Gene::6262,RYR2,Gene
+Gene::6275,S100A4,Gene
+Gene::6278,S100A7,Gene
+Gene::6284,S100A13,Gene
+Gene::6286,S100P,Gene
+Gene::6301,SARS,Gene
+Gene::6304,SATB1,Gene
+Gene::6307,MSMO1,Gene
+Gene::6319,SCD,Gene
+Gene::6324,SCN1B,Gene
+Gene::6331,SCN5A,Gene
+Gene::6337,SCNN1A,Gene
+Gene::6338,SCNN1B,Gene
+Gene::6339,SCNN1D,Gene
+Gene::6340,SCNN1G,Gene
+Gene::6347,CCL2,Gene
+Gene::6382,SDC1,Gene
+Gene::63874,ABHD4,Gene
+Gene::63875,MRPL17,Gene
+Gene::6390,SDHB,Gene
+Gene::63933,MCUR1,Gene
+Gene::6401,SELE,Gene
+Gene::6402,SELL,Gene
+Gene::64080,RBKS,Gene
+Gene::64083,GOLPH3,Gene
+Gene::641,BLM,Gene
+Gene::64118,DUS1L,Gene
+Gene::64167,ERAP2,Gene
+Gene::642,BLMH,Gene
+Gene::64240,ABCG5,Gene
+Gene::64241,ABCG8,Gene
+Gene::64288,ZSCAN31,Gene
+Gene::64318,NOC3L,Gene
+Gene::64342,HS1BP3,Gene
+Gene::64395,GMCL1,Gene
+Gene::64422,ATG3,Gene
+Gene::64425,POLR1E,Gene
+Gene::64428,NARFL,Gene
+Gene::64429,ZDHHC6,Gene
+Gene::6443,SGCB,Gene
+Gene::64601,VPS16,Gene
+Gene::6461,SHB,Gene
+Gene::6462,SHBG,Gene
+Gene::6464,SHC1,Gene
+Gene::64682,ANAPC1,Gene
+Gene::64743,WDR13,Gene
+Gene::64755,C16orf58,Gene
+Gene::6476,SI,Gene
+Gene::64781,CERK,Gene
+Gene::64805,P2RY12,Gene
+Gene::64943,NT5DC2,Gene
+Gene::65055,REEP1,Gene
+Gene::65057,ACD,Gene
+Gene::6509,SLC1A4,Gene
+Gene::652,BMP4,Gene
+Gene::6530,SLC6A2,Gene
+Gene::6532,SLC6A4,Gene
+Gene::6548,SLC9A1,Gene
+Gene::6554,SLC10A1,Gene
+Gene::6557,SLC12A1,Gene
+Gene::6558,SLC12A2,Gene
+Gene::6559,SLC12A3,Gene
+Gene::6560,SLC12A4,Gene
+Gene::6564,SLC15A1,Gene
+Gene::6565,SLC15A2,Gene
+Gene::6566,SLC16A1,Gene
+Gene::6570,SLC18A1,Gene
+Gene::6571,SLC18A2,Gene
+Gene::6578,SLCO2A1,Gene
+Gene::6579,SLCO1A2,Gene
+Gene::6580,SLC22A1,Gene
+Gene::6581,SLC22A3,Gene
+Gene::6582,SLC22A2,Gene
+Gene::6583,SLC22A4,Gene
+Gene::6584,SLC22A5,Gene
+Gene::6599,SMARCC1,Gene
+Gene::65998,C11orf95,Gene
+Gene::6609,SMPD1,Gene
+Gene::6627,SNRPA1,Gene
+Gene::6632,SNRPD1,Gene
+Gene::6635,SNRPE,Gene
+Gene::6636,SNRPF,Gene
+Gene::664,BNIP3,Gene
+Gene::6646,SOAT1,Gene
+Gene::665,BNIP3L,Gene
+Gene::6652,SORD,Gene
+Gene::6657,SOX2,Gene
+Gene::6676,SPAG4,Gene
+Gene::6696,SPP1,Gene
+Gene::6697,SPR,Gene
+Gene::670,BPHL,Gene
+Gene::6713,SQLE,Gene
+Gene::6714,SRC,Gene
+Gene::672,BRCA1,Gene
+Gene::6721,SREBF2,Gene
+Gene::6723,SRM,Gene
+Gene::6742,SSBP1,Gene
+Gene::6790,AURKA,Gene
+Gene::6793,STK10,Gene
+Gene::6804,STX1A,Gene
+Gene::6810,STX4,Gene
+Gene::6812,STXBP1,Gene
+Gene::6813,STXBP2,Gene
+Gene::6817,SULT1A1,Gene
+Gene::682,BSG,Gene
+Gene::6820,SULT2B1,Gene
+Gene::6832,SUPV3L1,Gene
+Gene::6833,ABCC8,Gene
+Gene::6839,SUV39H1,Gene
+Gene::6850,SYK,Gene
+Gene::6876,TAGLN,Gene
+Gene::6890,TAP1,Gene
+Gene::6908,TBP,Gene
+Gene::6909,TBX2,Gene
+Gene::6915,TBXA2R,Gene
+Gene::6919,TCEA2,Gene
+Gene::6947,TCN1,Gene
+Gene::6988,TCTA,Gene
+Gene::6990,DYNLT3,Gene
+Gene::6992,PPP1R11,Gene
+Gene::701,BUB1B,Gene
+Gene::7015,TERT,Gene
+Gene::7016,TESK1,Gene
+Gene::7020,TFAP2A,Gene
+Gene::7027,TFDP1,Gene
+Gene::7037,TFRC,Gene
+Gene::7043,TGFB3,Gene
+Gene::7048,TGFBR2,Gene
+Gene::705,BYSL,Gene
+Gene::7074,TIAM1,Gene
+Gene::7076,TIMP1,Gene
+Gene::7077,TIMP2,Gene
+Gene::708,C1QBP,Gene
+Gene::7088,TLE1,Gene
+Gene::7099,TLR4,Gene
+Gene::7103,TSPAN8,Gene
+Gene::7105,TSPAN6,Gene
+Gene::7106,TSPAN4,Gene
+Gene::7108,TM7SF2,Gene
+Gene::7125,TNNC2,Gene
+Gene::7134,TNNC1,Gene
+Gene::7153,TOP2A,Gene
+Gene::7155,TOP2B,Gene
+Gene::7157,TP53,Gene
+Gene::7159,TP53BP2,Gene
+Gene::7168,TPM1,Gene
+Gene::7172,TPMT,Gene
+Gene::7204,TRIO,Gene
+Gene::7264,TSTA3,Gene
+Gene::727,C5,Gene
+Gene::7277,TUBA4A,Gene
+Gene::728661,SLC35E2B,Gene
+Gene::7296,TXNRD1,Gene
+Gene::7298,TYMS,Gene
+Gene::7319,UBE2A,Gene
+Gene::7324,UBE2E1,Gene
+Gene::7336,UBE2V2,Gene
+Gene::7358,UGDH,Gene
+Gene::7364,UGT2B7,Gene
+Gene::7366,UGT2B15,Gene
+Gene::7367,UGT2B17,Gene
+Gene::7371,UCK2,Gene
+Gene::7372,UMPS,Gene
+Gene::7376,NR1H2,Gene
+Gene::7378,UPP1,Gene
+Gene::7392,USF2,Gene
+Gene::7398,USP1,Gene
+Gene::7412,VCAM1,Gene
+Gene::7422,VEGFA,Gene
+Gene::7431,VIM,Gene
+Gene::7443,VRK1,Gene
+Gene::747,DAGLA,Gene
+Gene::7485,WRB,Gene
+Gene::7494,XBP1,Gene
+Gene::7498,XDH,Gene
+Gene::7511,XPNPEP1,Gene
+Gene::7514,XPO1,Gene
+Gene::7538,ZFP36,Gene
+Gene::759,CA1,Gene
+Gene::760,CA2,Gene
+Gene::762,CA4,Gene
+Gene::763,CA5A,Gene
+Gene::765,CA6,Gene
+Gene::766,CA7,Gene
+Gene::768,CA9,Gene
+Gene::771,CA12,Gene
+Gene::7726,TRIM26,Gene
+Gene::773,CACNA1A,Gene
+Gene::774,CACNA1B,Gene
+Gene::775,CACNA1C,Gene
+Gene::7750,ZMYM2,Gene
+Gene::776,CACNA1D,Gene
+Gene::778,CACNA1F,Gene
+Gene::779,CACNA1S,Gene
+Gene::780,DDR1,Gene
+Gene::781,CACNA2D1,Gene
+Gene::782,CACNB1,Gene
+Gene::783,CACNB2,Gene
+Gene::784,CACNB3,Gene
+Gene::7849,PAX8,Gene
+Gene::785,CACNB4,Gene
+Gene::7852,CXCR4,Gene
+Gene::786,CACNG1,Gene
+Gene::7866,IFRD2,Gene
+Gene::78994,PRR14,Gene
+Gene::79000,AUNIP,Gene
+Gene::79019,CENPM,Gene
+Gene::79023,NUP37,Gene
+Gene::79056,PRRG4,Gene
+Gene::79058,ASPSCR1,Gene
+Gene::79071,ELOVL6,Gene
+Gene::79073,TMEM109,Gene
+Gene::79075,DSCC1,Gene
+Gene::79077,DCTPP1,Gene
+Gene::79080,CCDC86,Gene
+Gene::79084,WDR77,Gene
+Gene::79089,TMUB2,Gene
+Gene::79090,TRAPPC6A,Gene
+Gene::79094,CHAC1,Gene
+Gene::79143,MBOAT7,Gene
+Gene::79170,PRR15L,Gene
+Gene::79174,CRELD2,Gene
+Gene::79187,FSD1,Gene
+Gene::7920,ABHD16A,Gene
+Gene::7941,PLA2G7,Gene
+Gene::79600,TCTN1,Gene
+Gene::79622,SNRNP25,Gene
+Gene::79643,CHMP6,Gene
+Gene::79654,HECTD3,Gene
+Gene::79671,NLRX1,Gene
+Gene::79682,CENPU,Gene
+Gene::79693,YRDC,Gene
+Gene::79735,TBC1D17,Gene
+Gene::79736,TEFM,Gene
+Gene::7979,SHFM1,Gene
+Gene::79801,SHCBP1,Gene
+Gene::7982,ST7,Gene
+Gene::79833,GEMIN6,Gene
+Gene::79850,FAM57A,Gene
+Gene::79902,NUP85,Gene
+Gene::79921,TCEAL4,Gene
+Gene::79961,DENND2D,Gene
+Gene::79991,OBFC1,Gene
+Gene::801,CALM1,Gene
+Gene::80155,NAA15,Gene
+Gene::80212,CCDC92,Gene
+Gene::80218,NAA50,Gene
+Gene::80256,FAM214B,Gene
+Gene::80273,GRPEL1,Gene
+Gene::80324,PUS1,Gene
+Gene::805,CALM2,Gene
+Gene::8050,PDHX,Gene
+Gene::8061,FOSL1,Gene
+Gene::80746,TSEN2,Gene
+Gene::80758,PRR7,Gene
+Gene::808,CALM3,Gene
+Gene::8091,HMGA2,Gene
+Gene::81033,KCNH6,Gene
+Gene::81034,SLC25A32,Gene
+Gene::813,CALU,Gene
+Gene::81533,ITFG1,Gene
+Gene::81539,SLC38A1,Gene
+Gene::81544,GDPD5,Gene
+Gene::81566,CSRNP2,Gene
+Gene::81892,SLIRP,Gene
+Gene::81929,SEH1L,Gene
+Gene::8202,NCOA3,Gene
+Gene::8204,NRIP1,Gene
+Gene::8208,CHAF1B,Gene
+Gene::822,CAPG,Gene
+Gene::823,CAPN1,Gene
+Gene::8243,SMC1A,Gene
+Gene::8273,SLC10A3,Gene
+Gene::831,CAST,Gene
+Gene::8312,AXIN1,Gene
+Gene::8318,CDC45,Gene
+Gene::8321,FZD1,Gene
+Gene::8324,FZD7,Gene
+Gene::8334,HIST1H2AC,Gene
+Gene::83461,CDCA3,Gene
+Gene::8349,HIST2H2BE,Gene
+Gene::835,CASP2,Gene
+Gene::83743,GRWD1,Gene
+Gene::8396,PIP4K2B,Gene
+Gene::8398,PLA2G6,Gene
+Gene::8408,ULK1,Gene
+Gene::842,CASP9,Gene
+Gene::843,CASP10,Gene
+Gene::8440,NCK2,Gene
+Gene::8444,DYRK3,Gene
+Gene::8446,DUSP11,Gene
+Gene::84549,MAK16,Gene
+Gene::84617,TUBB6,Gene
+Gene::847,CAT,Gene
+Gene::84722,PSRC1,Gene
+Gene::8480,RAE1,Gene
+Gene::84890,ADO,Gene
+Gene::8503,PIK3R3,Gene
+Gene::8513,LIPF,Gene
+Gene::8520,HAT1,Gene
+Gene::85236,HIST1H2BK,Gene
+Gene::8533,COPS3,Gene
+Gene::85377,MICALL1,Gene
+Gene::8553,BHLHE40,Gene
+Gene::8562,DENR,Gene
+Gene::8569,MKNK1,Gene
+Gene::8573,CASK,Gene
+Gene::8574,AKR7A2,Gene
+Gene::8602,NOP14,Gene
+Gene::8607,RUVBL1,Gene
+Gene::8624,PSMG1,Gene
+Gene::8639,AOC3,Gene
+Gene::8647,ABCB11,Gene
+Gene::865,CBFB,Gene
+Gene::868,CBLB,Gene
+Gene::8714,ABCC3,Gene
+Gene::8726,EED,Gene
+Gene::8727,CTNNAL1,Gene
+Gene::873,CBR1,Gene
+Gene::8744,TNFSF9,Gene
+Gene::8800,PEX11A,Gene
+Gene::8821,INPP4B,Gene
+Gene::8834,TMEM11,Gene
+Gene::8835,SOCS2,Gene
+Gene::8837,CFLAR,Gene
+Gene::8843,HCAR3,Gene
+Gene::8859,STK19,Gene
+Gene::8861,LDB1,Gene
+Gene::8869,ST3GAL5,Gene
+Gene::8870,IER3,Gene
+Gene::8872,CDC123,Gene
+Gene::8878,SQSTM1,Gene
+Gene::8884,SLC5A6,Gene
+Gene::8891,EIF2B3,Gene
+Gene::890,CCNA2,Gene
+Gene::8900,CCNA1,Gene
+Gene::891,CCNB1,Gene
+Gene::8911,CACNA1I,Gene
+Gene::8912,CACNA1H,Gene
+Gene::8913,CACNA1G,Gene
+Gene::8914,TIMELESS,Gene
+Gene::896,CCND3,Gene
+Gene::8972,MGAM,Gene
+Gene::8974,P4HA2,Gene
+Gene::89845,ABCC10,Gene
+Gene::8985,PLOD3,Gene
+Gene::901,CCNG2,Gene
+Gene::90134,KCNH7,Gene
+Gene::9019,MPZL1,Gene
+Gene::902,CCNH,Gene
+Gene::9053,MAP7,Gene
+Gene::9057,SLC7A6,Gene
+Gene::90864,SPSB3,Gene
+Gene::9088,PKMYT1,Gene
+Gene::9093,DNAJA3,Gene
+Gene::9123,SLC16A3,Gene
+Gene::9128,PRPF4,Gene
+Gene::91289,LMF2,Gene
+Gene::9133,CCNB2,Gene
+Gene::9134,CCNE2,Gene
+Gene::9136,RRP9,Gene
+Gene::9143,SYNGR3,Gene
+Gene::9150,CTDP1,Gene
+Gene::9156,EXO1,Gene
+Gene::9170,LPAR2,Gene
+Gene::9181,ARHGEF2,Gene
+Gene::9183,ZW10,Gene
+Gene::91942,NDUFAF2,Gene
+Gene::9212,AURKB,Gene
+Gene::9217,VAPB,Gene
+Gene::9221,NOLC1,Gene
+Gene::9246,UBE2L6,Gene
+Gene::9254,CACNA2D2,Gene
+Gene::9266,CYTH2,Gene
+Gene::9267,CYTH1,Gene
+Gene::9270,ITGB1BP1,Gene
+Gene::9276,COPB2,Gene
+Gene::9289,ADGRG1,Gene
+Gene::93129,ORAI3,Gene
+Gene::9319,TRIP13,Gene
+Gene::9329,GTF3C4,Gene
+Gene::93487,MAPK1IP1L,Gene
+Gene::9356,SLC22A6,Gene
+Gene::9375,TM9SF2,Gene
+Gene::9376,SLC22A8,Gene
+Gene::9415,FADS2,Gene
+Gene::9429,ABCG2,Gene
+Gene::9455,HOMER2,Gene
+Gene::9470,EIF4E2,Gene
+Gene::9488,PIGB,Gene
+Gene::9518,GDF15,Gene
+Gene::9533,POLR1C,Gene
+Gene::9540,TP53I3,Gene
+Gene::958,CD40,Gene
+Gene::9605,VPS9D1,Gene
+Gene::9641,IKBKE,Gene
+Gene::9648,GCC2,Gene
+Gene::9650,MTFR1,Gene
+Gene::9653,HS2ST1,Gene
+Gene::9665,KIAA0430,Gene
+Gene::9670,IPO13,Gene
+Gene::9686,VGLL4,Gene
+Gene::9688,NUP93,Gene
+Gene::9690,UBE3C,Gene
+Gene::9695,EDEM1,Gene
+Gene::9702,CEP57,Gene
+Gene::9709,HERPUD1,Gene
+Gene::9710,KIAA0355,Gene
+Gene::9712,USP6NL,Gene
+Gene::9736,USP34,Gene
+Gene::9738,CCP110,Gene
+Gene::9741,LAPTM4A,Gene
+Gene::975,CD81,Gene
+Gene::976,ADGRE5,Gene
+Gene::9768,KIAA0101,Gene
+Gene::9772,KIAA0195,Gene
+Gene::9787,DLGAP5,Gene
+Gene::9791,PTDSS1,Gene
+Gene::9797,TATDN2,Gene
+Gene::9801,MRPL19,Gene
+Gene::9816,URB2,Gene
+Gene::9817,KEAP1,Gene
+Gene::9820,CUL7,Gene
+Gene::983,CDK1,Gene
+Gene::9833,MELK,Gene
+Gene::9842,PLEKHM1,Gene
+Gene::9847,C2CD5,Gene
+Gene::9851,KIAA0753,Gene
+Gene::9854,C2CD2L,Gene
+Gene::9879,DDX46,Gene
+Gene::9897,KIAA0196,Gene
+Gene::990,CDC6,Gene
+Gene::9903,KLHL21,Gene
+Gene::991,CDC20,Gene
+Gene::9913,SUPT7L,Gene
+Gene::9915,ARNT2,Gene
+Gene::9918,NCAPD2,Gene
+Gene::9924,PAN2,Gene
+Gene::9926,LPGAT1,Gene
+Gene::9927,MFN2,Gene
+Gene::9928,KIF14,Gene
+Gene::993,CDC25A,Gene
+Gene::9933,KIAA0020,Gene
+Gene::994,CDC25B,Gene
+Gene::9941,EXOG,Gene
+Gene::9943,OXSR1,Gene
+Gene::9961,MVP,Gene
+Gene::997,CDC34,Gene
+Pharmacologic Class::N0000000069,Calcium Channel Antagonists,Pharmacologic Class
+Pharmacologic Class::N0000000070,Angiotensin 2 Receptor Antagonists,Pharmacologic Class
+Pharmacologic Class::N0000000166,alpha Glucosidase Inhibitors,Pharmacologic Class
+Pharmacologic Class::N0000007556,Dihydropyridines,Pharmacologic Class
+Pharmacologic Class::N0000007618,Ergolines,Pharmacologic Class
+Pharmacologic Class::N0000007641,Nicotinic Acids,Pharmacologic Class
+Pharmacologic Class::N0000007698,Biguanides,Pharmacologic Class
+Pharmacologic Class::N0000008054,Sulfonylurea Compounds,Pharmacologic Class
+Pharmacologic Class::N0000008553,Decreased Cholesterol Absorption,Pharmacologic Class
+Pharmacologic Class::N0000008832,Decreased Platelet Aggregation,Pharmacologic Class
+Pharmacologic Class::N0000008836,Decreased Prostaglandin Production,Pharmacologic Class
+Pharmacologic Class::N0000008859,Decreased Renal K+ Excretion,Pharmacologic Class
+Pharmacologic Class::N0000009916,Lipase Inhibitors,Pharmacologic Class
+Pharmacologic Class::N0000009918,Adrenergic alpha2-Agonists,Pharmacologic Class
+Pharmacologic Class::N0000009923,Adrenergic beta1-Antagonists,Pharmacologic Class
+Pharmacologic Class::N0000009924,Adrenergic beta2-Antagonists,Pharmacologic Class
+Pharmacologic Class::N0000011272,Thiazolidinediones,Pharmacologic Class
+Pharmacologic Class::N0000011310,Aldosterone Antagonists,Pharmacologic Class
+Pharmacologic Class::N0000166469,Thiazides,Pharmacologic Class
+Pharmacologic Class::N0000170118,PPAR alpha,Pharmacologic Class
+Pharmacologic Class::N0000170119,PPAR gamma,Pharmacologic Class
+Pharmacologic Class::N0000175359,Increased Diuresis,Pharmacologic Class
+Pharmacologic Class::N0000175366,Increased Diuresis at Loop of Henle,Pharmacologic Class
+Pharmacologic Class::N0000175374,Peroxisome Proliferator-activated Receptor Activity,Pharmacologic Class
+Pharmacologic Class::N0000175375,Peroxisome Proliferator-activated Receptor alpha Agonists,Pharmacologic Class
+Pharmacologic Class::N0000175379,Arteriolar Vasodilation,Pharmacologic Class
+Pharmacologic Class::N0000175448,Potassium Channel Antagonists,Pharmacologic Class
+Pharmacologic Class::N0000175644,Decreased Autonomic Ganglionic Activity,Pharmacologic Class
+Pharmacologic Class::N0000175650,Decreased Sympathetic Activity,Pharmacologic Class
+Pharmacologic Class::N0000175721,Nonsteroidal Anti-inflammatory Compounds,Pharmacologic Class
+Pharmacologic Class::N0000175912,Dipeptidyl Peptidase 4 Inhibitors,Pharmacologic Class
+Pharmacologic Class::N0000178477,Decreased Blood Pressure,Pharmacologic Class
+Pharmacologic Class::N0000182141,Cytochrome P450 3A4 Inhibitors,Pharmacologic Class
+Pharmacologic Class::N0000182143,P2Y12 Receptor Antagonists,Pharmacologic Class
+Pharmacologic Class::N0000185503,P-Glycoprotein Inhibitors,Pharmacologic Class
+Pharmacologic Class::N0000190115,Cytochrome P450 3A5 Inhibitors,Pharmacologic Class
+Pharmacologic Class::N0000190482,Phenylalanine Hydroxylase Activators,Pharmacologic Class
+Side Effect::C0000729,Abdominal cramps,Side Effect
+Side Effect::C0000731,Abdominal distension,Side Effect
+Side Effect::C0000737,Abdominal pain,Side Effect
+Side Effect::C0000768,Congenital anomaly,Side Effect
+Side Effect::C0000833,Abscess,Side Effect
+Side Effect::C0000889,Acanthosis nigricans,Side Effect
+Side Effect::C0001122,Acidosis,Side Effect
+Side Effect::C0001125,Lactic acidosis,Side Effect
+Side Effect::C0001206,Acromegaly,Side Effect
+Side Effect::C0001339,Pancreatitis acute,Side Effect
+Side Effect::C0001396,Adams-Stokes syndrome,Side Effect
+Side Effect::C0001807,Aggression,Side Effect
+Side Effect::C0001824,Agranulocytosis,Side Effect
+Side Effect::C0001883,Airway obstruction NOS,Side Effect
+Side Effect::C0001925,Albuminuria,Side Effect
+Side Effect::C0001973,Alcoholism,Side Effect
+Side Effect::C0002064,Respiratory alkalosis,Side Effect
+Side Effect::C0002170,Alopecia,Side Effect
+Side Effect::C0002418,Amblyopia,Side Effect
+Side Effect::C0002453,Amenorrhoea,Side Effect
+Side Effect::C0002622,Amnesia,Side Effect
+Side Effect::C0002792,Anaphylactic shock,Side Effect
+Side Effect::C0002871,Anaemia,Side Effect
+Side Effect::C0002874,Aplastic anaemia,Side Effect
+Side Effect::C0002878,Haemolytic anaemia,Side Effect
+Side Effect::C0002884,Hypochromic anaemia,Side Effect
+Side Effect::C0002888,Anaemia megaloblastic,Side Effect
+Side Effect::C0002940,Aneurysm,Side Effect
+Side Effect::C0002962,Angina pectoris,Side Effect
+Side Effect::C0002965,Angina unstable,Side Effect
+Side Effect::C0002994,Angioedema,Side Effect
+Side Effect::C0003079,Pupils unequal,Side Effect
+Side Effect::C0003123,Anorexia,Side Effect
+Side Effect::C0003126,Anosmia,Side Effect
+Side Effect::C0003460,Anuria,Side Effect
+Side Effect::C0003467,Anxiety,Side Effect
+Side Effect::C0003469,Anxiety disorder,Side Effect
+Side Effect::C0003537,Aphasia,Side Effect
+Side Effect::C0003615,Appendicitis,Side Effect
+Side Effect::C0003811,Arrhythmia,Side Effect
+Side Effect::C0003813,Sinus arrhythmia,Side Effect
+Side Effect::C0003834,Arterial insufficiency,Side Effect
+Side Effect::C0003850,Arteriosclerosis,Side Effect
+Side Effect::C0003860,Arteritis,Side Effect
+Side Effect::C0003862,Arthralgia,Side Effect
+Side Effect::C0003864,Arthritis,Side Effect
+Side Effect::C0003868,Gouty arthritis,Side Effect
+Side Effect::C0003962,Ascites,Side Effect
+Side Effect::C0004093,Asthenia,Side Effect
+Side Effect::C0004095,Asthenopia,Side Effect
+Side Effect::C0004096,Asthma,Side Effect
+Side Effect::C0004134,Ataxia,Side Effect
+Side Effect::C0004144,Atelectasis,Side Effect
+Side Effect::C0004153,Atherosclerosis,Side Effect
+Side Effect::C0004238,Atrial fibrillation,Side Effect
+Side Effect::C0004239,Atrial flutter,Side Effect
+Side Effect::C0004245,Atrioventricular block,Side Effect
+Side Effect::C0004331,Atrioventricular dissociation,Side Effect
+Side Effect::C0004364,Autoimmune disorder,Side Effect
+Side Effect::C0004604,Back pain,Side Effect
+Side Effect::C0004623,Bacterial infection,Side Effect
+Side Effect::C0004691,Balanoposthitis,Side Effect
+Side Effect::C0004936,Mental disorder,Side Effect
+Side Effect::C0005398,Cholestasis extrahepatic,Side Effect
+Side Effect::C0005684,Bladder cancer,Side Effect
+Side Effect::C0005695,Bladder neoplasm,Side Effect
+Side Effect::C0005741,Blepharitis,Side Effect
+Side Effect::C0005745,Eyelid ptosis,Side Effect
+Side Effect::C0005747,Blepharospasm,Side Effect
+Side Effect::C0005758,Blister,Side Effect
+Side Effect::C0005778,Clotting,Side Effect
+Side Effect::C0005779,Coagulopathy,Side Effect
+Side Effect::C0005818,Platelet disorder,Side Effect
+Side Effect::C0005940,Bone disorder,Side Effect
+Side Effect::C0006142,Breast cancer,Side Effect
+Side Effect::C0006145,Breast disorder,Side Effect
+Side Effect::C0006147,Breast feeding,Side Effect
+Side Effect::C0006266,Bronchospasm,Side Effect
+Side Effect::C0006271,Bronchiolitis,Side Effect
+Side Effect::C0006277,Bronchitis,Side Effect
+Side Effect::C0006384,Bundle branch block,Side Effect
+Side Effect::C0006444,Bursitis,Side Effect
+Side Effect::C0006826,Neoplasm malignant,Side Effect
+Side Effect::C0006840,Candida infection,Side Effect
+Side Effect::C0006849,Oral candidiasis,Side Effect
+Side Effect::C0006852,Vaginal moniliasis,Side Effect
+Side Effect::C0007097,Carcinoma,Side Effect
+Side Effect::C0007166,Cardiac output decreased,Side Effect
+Side Effect::C0007177,Cardiac tamponade,Side Effect
+Side Effect::C0007194,Hypertrophic cardiomyopathy,Side Effect
+Side Effect::C0007222,Cardiovascular disorder,Side Effect
+Side Effect::C0007286,Carpal tunnel syndrome,Side Effect
+Side Effect::C0007398,Catatonia,Side Effect
+Side Effect::C0007642,Cellulitis,Side Effect
+Side Effect::C0007682,Central nervous system disorder,Side Effect
+Side Effect::C0007785,Cerebral infarction,Side Effect
+Side Effect::C0007787,Transient ischaemic attack,Side Effect
+Side Effect::C0007815,Cerebrospinal fluid rhinorrhea,Side Effect
+Side Effect::C0007820,Cerebrovascular disorder,Side Effect
+Side Effect::C0007859,Neck pain,Side Effect
+Side Effect::C0008031,Chest pain,Side Effect
+Side Effect::C0008033,Pleuritic pain,Side Effect
+Side Effect::C0008049,Varicella,Side Effect
+Side Effect::C0008325,Cholecystitis,Side Effect
+Side Effect::C0008350,Cholelithiasis,Side Effect
+Side Effect::C0008370,Cholestasis,Side Effect
+Side Effect::C0008372,Cholestasis intrahepatic,Side Effect
+Side Effect::C0008449,Chondrodystrophy,Side Effect
+Side Effect::C0008489,Chorea,Side Effect
+Side Effect::C0009241,Cognitive disorder,Side Effect
+Side Effect::C0009319,Colitis,Side Effect
+Side Effect::C0009326,Collagen disorder,Side Effect
+Side Effect::C0009377,Colonic pseudo-obstruction,Side Effect
+Side Effect::C0009421,Coma,Side Effect
+Side Effect::C0009443,Common cold,Side Effect
+Side Effect::C0009450,Infection,Side Effect
+Side Effect::C0009676,Confusional state,Side Effect
+Side Effect::C0009759,Conjunctival disorder,Side Effect
+Side Effect::C0009760,Conjunctival haemorrhage,Side Effect
+Side Effect::C0009763,Conjunctivitis,Side Effect
+Side Effect::C0009766,Conjunctivitis allergic,Side Effect
+Side Effect::C0009782,Connective tissue disorder,Side Effect
+Side Effect::C0009806,Constipation,Side Effect
+Side Effect::C0009917,Muscle contracture,Side Effect
+Side Effect::C0009938,Contusion,Side Effect
+Side Effect::C0010034,Corneal disorder,Side Effect
+Side Effect::C0010068,Coronary heart disease,Side Effect
+Side Effect::C0010073,Arteriospasm coronary,Side Effect
+Side Effect::C0010200,Cough,Side Effect
+Side Effect::C0010263,Cramp of limb,Side Effect
+Side Effect::C0010266,Cranial nerve disorder,Side Effect
+Side Effect::C0010399,Crying,Side Effect
+Side Effect::C0010520,Cyanosis,Side Effect
+Side Effect::C0010692,Cystitis,Side Effect
+Side Effect::C0010709,Cyst,Side Effect
+Side Effect::C0010828,Cytopenia,Side Effect
+Side Effect::C0011053,Deafness,Side Effect
+Side Effect::C0011071,Sudden death,Side Effect
+Side Effect::C0011124,Libido decreased,Side Effect
+Side Effect::C0011168,Dysphagia,Side Effect
+Side Effect::C0011175,Dehydration,Side Effect
+Side Effect::C0011206,Delirium,Side Effect
+Side Effect::C0011253,Delusion,Side Effect
+Side Effect::C0011334,Dental caries,Side Effect
+Side Effect::C0011551,Depersonalisation,Side Effect
+Side Effect::C0011570,Depression,Side Effect
+Side Effect::C0011603,Dermatitis,Side Effect
+Side Effect::C0011606,Dermatitis exfoliative,Side Effect
+Side Effect::C0011609,Drug eruption,Side Effect
+Side Effect::C0011615,Dermatitis atopic,Side Effect
+Side Effect::C0011616,Dermatitis contact,Side Effect
+Side Effect::C0011630,Fungal skin infection,Side Effect
+Side Effect::C0011633,Dermatomyositis,Side Effect
+Side Effect::C0011849,Diabetes mellitus,Side Effect
+Side Effect::C0011860,Type 2 diabetes mellitus,Side Effect
+Side Effect::C0011875,Diabetic vascular disorder,Side Effect
+Side Effect::C0011882,Diabetic neuropathy,Side Effect
+Side Effect::C0011991,Diarrhoea,Side Effect
+Side Effect::C0012359,Distention,Side Effect
+Side Effect::C0012569,Diplopia,Side Effect
+Side Effect::C0012739,Disseminated intravascular coagulation,Side Effect
+Side Effect::C0012797,Diuresis,Side Effect
+Side Effect::C0012813,Diverticulitis,Side Effect
+Side Effect::C0012817,Diverticulum,Side Effect
+Side Effect::C0012833,Dizziness,Side Effect
+Side Effect::C0013144,Drowsiness,Side Effect
+Side Effect::C0013182,Drug hypersensitivity,Side Effect
+Side Effect::C0013274,Patent ductus arteriosus,Side Effect
+Side Effect::C0013295,Duodenal ulcer,Side Effect
+Side Effect::C0013298,Duodenitis,Side Effect
+Side Effect::C0013362,Dysarthria,Side Effect
+Side Effect::C0013369,Dysentery,Side Effect
+Side Effect::C0013378,Dysgeusia,Side Effect
+Side Effect::C0013384,Dyskinesia,Side Effect
+Side Effect::C0013390,Dysmenorrhoea,Side Effect
+Side Effect::C0013395,Dyspepsia,Side Effect
+Side Effect::C0013404,Dyspnoea,Side Effect
+Side Effect::C0013428,Dysuria,Side Effect
+Side Effect::C0013447,Ear disorder,Side Effect
+Side Effect::C0013456,Ear pain,Side Effect
+Side Effect::C0013491,Ecchymosis,Side Effect
+Side Effect::C0013595,Eczema,Side Effect
+Side Effect::C0013604,Oedema,Side Effect
+Side Effect::C0013609,Localised oedema,Side Effect
+Side Effect::C0013922,Embolism,Side Effect
+Side Effect::C0013985,Emotional disturbance NOS,Side Effect
+Side Effect::C0014034,Enanthema,Side Effect
+Side Effect::C0014130,Endocrine disorder,Side Effect
+Side Effect::C0014236,Endophthalmitis,Side Effect
+Side Effect::C0014335,Enteritis,Side Effect
+Side Effect::C0014394,Enuresis,Side Effect
+Side Effect::C0014457,Eosinophilia,Side Effect
+Side Effect::C0014518,Toxic epidermal necrolysis,Side Effect
+Side Effect::C0014527,Epidermolysis bullosa,Side Effect
+Side Effect::C0014534,Epididymitis,Side Effect
+Side Effect::C0014544,Epilepsy,Side Effect
+Side Effect::C0014549,Grand mal convulsion,Side Effect
+Side Effect::C0014591,Epistaxis,Side Effect
+Side Effect::C0014714,Ergot poisoning,Side Effect
+Side Effect::C0014724,Eructation,Side Effect
+Side Effect::C0014742,Erythema multiforme,Side Effect
+Side Effect::C0014743,Erythema nodosum,Side Effect
+Side Effect::C0014804,Erythromelalgia,Side Effect
+Side Effect::C0014868,Oesophagitis,Side Effect
+Side Effect::C0014869,Reflux esophagitis,Side Effect
+Side Effect::C0015230,Rash,Side Effect
+Side Effect::C0015256,Excoriation,Side Effect
+Side Effect::C0015300,Exophthalmos,Side Effect
+Side Effect::C0015371,Extrapyramidal disorder,Side Effect
+Side Effect::C0015376,Extravasation,Side Effect
+Side Effect::C0015393,Congenital eye disorder,Side Effect
+Side Effect::C0015397,Eye disorder,Side Effect
+Side Effect::C0015402,Eye haemorrhage,Side Effect
+Side Effect::C0015672,Fatigue,Side Effect
+Side Effect::C0015695,Liver fatty,Side Effect
+Side Effect::C0015732,Faecal incontinence,Side Effect
+Side Effect::C0015934,Microsomia,Side Effect
+Side Effect::C0015967,Body temperature increased,Side Effect
+Side Effect::C0016053,Fibromyalgia,Side Effect
+Side Effect::C0016059,Fibrosis,Side Effect
+Side Effect::C0016167,Anal fissure,Side Effect
+Side Effect::C0016199,Flank pain,Side Effect
+Side Effect::C0016204,Flatulence,Side Effect
+Side Effect::C0016242,Vitreous floaters,Side Effect
+Side Effect::C0016382,Flushing,Side Effect
+Side Effect::C0016385,Cardiac flutter,Side Effect
+Side Effect::C0016470,Food allergy,Side Effect
+Side Effect::C0016512,Foot pain,Side Effect
+Side Effect::C0016579,Formication,Side Effect
+Side Effect::C0016655,Multiple fractures,Side Effect
+Side Effect::C0016658,Fracture,Side Effect
+Side Effect::C0016867,Furunculosis,Side Effect
+Side Effect::C0016977,Gallbladder disorder,Side Effect
+Side Effect::C0017086,Gangrene,Side Effect
+Side Effect::C0017152,Gastritis,Side Effect
+Side Effect::C0017160,Gastroenteritis,Side Effect
+Side Effect::C0017168,Gastrooesophageal reflux disease,Side Effect
+Side Effect::C0017178,Gastrointestinal disorder,Side Effect
+Side Effect::C0017181,Gastrointestinal haemorrhage,Side Effect
+Side Effect::C0017563,Gingival disorder,Side Effect
+Side Effect::C0017565,Gingival bleeding,Side Effect
+Side Effect::C0017566,Gingival hyperplasia,Side Effect
+Side Effect::C0017574,Gingivitis,Side Effect
+Side Effect::C0017601,Glaucoma,Side Effect
+Side Effect::C0017658,Glomerulonephritis,Side Effect
+Side Effect::C0017675,Glossitis,Side Effect
+Side Effect::C0017979,Glycosuria,Side Effect
+Side Effect::C0018099,Gout,Side Effect
+Side Effect::C0018418,Gynaecomastia,Side Effect
+Side Effect::C0018500,Hair disorder,Side Effect
+Side Effect::C0018520,Breath odour,Side Effect
+Side Effect::C0018524,Hallucination,Side Effect
+Side Effect::C0018621,Seasonal allergy,Side Effect
+Side Effect::C0018681,Headache,Side Effect
+Side Effect::C0018772,Partial hearing loss,Side Effect
+Side Effect::C0018790,Cardiac arrest,Side Effect
+Side Effect::C0018794,Block heart,Side Effect
+Side Effect::C0018799,Cardiac disorder,Side Effect
+Side Effect::C0018800,Cardiomegaly,Side Effect
+Side Effect::C0018801,Cardiac failure,Side Effect
+Side Effect::C0018802,Cardiac failure congestive,Side Effect
+Side Effect::C0018808,Cardiac murmur,Side Effect
+Side Effect::C0018824,Cardiac valve disease,Side Effect
+Side Effect::C0018834,Heartburn,Side Effect
+Side Effect::C0018924,Haemarthrosis,Side Effect
+Side Effect::C0018926,Haematemesis,Side Effect
+Side Effect::C0018932,Haematochezia,Side Effect
+Side Effect::C0018939,Blood disorder,Side Effect
+Side Effect::C0018944,Haematoma,Side Effect
+Side Effect::C0018965,Haematuria,Side Effect
+Side Effect::C0019054,Haemolysis,Side Effect
+Side Effect::C0019064,Pericardial haemorrhage,Side Effect
+Side Effect::C0019065,Peritoneal haemorrhage,Side Effect
+Side Effect::C0019069,Factor VIII deficiency,Side Effect
+Side Effect::C0019079,Haemoptysis,Side Effect
+Side Effect::C0019080,Haemorrhage,Side Effect
+Side Effect::C0019087,Haemorrhagic disorder,Side Effect
+Side Effect::C0019112,Haemorrhoids,Side Effect
+Side Effect::C0019123,Haemothorax,Side Effect
+Side Effect::C0019151,Hepatic encephalopathy,Side Effect
+Side Effect::C0019158,Hepatitis,Side Effect
+Side Effect::C0019159,Hepatitis A,Side Effect
+Side Effect::C0019209,Hepatomegaly,Side Effect
+Side Effect::C0019270,Hernia,Side Effect
+Side Effect::C0019294,Inguinal hernia,Side Effect
+Side Effect::C0019340,Herpes NOS,Side Effect
+Side Effect::C0019345,Herpes labialis,Side Effect
+Side Effect::C0019348,Herpes simplex,Side Effect
+Side Effect::C0019360,Herpes zoster,Side Effect
+Side Effect::C0019372,Herpes virus infection,Side Effect
+Side Effect::C0019521,Hiccups,Side Effect
+Side Effect::C0019559,Coxalgia,Side Effect
+Side Effect::C0019825,Hoarseness,Side Effect
+Side Effect::C0020175,Hunger,Side Effect
+Side Effect::C0020295,Hydronephrosis,Side Effect
+Side Effect::C0020433,Hyperbilirubinaemia,Side Effect
+Side Effect::C0020437,Hypercalcaemia,Side Effect
+Side Effect::C0020443,Hypercholesterolaemia,Side Effect
+Side Effect::C0020452,Hyperaemia,Side Effect
+Side Effect::C0020453,Hyperaesthesia,Side Effect
+Side Effect::C0020456,Hyperglycaemia,Side Effect
+Side Effect::C0020457,Diabetic hyperosmolar coma,Side Effect
+Side Effect::C0020458,Hyperhidrosis,Side Effect
+Side Effect::C0020459,Hyperinsulinism,Side Effect
+Side Effect::C0020461,Hyperkalaemia,Side Effect
+Side Effect::C0020473,Hyperlipidaemia,Side Effect
+Side Effect::C0020507,Hyperplasia,Side Effect
+Side Effect::C0020514,Hyperprolactinaemia,Side Effect
+Side Effect::C0020517,Hypersensitivity,Side Effect
+Side Effect::C0020538,Hypertension,Side Effect
+Side Effect::C0020540,Malignant hypertension,Side Effect
+Side Effect::C0020545,Renovascular hypertension,Side Effect
+Side Effect::C0020546,Hypertensive crisis,Side Effect
+Side Effect::C0020550,Hyperthyroidism,Side Effect
+Side Effect::C0020555,Hypertrichosis,Side Effect
+Side Effect::C0020557,Hypertriglyceridaemia,Side Effect
+Side Effect::C0020564,Hypertrophy,Side Effect
+Side Effect::C0020569,Salivary gland enlargement,Side Effect
+Side Effect::C0020578,Hyperventilation,Side Effect
+Side Effect::C0020580,Hypoaesthesia,Side Effect
+Side Effect::C0020598,Hypocalcaemia,Side Effect
+Side Effect::C0020599,Hypocalciuria,Side Effect
+Side Effect::C0020615,Hypoglycaemia,Side Effect
+Side Effect::C0020617,Hypoglycaemic coma,Side Effect
+Side Effect::C0020621,Hypokalaemia,Side Effect
+Side Effect::C0020625,Hyponatraemia,Side Effect
+Side Effect::C0020635,Hypopituitarism,Side Effect
+Side Effect::C0020639,Hypoproteinaemia,Side Effect
+Side Effect::C0020649,Hypotension,Side Effect
+Side Effect::C0020651,Orthostatic hypotension,Side Effect
+Side Effect::C0020672,Body temperature decreased,Side Effect
+Side Effect::C0020676,Hypothyroidism,Side Effect
+Side Effect::C0020678,Hypotrichosis,Side Effect
+Side Effect::C0020683,Hypovolaemic shock,Side Effect
+Side Effect::C0020757,Ichthyosis,Side Effect
+Side Effect::C0020903,Illusion,Side Effect
+Side Effect::C0021053,Immune system disorder,Side Effect
+Side Effect::C0021122,Impulse-control disorder,Side Effect
+Side Effect::C0021141,Inappropriate antidiuretic hormone secretion,Side Effect
+Side Effect::C0021167,Incontinence,Side Effect
+Side Effect::C0021177,Libido increased,Side Effect
+Side Effect::C0021308,Infarction,Side Effect
+Side Effect::C0021364,Infertility male,Side Effect
+Side Effect::C0021368,Inflammation,Side Effect
+Side Effect::C0021400,Influenza,Side Effect
+Side Effect::C0021564,Insect bite NOS,Side Effect
+Side Effect::C0021775,Intermittent claudication,Side Effect
+Side Effect::C0021831,Unspecified disorder of intestine,Side Effect
+Side Effect::C0021843,Intestinal obstruction,Side Effect
+Side Effect::C0021845,Intestinal perforation,Side Effect
+Side Effect::C0021933,Intussusception,Side Effect
+Side Effect::C0022081,Iritis,Side Effect
+Side Effect::C0022107,Irritability,Side Effect
+Side Effect::C0022116,Ischaemia,Side Effect
+Side Effect::C0022281,Eye pruritus,Side Effect
+Side Effect::C0022346,Jaundice,Side Effect
+Side Effect::C0022354,Jaundice cholestatic,Side Effect
+Side Effect::C0022408,Arthropathy,Side Effect
+Side Effect::C0022568,Keratitis,Side Effect
+Side Effect::C0022573,Keratoconjunctivitis,Side Effect
+Side Effect::C0022593,Keratosis,Side Effect
+Side Effect::C0022650,Calculus of kidney,Side Effect
+Side Effect::C0022658,Nephropathy,Side Effect
+Side Effect::C0022660,Renal failure acute,Side Effect
+Side Effect::C0022661,Renal failure chronic,Side Effect
+Side Effect::C0022890,Labyrinthine disorder,Side Effect
+Side Effect::C0022904,Lacrimal disorder,Side Effect
+Side Effect::C0023052,Laryngeal oedema,Side Effect
+Side Effect::C0023066,Laryngospasm,Side Effect
+Side Effect::C0023067,Laryngitis,Side Effect
+Side Effect::C0023182,Cerebrospinal fluid leakage,Side Effect
+Side Effect::C0023212,Left ventricular failure,Side Effect
+Side Effect::C0023218,Cramps of lower extremities,Side Effect
+Side Effect::C0023222,Leg pain,Side Effect
+Side Effect::C0023380,Lethargy,Side Effect
+Side Effect::C0023418,Leukaemia,Side Effect
+Side Effect::C0023518,Leukocytosis,Side Effect
+Side Effect::C0023530,Leukopenia,Side Effect
+Side Effect::C0023646,Lichen planus,Side Effect
+Side Effect::C0023648,Bullous lichen planus,Side Effect
+Side Effect::C0023890,Hepatic cirrhosis,Side Effect
+Side Effect::C0023895,Liver disorder,Side Effect
+Side Effect::C0024031,Low back pain,Side Effect
+Side Effect::C0024050,Lower gastrointestinal haemorrhage,Side Effect
+Side Effect::C0024115,Lung disorder,Side Effect
+Side Effect::C0024117,Chronic obstructive pulmonary disease,Side Effect
+Side Effect::C0024121,Lung neoplasm,Side Effect
+Side Effect::C0024141,Systemic lupus erythematosus,Side Effect
+Side Effect::C0024312,Lymphopenia,Side Effect
+Side Effect::C0024440,Cystoid macular oedema,Side Effect
+Side Effect::C0024523,Malabsorption,Side Effect
+Side Effect::C0024528,Malaise and fatigue,Side Effect
+Side Effect::C0024894,Mastitis,Side Effect
+Side Effect::C0024902,Breast pain,Side Effect
+Side Effect::C0025061,Mediastinal disorder,Side Effect
+Side Effect::C0025222,Melaena,Side Effect
+Side Effect::C0025274,Menarche,Side Effect
+Side Effect::C0025289,Meningitis,Side Effect
+Side Effect::C0025319,Menopausal disorder,Side Effect
+Side Effect::C0025320,Menopause,Side Effect
+Side Effect::C0025323,Menorrhagia,Side Effect
+Side Effect::C0025345,Menstrual disorder,Side Effect
+Side Effect::C0025517,Metabolic disorder,Side Effect
+Side Effect::C0025874,Metrorrhagia,Side Effect
+Side Effect::C0025958,Microcephaly,Side Effect
+Side Effect::C0026205,Miosis,Side Effect
+Side Effect::C0026636,Oral disorder,Side Effect
+Side Effect::C0026650,Movement disorder,Side Effect
+Side Effect::C0026821,Cramp muscle,Side Effect
+Side Effect::C0026826,Hypertonia,Side Effect
+Side Effect::C0026827,Hypotonia,Side Effect
+Side Effect::C0026846,Muscle atrophy,Side Effect
+Side Effect::C0026848,Myopathy,Side Effect
+Side Effect::C0026857,Musculoskeletal disorder,Side Effect
+Side Effect::C0026858,Musculoskeletal pain,Side Effect
+Side Effect::C0026896,Myasthenia gravis,Side Effect
+Side Effect::C0026946,Fungal infection,Side Effect
+Side Effect::C0026961,Mydriasis,Side Effect
+Side Effect::C0027051,Myocardial infarction,Side Effect
+Side Effect::C0027059,Myocarditis,Side Effect
+Side Effect::C0027066,Myoclonus,Side Effect
+Side Effect::C0027080,Myoglobinuria,Side Effect
+Side Effect::C0027092,Myopia,Side Effect
+Side Effect::C0027121,Myositis,Side Effect
+Side Effect::C0027125,Myotonia,Side Effect
+Side Effect::C0027339,Nail disorder,Side Effect
+Side Effect::C0027404,Narcolepsy,Side Effect
+Side Effect::C0027424,Nasal congestion,Side Effect
+Side Effect::C0027441,Nasopharyngitis,Side Effect
+Side Effect::C0027497,Nausea,Side Effect
+Side Effect::C0027540,Necrosis,Side Effect
+Side Effect::C0027543,Necrosis ischaemic,Side Effect
+Side Effect::C0027651,Neoplasm,Side Effect
+Side Effect::C0027697,Nephritis,Side Effect
+Side Effect::C0027707,Nephritis interstitial,Side Effect
+Side Effect::C0027709,Nephrocalcinosis,Side Effect
+Side Effect::C0027726,Nephrotic syndrome,Side Effect
+Side Effect::C0027765,Nervous system disorder,Side Effect
+Side Effect::C0027769,Nervousness,Side Effect
+Side Effect::C0027796,Neuralgia,Side Effect
+Side Effect::C0027813,Neuritis,Side Effect
+Side Effect::C0027849,Neuroleptic malignant syndrome,Side Effect
+Side Effect::C0027947,Neutropenia,Side Effect
+Side Effect::C0027960,Nevus,Side Effect
+Side Effect::C0027962,Melanocytic naevus,Side Effect
+Side Effect::C0028084,Nightmare,Side Effect
+Side Effect::C0028173,NPN increased,Side Effect
+Side Effect::C0028259,Nodule,Side Effect
+Side Effect::C0028643,Numbness,Side Effect
+Side Effect::C0028734,Nocturia,Side Effect
+Side Effect::C0028738,Nystagmus,Side Effect
+Side Effect::C0028754,Obesity,Side Effect
+Side Effect::C0028866,IIIrd nerve paralysis,Side Effect
+Side Effect::C0028949,Oligomenorrhoea,Side Effect
+Side Effect::C0028961,Oliguria,Side Effect
+Side Effect::C0029089,Ophthalmoplegia,Side Effect
+Side Effect::C0029124,Optic atrophy,Side Effect
+Side Effect::C0029134,Optic neuritis,Side Effect
+Side Effect::C0029163,Mouth haemorrhage,Side Effect
+Side Effect::C0029408,Osteoarthritis,Side Effect
+Side Effect::C0029445,Osteonecrosis,Side Effect
+Side Effect::C0029877,Otitis,Side Effect
+Side Effect::C0029878,Otitis externa,Side Effect
+Side Effect::C0029882,Otitis media,Side Effect
+Side Effect::C0030193,Pain,Side Effect
+Side Effect::C0030196,Pain in extremity,Side Effect
+Side Effect::C0030200,Intractable pain,Side Effect
+Side Effect::C0030232,Pallor,Side Effect
+Side Effect::C0030252,Palpitations,Side Effect
+Side Effect::C0030305,Pancreatitis,Side Effect
+Side Effect::C0030312,Pancytopenia,Side Effect
+Side Effect::C0030319,Panic disorder,Side Effect
+Side Effect::C0030326,Panniculitis,Side Effect
+Side Effect::C0030332,Panophthalmitis,Side Effect
+Side Effect::C0030446,Ileus paralytic,Side Effect
+Side Effect::C0030469,Sinus disorder,Side Effect
+Side Effect::C0030517,Parathyroid disorder,Side Effect
+Side Effect::C0030552,Paresis,Side Effect
+Side Effect::C0030554,Paraesthesia,Side Effect
+Side Effect::C0030567,Parkinson's disease,Side Effect
+Side Effect::C0030569,Secondary parkinsonism,Side Effect
+Side Effect::C0030583,Parotitis,Side Effect
+Side Effect::C0030662,Pathological gambling,Side Effect
+Side Effect::C0030794,Pelvic pain,Side Effect
+Side Effect::C0030805,Pemphigoid,Side Effect
+Side Effect::C0030807,Pemphigus,Side Effect
+Side Effect::C0030848,Peyronie's disease,Side Effect
+Side Effect::C0030920,Peptic ulcer,Side Effect
+Side Effect::C0030922,Peptic ulcer haemorrhage,Side Effect
+Side Effect::C0030976,Perceptual distortions,Side Effect
+Side Effect::C0031039,Pericardial effusion,Side Effect
+Side Effect::C0031046,Pericarditis,Side Effect
+Side Effect::C0031048,Pericarditis constrictive,Side Effect
+Side Effect::C0031099,Periodontitis,Side Effect
+Side Effect::C0031117,Neuropathy peripheral,Side Effect
+Side Effect::C0031154,Peritonitis,Side Effect
+Side Effect::C0031190,Persistent foetal circulation,Side Effect
+Side Effect::C0031212,Personality disorder,Side Effect
+Side Effect::C0031256,Petechiae,Side Effect
+Side Effect::C0031350,Pharyngitis,Side Effect
+Side Effect::C0031542,Phlebitis,Side Effect
+Side Effect::C0032227,Pleural effusion,Side Effect
+Side Effect::C0032231,Pleurisy,Side Effect
+Side Effect::C0032266,Pneumatosis cystoides intestinalis,Side Effect
+Side Effect::C0032285,Pneumonia,Side Effect
+Side Effect::C0032320,Pneumoperitoneum,Side Effect
+Side Effect::C0032326,Pneumothorax,Side Effect
+Side Effect::C0032343,Poisoning,Side Effect
+Side Effect::C0032533,Polymyalgia rheumatica,Side Effect
+Side Effect::C0032541,Polyneuritis,Side Effect
+Side Effect::C0032584,Polyp,Side Effect
+Side Effect::C0032617,Polyuria,Side Effect
+Side Effect::C0032708,Porphyrin metabolism disorder,Side Effect
+Side Effect::C0032781,Postnasal drip,Side Effect
+Side Effect::C0032961,Pregnancy,Side Effect
+Side Effect::C0033036,Supraventricular extrasystoles,Side Effect
+Side Effect::C0033038,Premature ejaculation,Side Effect
+Side Effect::C0033117,Priapism,Side Effect
+Side Effect::C0033246,Proctitis,Side Effect
+Side Effect::C0033247,Proctocolitis,Side Effect
+Side Effect::C0033575,Prostatic disorder,Side Effect
+Side Effect::C0033581,Prostatitis,Side Effect
+Side Effect::C0033687,Proteinuria,Side Effect
+Side Effect::C0033771,Prurigo,Side Effect
+Side Effect::C0033774,Pruritus,Side Effect
+Side Effect::C0033775,Anal pruritus,Side Effect
+Side Effect::C0033777,Pruritus genital,Side Effect
+Side Effect::C0033860,Psoriasis,Side Effect
+Side Effect::C0033953,Psychosexual disorder,Side Effect
+Side Effect::C0033975,Psychotic disorder,Side Effect
+Side Effect::C0034063,Pulmonary oedema,Side Effect
+Side Effect::C0034065,Pulmonary embolism,Side Effect
+Side Effect::C0034068,Pulmonary eosinophilia,Side Effect
+Side Effect::C0034069,Pulmonary fibrosis,Side Effect
+Side Effect::C0034150,Purpura,Side Effect
+Side Effect::C0034152,Henoch-Schonlein purpura,Side Effect
+Side Effect::C0034155,Thrombotic thrombocytopenic purpura,Side Effect
+Side Effect::C0034186,Pyelonephritis,Side Effect
+Side Effect::C0034359,Pyuria,Side Effect
+Side Effect::C0034642,Rales,Side Effect
+Side Effect::C0034734,Raynaud's disease,Side Effect
+Side Effect::C0034735,Raynaud's phenomenon,Side Effect
+Side Effect::C0034882,Rectal disorder,Side Effect
+Side Effect::C0034886,Proctalgia,Side Effect
+Side Effect::C0034933,Reflexes abnormal,Side Effect
+Side Effect::C0034951,Refraction disorder,Side Effect
+Side Effect::C0035067,Renal artery stenosis,Side Effect
+Side Effect::C0035078,Renal failure,Side Effect
+Side Effect::C0035204,Respiratory disorder,Side Effect
+Side Effect::C0035243,Respiratory tract infection,Side Effect
+Side Effect::C0035305,Retinal detachment,Side Effect
+Side Effect::C0035309,Retinal disorder,Side Effect
+Side Effect::C0035317,Retinal haemorrhage,Side Effect
+Side Effect::C0035357,Retroperitoneal fibrosis,Side Effect
+Side Effect::C0035400,Reye's syndrome,Side Effect
+Side Effect::C0035410,Rhabdomyolysis,Side Effect
+Side Effect::C0035455,Rhinitis,Side Effect
+Side Effect::C0035460,Vasomotor rhinitis,Side Effect
+Side Effect::C0035508,Rhonchi,Side Effect
+Side Effect::C0036104,Salivation,Side Effect
+Side Effect::C0036396,Sciatica,Side Effect
+Side Effect::C0036454,Scotoma,Side Effect
+Side Effect::C0036508,Seborrhoeic dermatitis,Side Effect
+Side Effect::C0036572,Convulsion,Side Effect
+Side Effect::C0036749,Serositis,Side Effect
+Side Effect::C0036830,Serum sickness,Side Effect
+Side Effect::C0036973,Shivering,Side Effect
+Side Effect::C0036974,Shock,Side Effect
+Side Effect::C0036980,Cardiogenic shock,Side Effect
+Side Effect::C0037011,Shoulder pain,Side Effect
+Side Effect::C0037023,Sialoadenitis,Side Effect
+Side Effect::C0037036,Salivary hypersecretion,Side Effect
+Side Effect::C0037052,Sick sinus syndrome,Side Effect
+Side Effect::C0037188,Sinoatrial block,Side Effect
+Side Effect::C0037195,Sinus headache,Side Effect
+Side Effect::C0037199,Sinusitis,Side Effect
+Side Effect::C0037274,Skin disorder,Side Effect
+Side Effect::C0037278,Skin infection,Side Effect
+Side Effect::C0037284,Skin lesion,Side Effect
+Side Effect::C0037286,Neoplasm skin,Side Effect
+Side Effect::C0037287,Skin nodule,Side Effect
+Side Effect::C0037299,Skin ulcer,Side Effect
+Side Effect::C0037317,Sleep disturbance,Side Effect
+Side Effect::C0037320,Sleep terror,Side Effect
+Side Effect::C0037383,Sneezing,Side Effect
+Side Effect::C0037763,Muscle spasms,Side Effect
+Side Effect::C0037822,Speech disorder,Side Effect
+Side Effect::C0037933,Spinal disorder,Side Effect
+Side Effect::C0038002,Splenomegaly,Side Effect
+Side Effect::C0038045,Sprain,Side Effect
+Side Effect::C0038218,Status asthmaticus,Side Effect
+Side Effect::C0038220,Status epilepticus,Side Effect
+Side Effect::C0038325,Stevens-Johnson syndrome,Side Effect
+Side Effect::C0038358,Gastric ulcer,Side Effect
+Side Effect::C0038362,Stomatitis,Side Effect
+Side Effect::C0038363,Aphthous stomatitis,Side Effect
+Side Effect::C0038435,Stress,Side Effect
+Side Effect::C0038450,Stridor,Side Effect
+Side Effect::C0038454,Cerebrovascular accident,Side Effect
+Side Effect::C0038525,Subarachnoid haemorrhage,Side Effect
+Side Effect::C0038587,Withdrawal syndrome,Side Effect
+Side Effect::C0038826,Superinfection,Side Effect
+Side Effect::C0038990,Sweating,Side Effect
+Side Effect::C0038999,Swelling,Side Effect
+Side Effect::C0039070,Syncope,Side Effect
+Side Effect::C0039103,Synovitis,Side Effect
+Side Effect::C0039231,Tachycardia,Side Effect
+Side Effect::C0039239,Sinus tachycardia,Side Effect
+Side Effect::C0039240,Supraventricular tachycardia,Side Effect
+Side Effect::C0039503,Tendonitis,Side Effect
+Side Effect::C0039520,Tenosynovitis,Side Effect
+Side Effect::C0039584,Testicular disorder,Side Effect
+Side Effect::C0039621,Tetany,Side Effect
+Side Effect::C0039971,Thirst,Side Effect
+Side Effect::C0040034,Thrombocytopenia,Side Effect
+Side Effect::C0040038,Thromboembolism,Side Effect
+Side Effect::C0040046,Thrombophlebitis,Side Effect
+Side Effect::C0040053,Thrombosis,Side Effect
+Side Effect::C0040128,Thyroid disorder,Side Effect
+Side Effect::C0040147,Thyroiditis,Side Effect
+Side Effect::C0040156,Thyrotoxicosis,Side Effect
+Side Effect::C0040247,Tinea infection,Side Effect
+Side Effect::C0040261,Onychomycosis,Side Effect
+Side Effect::C0040264,Tinnitus,Side Effect
+Side Effect::C0040409,Tongue disorder,Side Effect
+Side Effect::C0040425,Tonsillitis,Side Effect
+Side Effect::C0040435,Tooth disorder,Side Effect
+Side Effect::C0040460,Toothache,Side Effect
+Side Effect::C0040479,Torsade de pointes,Side Effect
+Side Effect::C0040584,Tracheitis,Side Effect
+Side Effect::C0040586,Tracheobronchitis,Side Effect
+Side Effect::C0040797,Traumatic haemorrhage,Side Effect
+Side Effect::C0040822,Tremor,Side Effect
+Side Effect::C0041349,Tubulointerstitial nephritis,Side Effect
+Side Effect::C0041582,Ulcer,Side Effect
+Side Effect::C0041657,Loss of consciousness,Side Effect
+Side Effect::C0041747,Unintended pregnancy,Side Effect
+Side Effect::C0041834,Erythema,Side Effect
+Side Effect::C0041912,Upper respiratory tract infection,Side Effect
+Side Effect::C0041948,Uremia,Side Effect
+Side Effect::C0041969,Urethral disorder,Side Effect
+Side Effect::C0042018,Calculus urinary,Side Effect
+Side Effect::C0042023,Pollakiuria,Side Effect
+Side Effect::C0042024,Urinary incontinence,Side Effect
+Side Effect::C0042029,Urinary tract infection,Side Effect
+Side Effect::C0042035,Micturition disorder,Side Effect
+Side Effect::C0042075,Urinary tract disorder,Side Effect
+Side Effect::C0042109,Urticaria,Side Effect
+Side Effect::C0042164,Uveitis,Side Effect
+Side Effect::C0042267,Vaginal inflammation,Side Effect
+Side Effect::C0042345,Varicose vein,Side Effect
+Side Effect::C0042373,Angiopathy,Side Effect
+Side Effect::C0042384,Vasculitis,Side Effect
+Side Effect::C0042401,Vasodilation,Side Effect
+Side Effect::C0042420,Syncope vasovagal,Side Effect
+Side Effect::C0042485,Venous insufficiency,Side Effect
+Side Effect::C0042487,Venous thrombosis,Side Effect
+Side Effect::C0042510,Ventricular fibrillation,Side Effect
+Side Effect::C0042514,Ventricular tachycardia,Side Effect
+Side Effect::C0042571,Vertigo,Side Effect
+Side Effect::C0042769,Viral infection,Side Effect
+Side Effect::C0042790,Disorder sight,Side Effect
+Side Effect::C0042847,Vitamin B12 deficiency,Side Effect
+Side Effect::C0042961,Volvulus,Side Effect
+Side Effect::C0042963,Vomiting,Side Effect
+Side Effect::C0043094,Weight increased,Side Effect
+Side Effect::C0043096,Weight decreased,Side Effect
+Side Effect::C0043144,Wheezing,Side Effect
+Side Effect::C0043251,Trauma,Side Effect
+Side Effect::C0043345,Xeroderma,Side Effect
+Side Effect::C0043349,Xerophthalmia,Side Effect
+Side Effect::C0043352,Dry mouth,Side Effect
+Side Effect::C0043387,Yawning,Side Effect
+Side Effect::C0079035,Bradyarrhythmia,Side Effect
+Side Effect::C0079924,Oligohydramnios,Side Effect
+Side Effect::C0080194,Muscle strain,Side Effect
+Side Effect::C0080274,Urinary retention,Side Effect
+Side Effect::C0080276,Urogenital disorder,Side Effect
+Side Effect::C0085096,Peripheral vascular disorder,Side Effect
+Side Effect::C0085129,Bronchial hyperreactivity,Side Effect
+Side Effect::C0085576,Microcytic anaemia,Side Effect
+Side Effect::C0085580,Essential hypertension,Side Effect
+Side Effect::C0085584,Encephalopathy,Side Effect
+Side Effect::C0085593,Chills,Side Effect
+Side Effect::C0085602,Polydipsia,Side Effect
+Side Effect::C0085605,Hepatic failure,Side Effect
+Side Effect::C0085606,Micturition urgency,Side Effect
+Side Effect::C0085607,Volume blood increased,Side Effect
+Side Effect::C0085610,Sinus bradycardia,Side Effect
+Side Effect::C0085612,Ventricular arrhythmia,Side Effect
+Side Effect::C0085614,Atrioventricular block first degree,Side Effect
+Side Effect::C0085616,Vasospasm,Side Effect
+Side Effect::C0085617,Arterial spasm,Side Effect
+Side Effect::C0085619,Orthopnoea,Side Effect
+Side Effect::C0085620,Paralysis flaccid,Side Effect
+Side Effect::C0085624,Burning sensation,Side Effect
+Side Effect::C0085628,Stupor,Side Effect
+Side Effect::C0085631,Agitation,Side Effect
+Side Effect::C0085632,Apathy,Side Effect
+Side Effect::C0085633,Mood swings,Side Effect
+Side Effect::C0085636,Photophobia,Side Effect
+Side Effect::C0085641,Rash pustular,Side Effect
+Side Effect::C0085649,Oedema peripheral,Side Effect
+Side Effect::C0085661,Onycholysis,Side Effect
+Side Effect::C0085680,Hypochloraemia,Side Effect
+Side Effect::C0085681,Hyperphosphataemia,Side Effect
+Side Effect::C0085682,Hypophosphataemia,Side Effect
+Side Effect::C0085688,Breast engorgement,Side Effect
+Side Effect::C0085693,Acute appendicitis,Side Effect
+Side Effect::C0085762,Alcohol abuse,Side Effect
+Side Effect::C0085786,Hamman-Rich syndrome,Side Effect
+Side Effect::C0085932,Dermatitis bullous,Side Effect
+Side Effect::C0086132,Depressive symptom,Side Effect
+Side Effect::C0086168,Dissociation,Side Effect
+Side Effect::C0086439,Hypokinesia,Side Effect
+Side Effect::C0086525,Lassitude,Side Effect
+Side Effect::C0086543,Cataract,Side Effect
+Side Effect::C0086565,Hepatic function abnormal,Side Effect
+Side Effect::C0086981,Syndrome sicca,Side Effect
+Side Effect::C0149514,Acute bronchitis,Side Effect
+Side Effect::C0149725,Lower respiratory tract infection,Side Effect
+Side Effect::C0149744,Oral lesion,Side Effect
+Side Effect::C0149745,Mouth ulceration,Side Effect
+Side Effect::C0149756,Plantar fasciitis,Side Effect
+Side Effect::C0149871,Deep vein thrombosis,Side Effect
+Side Effect::C0149904,Hepatitis cholestatic,Side Effect
+Side Effect::C0149931,Migraine,Side Effect
+Side Effect::C0149937,Acute interstitial nephritis,Side Effect
+Side Effect::C0150450,Altered state of consciousness,Side Effect
+Side Effect::C0151190,Palpable purpura,Side Effect
+Side Effect::C0151205,Periorbital oedema,Side Effect
+Side Effect::C0151315,Neck stiffness,Side Effect
+Side Effect::C0151436,Allergic cutaneous angiitis,Side Effect
+Side Effect::C0151463,Breast abscess,Side Effect
+Side Effect::C0151474,Alcohol intolerance,Side Effect
+Side Effect::C0151476,Alkalosis hypochloraemic,Side Effect
+Side Effect::C0151479,Amylase increased,Side Effect
+Side Effect::C0151480,Antinuclear antibody positive,Side Effect
+Side Effect::C0151505,Application site reaction,Side Effect
+Side Effect::C0151517,Atrioventricular block complete,Side Effect
+Side Effect::C0151529,Bleeding time prolonged,Side Effect
+Side Effect::C0151539,Blood urea increased,Side Effect
+Side Effect::C0151547,Cataract specified,Side Effect
+Side Effect::C0151576,Creatine phosphokinase increased,Side Effect
+Side Effect::C0151578,Creatinine increased,Side Effect
+Side Effect::C0151579,Crystalluria,Side Effect
+Side Effect::C0151585,Deafness permanent,Side Effect
+Side Effect::C0151595,Digitalis intoxication (NOS),Side Effect
+Side Effect::C0151599,Drug level increased,Side Effect
+Side Effect::C0151601,Conjunctival oedema,Side Effect
+Side Effect::C0151602,Swelling face,Side Effect
+Side Effect::C0151603,Generalised oedema,Side Effect
+Side Effect::C0151609,Scrotal oedema,Side Effect
+Side Effect::C0151610,Tongue oedema,Side Effect
+Side Effect::C0151614,Electrolyte depletion,Side Effect
+Side Effect::C0151625,Enzyme abnormality,Side Effect
+Side Effect::C0151626,Necrolysis epidermal,Side Effect
+Side Effect::C0151632,Red blood cell sedimentation rate increased,Side Effect
+Side Effect::C0151636,Ventricular extrasystoles,Side Effect
+Side Effect::C0151640,Fertility male decreased,Side Effect
+Side Effect::C0151662,Gamma-glutamyltransferase increased,Side Effect
+Side Effect::C0151671,Glucose tolerance decreased,Side Effect
+Side Effect::C0151691,High density lipoprotein decreased,Side Effect
+Side Effect::C0151698,Injection site haemorrhage,Side Effect
+Side Effect::C0151699,Haemorrhage intracranial,Side Effect
+Side Effect::C0151701,Pulmonary haemorrhage,Side Effect
+Side Effect::C0151705,Retroperitoneal haemorrhage,Side Effect
+Side Effect::C0151717,Skin hypertrophy,Side Effect
+Side Effect::C0151718,Hypocholesterolaemia,Side Effect
+Side Effect::C0151723,Hypomagnesaemia,Side Effect
+Side Effect::C0151730,Drug effect increased,Side Effect
+Side Effect::C0151735,Injection site reaction,Side Effect
+Side Effect::C0151736,Accidental injury,Side Effect
+Side Effect::C0151744,Myocardial ischaemia,Side Effect
+Side Effect::C0151746,Kidney function abnormal,Side Effect
+Side Effect::C0151754,Lactic dehydrogenase activity increased,Side Effect
+Side Effect::C0151763,Hepatocellular injury,Side Effect
+Side Effect::C0151765,Liver fatty deposition,Side Effect
+Side Effect::C0151766,Liver function test abnormal,Side Effect
+Side Effect::C0151773,Bone marrow depression,Side Effect
+Side Effect::C0151785,Mucous membrane disorder,Side Effect
+Side Effect::C0151786,Muscular weakness,Side Effect
+Side Effect::C0151798,Hepatic necrosis,Side Effect
+Side Effect::C0151799,Skin necrosis,Side Effect
+Side Effect::C0151824,Biliary colic,Side Effect
+Side Effect::C0151825,Bone pain,Side Effect
+Side Effect::C0151826,Retrosternal pain,Side Effect
+Side Effect::C0151827,Eye pain,Side Effect
+Side Effect::C0151828,Injection site pain,Side Effect
+Side Effect::C0151849,Phosphatase alkaline increased,Side Effect
+Side Effect::C0151878,Electrocardiogram QT prolonged,Side Effect
+Side Effect::C0151883,Vesiculobullous rash,Side Effect
+Side Effect::C0151904,Aspartate aminotransferase increased,Side Effect
+Side Effect::C0151905,Alanine aminotransferase increased,Side Effect
+Side Effect::C0151907,Skin discolouration,Side Effect
+Side Effect::C0151908,Dry skin,Side Effect
+Side Effect::C0151934,Hypogeusia,Side Effect
+Side Effect::C0151936,Tendon disorder,Side Effect
+Side Effect::C0151942,Arterial thrombosis,Side Effect
+Side Effect::C0151966,Duodenal ulcer haemorrhage,Side Effect
+Side Effect::C0151970,Oesophageal ulcer,Side Effect
+Side Effect::C0151971,Intestinal ulcer,Side Effect
+Side Effect::C0152025,Polyneuropathy,Side Effect
+Side Effect::C0152027,Sensory disturbance,Side Effect
+Side Effect::C0152029,Sinus congestion,Side Effect
+Side Effect::C0152030,Skin irritation,Side Effect
+Side Effect::C0152031,Joint swelling,Side Effect
+Side Effect::C0152169,Renal colic,Side Effect
+Side Effect::C0152198,Accommodation disorder,Side Effect
+Side Effect::C0152227,Lacrimation increased,Side Effect
+Side Effect::C0152517,Viral diarrhoea,Side Effect
+Side Effect::C0154251,Lipid metabolism disorder,Side Effect
+Side Effect::C0154769,Myopathy toxic,Side Effect
+Side Effect::C0154833,Retinal vascular disorder,Side Effect
+Side Effect::C0155003,Blindness transient,Side Effect
+Side Effect::C0155169,Ocular hyperaemia,Side Effect
+Side Effect::C0155177,Eczema eyelids,Side Effect
+Side Effect::C0155365,Vitreous disorder,Side Effect
+Side Effect::C0155626,Acute myocardial infarction,Side Effect
+Side Effect::C0155709,Atrial fibrillation and flutter,Side Effect
+Side Effect::C0155713,Papillary muscle rupture,Side Effect
+Side Effect::C0155919,Acute pulmonary oedema,Side Effect
+Side Effect::C0156404,Menstruation irregular,Side Effect
+Side Effect::C0157733,Abnormalities of the hair,Side Effect
+Side Effect::C0158369,Swelling of limb,Side Effect
+Side Effect::C0158570,Vascular anomaly,Side Effect
+Side Effect::C0158775,Spine malformation,Side Effect
+Side Effect::C0159056,Abnormal chest sounds NOS,Side Effect
+Side Effect::C0160390,Liver injury,Side Effect
+Side Effect::C0162119,Haemoglobin decreased,Side Effect
+Side Effect::C0162275,Ketonuria,Side Effect
+Side Effect::C0162279,Choroidal detachment,Side Effect
+Side Effect::C0162285,Eyelid oedema,Side Effect
+Side Effect::C0162287,Abnormal faeces,Side Effect
+Side Effect::C0162297,Respiratory arrest,Side Effect
+Side Effect::C0162298,Joint stiffness,Side Effect
+Side Effect::C0162316,Iron deficiency anaemia,Side Effect
+Side Effect::C0162429,Malnutrition,Side Effect
+Side Effect::C0162529,Colitis ischaemic,Side Effect
+Side Effect::C0162533,Porphyria hepatic,Side Effect
+Side Effect::C0162557,Acute hepatic failure,Side Effect
+Side Effect::C0162566,Porphyria cutanea tarda,Side Effect
+Side Effect::C0162627,Skin bacterial infection,Side Effect
+Side Effect::C0162830,Photosensitivity reaction,Side Effect
+Side Effect::C0162834,Skin hyperpigmentation,Side Effect
+Side Effect::C0162848,Eruption lichenoid,Side Effect
+Side Effect::C0178298,Unspecified disorder of skin and subcutaneous tissue,Side Effect
+Side Effect::C0178416,Hypoplastic anaemia,Side Effect
+Side Effect::C0178421,Fibroadenoma of breast,Side Effect
+Side Effect::C0205204,Scab,Side Effect
+Side Effect::C0205707,Sprue,Side Effect
+Side Effect::C0206061,Interstitial pneumonia,Side Effect
+Side Effect::C0206062,Interstitial lung disease,Side Effect
+Side Effect::C0220870,Lightheadedness,Side Effect
+Side Effect::C0220981,Metabolic acidosis,Side Effect
+Side Effect::C0220982,Ketoacidosis,Side Effect
+Side Effect::C0220983,Metabolic alkalosis,Side Effect
+Side Effect::C0221046,Carotid sinus syndrome,Side Effect
+Side Effect::C0221161,Shallow breathing,Side Effect
+Side Effect::C0221185,Xanthopsia,Side Effect
+Side Effect::C0221201,Rash macular,Side Effect
+Side Effect::C0221245,Skin fissures,Side Effect
+Side Effect::C0221269,Pseudolymphoma,Side Effect
+Side Effect::C0221395,Erythropenia,Side Effect
+Side Effect::C0221490,Epigastric distress,Side Effect
+Side Effect::C0221512,Stomach ache,Side Effect
+Side Effect::C0221725,Bronchial obstruction,Side Effect
+Side Effect::C0221733,Paradoxical pressor response,Side Effect
+Side Effect::C0231218,Malaise,Side Effect
+Side Effect::C0231230,Fatigability,Side Effect
+Side Effect::C0231303,Distress,Side Effect
+Side Effect::C0231528,Myalgia,Side Effect
+Side Effect::C0231529,Tendon pain,Side Effect
+Side Effect::C0231530,Muscle twitching,Side Effect
+Side Effect::C0231749,Knee pain,Side Effect
+Side Effect::C0231807,Dyspnoea exertional,Side Effect
+Side Effect::C0231856,Breath sounds abnormal,Side Effect
+Side Effect::C0231874,Wheezing inspiratory,Side Effect
+Side Effect::C0231919,Nasal dryness,Side Effect
+Side Effect::C0232097,Volume plasma increased,Side Effect
+Side Effect::C0232197,Cardiac fibrillation,Side Effect
+Side Effect::C0232203,Atrial rhythm,Side Effect
+Side Effect::C0232208,Nodal rhythm,Side Effect
+Side Effect::C0232286,Precordial pain,Side Effect
+Side Effect::C0232292,Chest tightness,Side Effect
+Side Effect::C0232333,Electrocardiogram U wave present,Side Effect
+Side Effect::C0232352,Vascular insufficiency,Side Effect
+Side Effect::C0232431,Cold sweat,Side Effect
+Side Effect::C0232459,Digestion impaired,Side Effect
+Side Effect::C0232461,Increased appetite,Side Effect
+Side Effect::C0232462,Decreased appetite,Side Effect
+Side Effect::C0232487,Abdominal discomfort,Side Effect
+Side Effect::C0232488,Abdominal colic,Side Effect
+Side Effect::C0232492,Abdominal pain upper,Side Effect
+Side Effect::C0232493,Epigastric pain,Side Effect
+Side Effect::C0232495,Abdominal pain lower,Side Effect
+Side Effect::C0232570,Epigastric fullness,Side Effect
+Side Effect::C0232602,Retching,Side Effect
+Side Effect::C0232693,Borborygmi,Side Effect
+Side Effect::C0232726,Rectal tenesmus,Side Effect
+Side Effect::C0232766,Asterixis,Side Effect
+Side Effect::C0232807,Function kidney decreased,Side Effect
+Side Effect::C0232849,Bladder pain,Side Effect
+Side Effect::C0233407,Disorientation,Side Effect
+Side Effect::C0233414,Disturbance in attention,Side Effect
+Side Effect::C0233417,Poor concentration,Side Effect
+Side Effect::C0233459,Emotional disorder,Side Effect
+Side Effect::C0233471,Flat affect,Side Effect
+Side Effect::C0233472,Affect lability,Side Effect
+Side Effect::C0233485,Apprehension,Side Effect
+Side Effect::C0233494,Tension,Side Effect
+Side Effect::C0233571,Excitement,Side Effect
+Side Effect::C0233632,Thinking abnormal,Side Effect
+Side Effect::C0233715,Speech impairment NOS,Side Effect
+Side Effect::C0233763,"Hallucination, visual",Side Effect
+Side Effect::C0233794,Memory impairment,Side Effect
+Side Effect::C0234133,Extrapyramidal symptoms,Side Effect
+Side Effect::C0234192,Feeling cold,Side Effect
+Side Effect::C0234193,Sensation of heat,Side Effect
+Side Effect::C0234215,Discomfort,Side Effect
+Side Effect::C0234222,Sensation of pressure,Side Effect
+Side Effect::C0234233,Tenderness,Side Effect
+Side Effect::C0234238,Ache,Side Effect
+Side Effect::C0234369,Trembling,Side Effect
+Side Effect::C0234428,Consciousness abnormal,Side Effect
+Side Effect::C0234458,Abnormal dreams,Side Effect
+Side Effect::C0234518,Slurred speech,Side Effect
+Side Effect::C0234533,Convulsions generalised,Side Effect
+Side Effect::C0234632,Visual acuity reduced,Side Effect
+Side Effect::C0234708,Intraocular pressure increased,Side Effect
+Side Effect::C0234913,Rash erythematous,Side Effect
+Side Effect::C0234987,Dizziness postural,Side Effect
+Side Effect::C0235018,Localised numbness,Side Effect
+Side Effect::C0235031,Neurological symptom,Side Effect
+Side Effect::C0235032,Neurotoxicity,Side Effect
+Side Effect::C0235086,Muscle contractions involuntary,Side Effect
+Side Effect::C0235198,Cerebration impaired,Side Effect
+Side Effect::C0235234,Dry throat,Side Effect
+Side Effect::C0235266,Eye irritation,Side Effect
+Side Effect::C0235280,Ototoxicity,Side Effect
+Side Effect::C0235283,Ear buzzing,Side Effect
+Side Effect::C0235290,Taste bitter,Side Effect
+Side Effect::C0235295,Abdominal distress,Side Effect
+Side Effect::C0235296,Epigastric pain not food-related,Side Effect
+Side Effect::C0235309,Upset stomach,Side Effect
+Side Effect::C0235315,Faeces discoloured,Side Effect
+Side Effect::C0235318,Fullness abdominal,Side Effect
+Side Effect::C0235325,Gastric haemorrhage,Side Effect
+Side Effect::C0235338,Salivary gland pain,Side Effect
+Side Effect::C0235351,Tongue ulceration,Side Effect
+Side Effect::C0235357,Tooth hypoplasia,Side Effect
+Side Effect::C0235369,Hepatitis granulomatous,Side Effect
+Side Effect::C0235378,Hepatotoxicity,Side Effect
+Side Effect::C0235398,Diabetes mellitus exacerbated,Side Effect
+Side Effect::C0235416,Blood uric acid increased,Side Effect
+Side Effect::C0235430,Ketonemia,Side Effect
+Side Effect::C0235431,Blood creatinine increased,Side Effect
+Side Effect::C0235437,Gravitational oedema,Side Effect
+Side Effect::C0235439,Ankle edema,Side Effect
+Side Effect::C0235467,Angina pectoris aggravated,Side Effect
+Side Effect::C0235490,Peripheral ischaemia,Side Effect
+Side Effect::C0235522,Vein disorder,Side Effect
+Side Effect::C0235546,Hypopnoea,Side Effect
+Side Effect::C0235560,Respiratory tract haemorrhage,Side Effect
+Side Effect::C0235620,Haemorrhage urinary tract,Side Effect
+Side Effect::C0235639,Urine abnormality,Side Effect
+Side Effect::C0235660,Galactorrhoea,Side Effect
+Side Effect::C0235710,Chest discomfort,Side Effect
+Side Effect::C0235750,Hypertension worsened,Side Effect
+Side Effect::C0235756,Semen abnormal,Side Effect
+Side Effect::C0235763,Psoriasis flare-up,Side Effect
+Side Effect::C0235807,Hair texture abnormal,Side Effect
+Side Effect::C0235818,Bullous eruption,Side Effect
+Side Effect::C0235832,Hernia congenital,Side Effect
+Side Effect::C0235848,Skin cold clammy,Side Effect
+Side Effect::C0235857,Lacrimation decreased,Side Effect
+Side Effect::C0235876,Depression aggravated,Side Effect
+Side Effect::C0235886,Leg edema,Side Effect
+Side Effect::C0235889,Arthritis aggravated,Side Effect
+Side Effect::C0235890,Migraine aggravated,Side Effect
+Side Effect::C0235893,Allergy aggravated,Side Effect
+Side Effect::C0235896,Lung infiltration,Side Effect
+Side Effect::C0235901,Lacrimation abnormal NOS,Side Effect
+Side Effect::C0235906,Bronchospasm aggravated,Side Effect
+Side Effect::C0235922,Breast neoplasm benign female,Side Effect
+Side Effect::C0235966,Dreaming excessive,Side Effect
+Side Effect::C0235996,Hepatic enzyme increased,Side Effect
+Side Effect::C0236036,Oculomucocutaneous syndrome,Side Effect
+Side Effect::C0236068,Swollen tongue,Side Effect
+Side Effect::C0236075,Menopausal symptoms,Side Effect
+Side Effect::C0236106,Photosensitivity allergic reaction,Side Effect
+Side Effect::C0236124,Gastrointestinal obstruction,Side Effect
+Side Effect::C0236141,Electrocardiogram abnormal specific,Side Effect
+Side Effect::C0237314,Heart rate irregular,Side Effect
+Side Effect::C0237326,Dyschezia,Side Effect
+Side Effect::C0237849,Skin exfoliation,Side Effect
+Side Effect::C0237938,Gastrointestinal ulcer,Side Effect
+Side Effect::C0238242,Lithium toxicity,Side Effect
+Side Effect::C0239113,Coombs test positive,Side Effect
+Side Effect::C0239134,Productive cough,Side Effect
+Side Effect::C0239182,Watery diarrhoea,Side Effect
+Side Effect::C0239293,Oesophageal haemorrhage,Side Effect
+Side Effect::C0239340,Edema of lower extremities,Side Effect
+Side Effect::C0239343,Acral erythema,Side Effect
+Side Effect::C0239375,Numbness of limbs,Side Effect
+Side Effect::C0239377,Pain in arm,Side Effect
+Side Effect::C0239385,Paresthesia of limbs,Side Effect
+Side Effect::C0239454,Erythema of eyelid,Side Effect
+Side Effect::C0239488,Erythema facial,Side Effect
+Side Effect::C0239513,Pallor facial,Side Effect
+Side Effect::C0239521,Facial rash,Side Effect
+Side Effect::C0239571,Foetor hepaticus,Side Effect
+Side Effect::C0239836,Paraesthesia hand,Side Effect
+Side Effect::C0239937,Microscopic hematuria,Side Effect
+Side Effect::C0240327,Taste metallic,Side Effect
+Side Effect::C0240464,Neck oedema of,Side Effect
+Side Effect::C0240515,Nipple pain,Side Effect
+Side Effect::C0240521,Nipple tenderness,Side Effect
+Side Effect::C0240717,Perineal pain,Side Effect
+Side Effect::C0240735,Personality change,Side Effect
+Side Effect::C0241057,Skin burning sensation,Side Effect
+Side Effect::C0241075,Skin induration,Side Effect
+Side Effect::C0241137,Pallor of skin,Side Effect
+Side Effect::C0241705,Strangury,Side Effect
+Side Effect::C0241742,Wound haemorrhage,Side Effect
+Side Effect::C0241832,Cerebrovascular insufficiency,Side Effect
+Side Effect::C0241863,Diabetic,Side Effect
+Side Effect::C0241950,Intestinal infarction,Side Effect
+Side Effect::C0242073,Pulmonary congestion,Side Effect
+Side Effect::C0242184,Hypoxia,Side Effect
+Side Effect::C0242301,Furuncle,Side Effect
+Side Effect::C0242339,Dyslipidaemia,Side Effect
+Side Effect::C0242350,Erectile dysfunction,Side Effect
+Side Effect::C0242379,Lung neoplasm malignant,Side Effect
+Side Effect::C0242420,Retinal oedema,Side Effect
+Side Effect::C0242422,Parkinsonism,Side Effect
+Side Effect::C0242429,Throat sore,Side Effect
+Side Effect::C0242461,Purpura non-thrombocytopenic,Side Effect
+Side Effect::C0242528,Azotaemia,Side Effect
+Side Effect::C0242656,Disease progression,Side Effect
+Side Effect::C0242698,Left ventricular dysfunction,Side Effect
+Side Effect::C0242979,Muscle fatigue,Side Effect
+Side Effect::C0243026,Sepsis,Side Effect
+Side Effect::C0259749,Autonomic neuropathy,Side Effect
+Side Effect::C0259799,Punctate keratitis,Side Effect
+Side Effect::C0259817,Xerosis,Side Effect
+Side Effect::C0260662,Auditory disorder NOS,Side Effect
+Side Effect::C0262662,Ventricular bigeminy,Side Effect
+Side Effect::C0262985,Dermatitis psoriasiform,Side Effect
+Side Effect::C0262988,Cutaneous vasculitis,Side Effect
+Side Effect::C0263386,Ichthyosis acquired,Side Effect
+Side Effect::C0263540,Onychomadesis,Side Effect
+Side Effect::C0264545,Pleural thickening,Side Effect
+Side Effect::C0264714,Cardiac failure acute,Side Effect
+Side Effect::C0264886,Conduction disorder,Side Effect
+Side Effect::C0264893,Nodal arrhythmia,Side Effect
+Side Effect::C0264906,Atrioventricular block second degree,Side Effect
+Side Effect::C0264939,Polyangiitis,Side Effect
+Side Effect::C0265031,Haemorrhoidal haemorrhage,Side Effect
+Side Effect::C0265935,Congenital arterial malformation,Side Effect
+Side Effect::C0267373,Intestinal haemorrhage,Side Effect
+Side Effect::C0267406,Infarction mesenteric,Side Effect
+Side Effect::C0267410,Mesenteric artery thrombosis,Side Effect
+Side Effect::C0267596,Rectal haemorrhage,Side Effect
+Side Effect::C0267792,Hepatobiliary disease,Side Effect
+Side Effect::C0267821,Hepatic congestion,Side Effect
+Side Effect::C0267941,Pancreatitis necrotising,Side Effect
+Side Effect::C0268000,Fluid retention,Side Effect
+Side Effect::C0268030,Acidemia,Side Effect
+Side Effect::C0268732,Nephritic syndrome,Side Effect
+Side Effect::C0270458,Psychotic depression,Side Effect
+Side Effect::C0270729,Drug-induced parkinsonism,Side Effect
+Side Effect::C0270790,Quadriparesis,Side Effect
+Side Effect::C0270795,Monoparesis,Side Effect
+Side Effect::C0271051,Macular oedema,Side Effect
+Side Effect::C0271240,Blindness unilateral,Side Effect
+Side Effect::C0271308,Blepharitis allergic,Side Effect
+Side Effect::C0271412,Ear haemorrhage,Side Effect
+Side Effect::C0271429,Otitis media acute,Side Effect
+Side Effect::C0271650,Glucose tolerance impaired,Side Effect
+Side Effect::C0271710,Hypoglycemic reaction,Side Effect
+Side Effect::C0277585,Drug intolerance,Side Effect
+Side Effect::C0277925,Peripheral coldness,Side Effect
+Side Effect::C0278016,Faeces hard,Side Effect
+Side Effect::C0278106,Ejaculation failure,Side Effect
+Side Effect::C0278134,Sensory loss,Side Effect
+Side Effect::C0281774,Acute psychosis,Side Effect
+Side Effect::C0281913,Muscle swelling,Side Effect
+Side Effect::C0281981,Skin mass,Side Effect
+Side Effect::C0302295,Eruption,Side Effect
+Side Effect::C0302314,Xanthoma,Side Effect
+Side Effect::C0302809,Hepatitis fulminant,Side Effect
+Side Effect::C0311220,Lymphocytoma cutis,Side Effect
+Side Effect::C0311468,Blood bilirubin increased,Side Effect
+Side Effect::C0312420,Hypersexuality,Side Effect
+Side Effect::C0314719,Dry eye,Side Effect
+Side Effect::C0332534,Induration,Side Effect
+Side Effect::C0332563,Papule,Side Effect
+Side Effect::C0332573,Macule,Side Effect
+Side Effect::C0332575,Redness,Side Effect
+Side Effect::C0332691,Scald,Side Effect
+Side Effect::C0333139,Pneumatosis,Side Effect
+Side Effect::C0333243,Pitting edema,Side Effect
+Side Effect::C0333291,Ulcer haemorrhage,Side Effect
+Side Effect::C0338375,Aseptic peritonitis,Side Effect
+Side Effect::C0338480,Migraine without aura,Side Effect
+Side Effect::C0338575,Superior sagittal sinus thrombosis,Side Effect
+Side Effect::C0338614,Psychotic episode,Side Effect
+Side Effect::C0338656,Cognitive impairment,Side Effect
+Side Effect::C0338831,Mania,Side Effect
+Side Effect::C0338908,Anxiety depression,Side Effect
+Side Effect::C0339916,Viral upper respiratory tract infection,Side Effect
+Side Effect::C0340305,Inferior myocardial infarction,Side Effect
+Side Effect::C0340464,Extrasystoles,Side Effect
+Side Effect::C0340726,Embolism venous,Side Effect
+Side Effect::C0340861,Pulseless electrical activity,Side Effect
+Side Effect::C0340865,Anaphylactoid reaction,Side Effect
+Side Effect::C0341012,Oral herpes,Side Effect
+Side Effect::C0341047,Parotid gland enlargement,Side Effect
+Side Effect::C0341163,Gastric ulcer perforation,Side Effect
+Side Effect::C0341164,Gastric ulcer haemorrhage,Side Effect
+Side Effect::C0341245,Duodenitis haemorrhagic,Side Effect
+Side Effect::C0341503,Peritonitis bacterial,Side Effect
+Side Effect::C0341742,Acute retention of urine,Side Effect
+Side Effect::C0342257,Diabetic complication,Side Effect
+Side Effect::C0342579,Electrolyte imbalance,Side Effect
+Side Effect::C0342592,Anion gap increased,Side Effect
+Side Effect::C0342881,Homozygous familial hypercholesterolaemia,Side Effect
+Side Effect::C0342882,Heterozygous familial hypercholesterolemia,Side Effect
+Side Effect::C0343378,Helicobacter gastritis,Side Effect
+Side Effect::C0343863,Genital candidiasis,Side Effect
+Side Effect::C0344232,Vision blurred,Side Effect
+Side Effect::C0344315,Depressed mood,Side Effect
+Side Effect::C0344320,Vivid dreams,Side Effect
+Side Effect::C0344357,Nocturnal dyspnoea,Side Effect
+Side Effect::C0345904,Hepatic cancer,Side Effect
+Side Effect::C0346156,Benign breast neoplasm,Side Effect
+Side Effect::C0349506,Photosensitivity,Side Effect
+Side Effect::C0349782,Ischaemic cardiomyopathy,Side Effect
+Side Effect::C0349790,Exacerbation of asthma,Side Effect
+Side Effect::C0376175,Bell's palsy,Side Effect
+Side Effect::C0376286,Avitaminosis,Side Effect
+Side Effect::C0392025,Enlargement abdomen,Side Effect
+Side Effect::C0392156,Akathisia,Side Effect
+Side Effect::C0392162,Sticky skin,Side Effect
+Side Effect::C0392163,Corneal erosion,Side Effect
+Side Effect::C0392171,Influenza-like symptoms,Side Effect
+Side Effect::C0392176,Gastric irritation,Side Effect
+Side Effect::C0392197,Warmth,Side Effect
+Side Effect::C0392386,Platelet count decreased,Side Effect
+Side Effect::C0392525,Nephrolithiasis,Side Effect
+Side Effect::C0392699,Dysaesthesia,Side Effect
+Side Effect::C0392703,Shakiness,Side Effect
+Side Effect::C0393760,Initial insomnia,Side Effect
+Side Effect::C0393761,Middle insomnia,Side Effect
+Side Effect::C0394006,Disequilibrium syndrome,Side Effect
+Side Effect::C0398370,Lipoedema,Side Effect
+Side Effect::C0398623,Thrombophilia,Side Effect
+Side Effect::C0400821,Colitis microscopic,Side Effect
+Side Effect::C0400822,Lymphocytic colitis,Side Effect
+Side Effect::C0401013,Fungal peritonitis,Side Effect
+Side Effect::C0401151,Chronic diarrhea,Side Effect
+Side Effect::C0403447,Chronic renal insufficiency,Side Effect
+Side Effect::C0403632,Cystitis noninfective,Side Effect
+Side Effect::C0403673,Retrograde ejaculation,Side Effect
+Side Effect::C0404521,Vaginal infection,Side Effect
+Side Effect::C0409974,Lupus erythematosus,Side Effect
+Side Effect::C0413252,Hypothermia,Side Effect
+Side Effect::C0423006,Eye discharge,Side Effect
+Side Effect::C0423008,Eye bleeding,Side Effect
+Side Effect::C0423153,Lacrimation,Side Effect
+Side Effect::C0423271,Scleral hyperaemia,Side Effect
+Side Effect::C0423281,Anterior chamber flare,Side Effect
+Side Effect::C0423602,Sensation of foreign body,Side Effect
+Side Effect::C0423636,Cardiac pain,Side Effect
+Side Effect::C0423729,Painful respiration,Side Effect
+Side Effect::C0423791,Rash maculo-papular,Side Effect
+Side Effect::C0423798,Increased tendency to bruise,Side Effect
+Side Effect::C0424024,Delusional perception,Side Effect
+Side Effect::C0424109,Tearfulness,Side Effect
+Side Effect::C0424295,Hyperkinesia,Side Effect
+Side Effect::C0424605,Developmental delay,Side Effect
+Side Effect::C0424740,Cold hands,Side Effect
+Side Effect::C0424741,Cold feet,Side Effect
+Side Effect::C0424790,Rigors,Side Effect
+Side Effect::C0426390,Bladder spasm,Side Effect
+Side Effect::C0426576,Gastrointestinal symptom NOS,Side Effect
+Side Effect::C0427008,Stiffness,Side Effect
+Side Effect::C0427055,Facial paresis,Side Effect
+Side Effect::C0428282,Serum creatinine decreased,Side Effect
+Side Effect::C0428908,Sinoatrial node dysfunction,Side Effect
+Side Effect::C0428974,Arrhythmia supraventricular,Side Effect
+Side Effect::C0428977,Bradycardia,Side Effect
+Side Effect::C0435002,Ligament sprain,Side Effect
+Side Effect::C0438142,Urine analysis abnormal,Side Effect
+Side Effect::C0438215,Laboratory test abnormal,Side Effect
+Side Effect::C0438717,Transaminases increased,Side Effect
+Side Effect::C0442856,Hypoperfusion,Side Effect
+Side Effect::C0442874,Neuropathy,Side Effect
+Side Effect::C0451641,Urolithiasis,Side Effect
+Side Effect::C0456909,Blindness,Side Effect
+Side Effect::C0473237,Frank hematuria,Side Effect
+Side Effect::C0475858,Pruritus generalised,Side Effect
+Side Effect::C0476273,Respiratory distress,Side Effect
+Side Effect::C0476280,Musculoskeletal chest pain,Side Effect
+Side Effect::C0476281,Non-cardiac chest pain,Side Effect
+Side Effect::C0476289,Gas pain,Side Effect
+Side Effect::C0476327,Serum amylase increased,Side Effect
+Side Effect::C0483455,Prothrombin time ratio,Side Effect
+Side Effect::C0494475,Tonic-clonic seizures,Side Effect
+Side Effect::C0494559,Inner ear disorder,Side Effect
+Side Effect::C0497156,Lymphadenopathy,Side Effect
+Side Effect::C0497201,Abnormal sensation in eye,Side Effect
+Side Effect::C0497247,Blood pressure increased,Side Effect
+Side Effect::C0497365,Rash generalised,Side Effect
+Side Effect::C0497538,Benign gastrointestinal neoplasm,Side Effect
+Side Effect::C0518015,Haemoglobin,Side Effect
+Side Effect::C0518988,Tooth abscess,Side Effect
+Side Effect::C0520463,Hepatitis chronic active,Side Effect
+Side Effect::C0520532,Subcutaneous haematoma,Side Effect
+Side Effect::C0520540,Rebound hypertension,Side Effect
+Side Effect::C0520886,Electrocardiogram ST segment elevation,Side Effect
+Side Effect::C0520887,Electrocardiogram ST segment depression,Side Effect
+Side Effect::C0520888,Electrocardiogram T wave inversion,Side Effect
+Side Effect::C0520893,Localized exfoliation,Side Effect
+Side Effect::C0520962,Pain localised,Side Effect
+Side Effect::C0520966,Coordination abnormal,Side Effect
+Side Effect::C0521158,Neoplasm recurrence,Side Effect
+Side Effect::C0521160,Rash psoriaform,Side Effect
+Side Effect::C0521172,Eschar,Side Effect
+Side Effect::C0521465,Toxic skin eruption,Side Effect
+Side Effect::C0521491,Application site pain,Side Effect
+Side Effect::C0521495,Application site rash,Side Effect
+Side Effect::C0521516,Polymyalgia,Side Effect
+Side Effect::C0521839,Influenza like illness,Side Effect
+Side Effect::C0522035,Upper limb oedema,Side Effect
+Side Effect::C0522055,Electrocardiogram abnormal,Side Effect
+Side Effect::C0522224,Paralysis,Side Effect
+Side Effect::C0524620,Metabolic syndrome,Side Effect
+Side Effect::C0541782,Sinus arrest,Side Effect
+Side Effect::C0541799,Bad taste,Side Effect
+Side Effect::C0541832,Chromaturia,Side Effect
+Side Effect::C0541900,Disulfiram like reaction,Side Effect
+Side Effect::C0541923,Lip oedema,Side Effect
+Side Effect::C0542027,Hypercoagulation,Side Effect
+Side Effect::C0542052,Coronary artery insufficiency,Side Effect
+Side Effect::C0542175,Rash pemphigoid,Side Effect
+Side Effect::C0542184,Reaction gastrointestinal,Side Effect
+Side Effect::C0542203,Water retention,Side Effect
+Side Effect::C0542476,Forgetfulness,Side Effect
+Side Effect::C0542571,Face oedema,Side Effect
+Side Effect::C0543467,Surgery,Side Effect
+Side Effect::C0543698,Hypersensitive syndrome,Side Effect
+Side Effect::C0546817,Fluid overload,Side Effect
+Side Effect::C0546884,Hypovolaemia,Side Effect
+Side Effect::C0546956,Onychoclasis,Side Effect
+Side Effect::C0546959,Atrial tachycardia,Side Effect
+Side Effect::C0547030,Visual disturbance,Side Effect
+Side Effect::C0548823,Distress gastrointestinal,Side Effect
+Side Effect::C0549202,Chapped skin,Side Effect
+Side Effect::C0549209,Feeling jittery,Side Effect
+Side Effect::C0549249,Depressed level of consciousness,Side Effect
+Side Effect::C0549262,Rebound effect,Side Effect
+Side Effect::C0549336,Asthma aggravated,Side Effect
+Side Effect::C0549356,Inflicted injury,Side Effect
+Side Effect::C0549369,Pancreatic enzymes increased,Side Effect
+Side Effect::C0549373,Laryngeal pain,Side Effect
+Side Effect::C0549386,Sensation of warmth,Side Effect
+Side Effect::C0549410,Palmar-plantar erythrodysaesthesia syndrome,Side Effect
+Side Effect::C0549433,Surgical intervention,Side Effect
+Side Effect::C0549453,Traumatic haematoma,Side Effect
+Side Effect::C0549493,Alveolitis,Side Effect
+Side Effect::C0549622,Sexual dysfunction,Side Effect
+Side Effect::C0553548,Angiitis necrotising,Side Effect
+Side Effect::C0553692,Haemorrhagic stroke,Side Effect
+Side Effect::C0553704,Serum potassium increased,Side Effect
+Side Effect::C0553732,Prothrombin level decreased,Side Effect
+Side Effect::C0554309,Azotemia prerenal,Side Effect
+Side Effect::C0554976,Bradyphrenia,Side Effect
+Side Effect::C0555970,Nose infection NOS,Side Effect
+Side Effect::C0558489,Renal pain,Side Effect
+Side Effect::C0564622,Albumin urine present,Side Effect
+Side Effect::C0574002,Foot edema,Side Effect
+Side Effect::C0574067,Cough increased,Side Effect
+Side Effect::C0574741,Skin bleeding,Side Effect
+Side Effect::C0575081,Gait disturbance,Side Effect
+Side Effect::C0575090,Balance disorder,Side Effect
+Side Effect::C0577115,Soft stools,Side Effect
+Side Effect::C0578454,Neck swelling,Side Effect
+Side Effect::C0581164,Digoxin level increased,Side Effect
+Side Effect::C0581394,Swelling of legs,Side Effect
+Side Effect::C0585186,Cutaneous hypersensitivity,Side Effect
+Side Effect::C0587246,Limb paresis,Side Effect
+Side Effect::C0595877,Blood glucose increased,Side Effect
+Side Effect::C0595883,Blood glucose decreased,Side Effect
+Side Effect::C0595916,Nephropathy toxic,Side Effect
+Side Effect::C0595929,Cholesterol serum elevated,Side Effect
+Side Effect::C0595930,Blood cholesterol increased,Side Effect
+Side Effect::C0595938,Increased effect,Side Effect
+Side Effect::C0596170,Binge eating,Side Effect
+Side Effect::C0600142,Hot flush,Side Effect
+Side Effect::C0600228,Cardio-respiratory arrest,Side Effect
+Side Effect::C0600260,Obstructive airways disorder,Side Effect
+Side Effect::C0677500,Stinging,Side Effect
+Side Effect::C0678222,Carcinoma breast,Side Effect
+Side Effect::C0679403,Vascular stenosis,Side Effect
+Side Effect::C0684249,Carcinoma of lung,Side Effect
+Side Effect::C0687133,Drug interaction,Side Effect
+Side Effect::C0687707,Anorectal disorder,Side Effect
+Side Effect::C0687713,Gastrointestinal pain,Side Effect
+Side Effect::C0694547,Systolic ejection murmur,Side Effect
+Side Effect::C0694563,Excessive daytime sleepiness,Side Effect
+Side Effect::C0699744,Ear infection,Side Effect
+Side Effect::C0700053,Idiopathic hypertrophic subaortic stenosis,Side Effect
+Side Effect::C0700200,Presyncope,Side Effect
+Side Effect::C0700225,Serum creatinine increased,Side Effect
+Side Effect::C0700345,Vulvovaginal candidiasis,Side Effect
+Side Effect::C0700361,Emotional distress,Side Effect
+Side Effect::C0700363,Rhythm idioventricular,Side Effect
+Side Effect::C0700590,Sweating increased,Side Effect
+Side Effect::C0701811,Short-term memory loss,Side Effect
+Side Effect::C0701836,Thermal burn,Side Effect
+Side Effect::C0702166,Acne,Side Effect
+Side Effect::C0728899,Intoxication,Side Effect
+Side Effect::C0728936,Unspecified circulatory system disorder,Side Effect
+Side Effect::C0730345,Microalbuminuria,Side Effect
+Side Effect::C0740394,Hyperuricaemia,Side Effect
+Side Effect::C0740399,Auditory and visual hallucinations,Side Effect
+Side Effect::C0740481,Hypotension asymptomatic,Side Effect
+Side Effect::C0740482,Hypotension orthostatic symptomatic,Side Effect
+Side Effect::C0741494,Bilirubin total increased,Side Effect
+Side Effect::C0741983,Carotid sinus hypersensitivity,Side Effect
+Side Effect::C0744727,Haematocrit decreased,Side Effect
+Side Effect::C0745103,Type IIa hyperlipidaemia,Side Effect
+Side Effect::C0745153,Hypoglycaemic episode,Side Effect
+Side Effect::C0745499,Junctional bradycardia,Side Effect
+Side Effect::C0746961,Oxygen saturation decreased,Side Effect
+Side Effect::C0750016,Generalized urticaria,Side Effect
+Side Effect::C0750197,Sustained ventricular tachycardia,Side Effect
+Side Effect::C0750272,Unilateral vision loss,Side Effect
+Side Effect::C0750394,White blood cell count decreased,Side Effect
+Side Effect::C0750426,White blood cell count increased,Side Effect
+Side Effect::C0750857,Alkaline phosphatase serum increased,Side Effect
+Side Effect::C0751295,Memory loss,Side Effect
+Side Effect::C0812387,Coldness,Side Effect
+Side Effect::C0813230,Serum triglycerides increased,Side Effect
+Side Effect::C0847033,Allergic oedema,Side Effect
+Side Effect::C0848548,Hypertensive nephropathy,Side Effect
+Side Effect::C0849918,Eyelids pruritus,Side Effect
+Side Effect::C0850149,Dry cough,Side Effect
+Side Effect::C0851341,Infestation NOS,Side Effect
+Side Effect::C0851578,Sleep disorder,Side Effect
+Side Effect::C0852361,Skin haemorrhage,Side Effect
+Side Effect::C0852795,Blood insulin increased,Side Effect
+Side Effect::C0852810,Blood creatinine decreased,Side Effect
+Side Effect::C0852911,Blood alkaline phosphatase increased,Side Effect
+Side Effect::C0853026,Porphyria non-acute,Side Effect
+Side Effect::C0853034,Blood creatine phosphokinase increased,Side Effect
+Side Effect::C0853087,Nail abnormality NOS,Side Effect
+Side Effect::C0853149,Blood lactate dehydrogenase increased,Side Effect
+Side Effect::C0853225,International normalised ratio increased,Side Effect
+Side Effect::C0853277,Pseudo-Bartter syndrome,Side Effect
+Side Effect::C0853348,Arthropod bite,Side Effect
+Side Effect::C0853619,Local swelling,Side Effect
+Side Effect::C0853692,Blood triglycerides increased,Side Effect
+Side Effect::C0853697,Neutrophil count decreased,Side Effect
+Side Effect::C0853700,Application site erythema,Side Effect
+Side Effect::C0853754,Blood osmolarity increased,Side Effect
+Side Effect::C0853760,Blood potassium increased,Side Effect
+Side Effect::C0853761,Blood potassium decreased,Side Effect
+Side Effect::C0853813,Local reaction,Side Effect
+Side Effect::C0853875,Myoglobin urine present,Side Effect
+Side Effect::C0853893,Device interaction,Side Effect
+Side Effect::C0853908,Oropharyngeal swelling,Side Effect
+Side Effect::C0854029,Blood creatine increased,Side Effect
+Side Effect::C0854082,Blood prolactin increased,Side Effect
+Side Effect::C0854097,Hypoaesthesia eye,Side Effect
+Side Effect::C0854107,Haemorrhage subcutaneous,Side Effect
+Side Effect::C0854382,Libido disorder,Side Effect
+Side Effect::C0854467,Myelosuppression,Side Effect
+Side Effect::C0855223,"Hallucinations, mixed",Side Effect
+Side Effect::C0855242,Disturbance in sexual arousal,Side Effect
+Side Effect::C0855246,Abnormal sleep-related event,Side Effect
+Side Effect::C0855304,Glycosylated haemoglobin decreased,Side Effect
+Side Effect::C0855329,Electrocardiogram change,Side Effect
+Side Effect::C0855625,Bilirubin conjugated increased,Side Effect
+Side Effect::C0856110,Oedema aggravated,Side Effect
+Side Effect::C0856597,Pulmonary alveolitis,Side Effect
+Side Effect::C0856882,Potassium increased,Side Effect
+Side Effect::C0857073,Cold hands & feet,Side Effect
+Side Effect::C0857083,Generalized macular rash,Side Effect
+Side Effect::C0857093,Elevated liver enzyme levels,Side Effect
+Side Effect::C0857121,Hypertensive,Side Effect
+Side Effect::C0857122,Hyponatraemic,Side Effect
+Side Effect::C0857172,Persistent dry cough,Side Effect
+Side Effect::C0857177,Arthritic pains,Side Effect
+Side Effect::C0857189,Raised serum uric acid,Side Effect
+Side Effect::C0857256,Unwell,Side Effect
+Side Effect::C0857305,Thrombocytopenic purpura,Side Effect
+Side Effect::C0857323,Angioedema of larynx,Side Effect
+Side Effect::C0857331,Acute liver damage,Side Effect
+Side Effect::C0857353,Hypotensive,Side Effect
+Side Effect::C0857370,Generalized flushing,Side Effect
+Side Effect::C0857432,Serum osmolality increased,Side Effect
+Side Effect::C0857448,Serum urea increased,Side Effect
+Side Effect::C0857468,Withdrawal hypertension,Side Effect
+Side Effect::C0857483,Worsening of diabetes,Side Effect
+Side Effect::C0857493,Upper gastrointestinal symptoms,Side Effect
+Side Effect::C0857496,Thromboembolic event,Side Effect
+Side Effect::C0857807,Accidental ingestion,Side Effect
+Side Effect::C0858118,Plasma creatinine increased,Side Effect
+Side Effect::C0858217,Gastrointestinal fullness,Side Effect
+Side Effect::C0858589,Coordination disturbance,Side Effect
+Side Effect::C0858600,Taste sweet,Side Effect
+Side Effect::C0858635,Pharyngolaryngeal pain,Side Effect
+Side Effect::C0858678,Alopecia reversible,Side Effect
+Side Effect::C0858738,Vitamin B12 absorption decreased,Side Effect
+Side Effect::C0858797,Instillation site pain,Side Effect
+Side Effect::C0858814,Hepatitis symptom,Side Effect
+Side Effect::C0859061,Bilirubin value increased,Side Effect
+Side Effect::C0859996,Corneal sensitivity decreased,Side Effect
+Side Effect::C0860155,Non-Q wave MI,Side Effect
+Side Effect::C0860207,Drug-induced liver injury,Side Effect
+Side Effect::C0860210,Granulomatous liver disease,Side Effect
+Side Effect::C0860239,Catheter related infection,Side Effect
+Side Effect::C0860433,Irreversible renal failure,Side Effect
+Side Effect::C0860434,Fluid and electrolyte imbalance,Side Effect
+Side Effect::C0860645,Bizarre dreams,Side Effect
+Side Effect::C0861111,Cardioactive drug level increased,Side Effect
+Side Effect::C0861120,Albumin urine increased,Side Effect
+Side Effect::C0863084,Skin discomfort,Side Effect
+Side Effect::C0863093,Cold symptoms,Side Effect
+Side Effect::C0863113,Hypotension symptomatic,Side Effect
+Side Effect::C0863129,AGEP,Side Effect
+Side Effect::C0863147,Glucose urine increased,Side Effect
+Side Effect::C0870082,Hyperkeratosis,Side Effect
+Side Effect::C0876973,Lung infection,Side Effect
+Side Effect::C0877046,Tooth infection,Side Effect
+Side Effect::C0877055,Acute generalised exanthematous pustulosis,Side Effect
+Side Effect::C0877056,Hypoglycaemic seizure,Side Effect
+Side Effect::C0877127,Application site papules,Side Effect
+Side Effect::C0877167,Psychomotor skills impaired,Side Effect
+Side Effect::C0877172,Spinal epidural haematoma,Side Effect
+Side Effect::C0877232,Peripheral swelling,Side Effect
+Side Effect::C0877266,Upper respiratory tract inflammation,Side Effect
+Side Effect::C0877322,Muscle tightness,Side Effect
+Side Effect::C0877359,Raised liver function tests,Side Effect
+Side Effect::C0877605,Burning anal,Side Effect
+Side Effect::C0877609,Alertness decreased,Side Effect
+Side Effect::C0877661,Application site burn,Side Effect
+Side Effect::C0877664,Gastrointestinal cramps,Side Effect
+Side Effect::C0917798,Cerebral ischaemia,Side Effect
+Side Effect::C0917799,Hypersomnia,Side Effect
+Side Effect::C0917801,Insomnia,Side Effect
+Side Effect::C0919582,Sudden onset of sleep,Side Effect
+Side Effect::C0919671,Subileus,Side Effect
+Side Effect::C0919715,Lupus-like syndrome,Side Effect
+Side Effect::C0919823,Cytolytic hepatitis,Side Effect
+Side Effect::C0919874,Post procedural haemorrhage,Side Effect
+Side Effect::C0919883,Puncture site haemorrhage,Side Effect
+Side Effect::C0919980,VIIth nerve paralysis,Side Effect
+Side Effect::C0920114,Urinary sediment abnormal,Side Effect
+Side Effect::C0920166,Catheter site haemorrhage,Side Effect
+Side Effect::C0920171,Foreign body sensation in eyes,Side Effect
+Side Effect::C0920195,Aphakic cystoid macular oedema,Side Effect
+Side Effect::C0920289,Sluggishness,Side Effect
+Side Effect::C0947912,Myasthenia,Side Effect
+Side Effect::C0947999,Blood urine present,Side Effect
+Side Effect::C0948008,Ischaemic stroke,Side Effect
+Side Effect::C0948036,Gastric ulcer helicobacter,Side Effect
+Side Effect::C0948050,Small bowel angioedema,Side Effect
+Side Effect::C0948089,Acute coronary syndrome,Side Effect
+Side Effect::C0948281,Malignant syndrome NOS,Side Effect
+Side Effect::C0948294,Eyelid margin crusting,Side Effect
+Side Effect::C0948296,Ear discomfort,Side Effect
+Side Effect::C0948309,Pseudohyperkalaemia,Side Effect
+Side Effect::C0948349,Respiratory tract congestion,Side Effect
+Side Effect::C0948521,Oral pruritus,Side Effect
+Side Effect::C0948525,Musculoskeletal stiffness,Side Effect
+Side Effect::C0948586,Protein urine present,Side Effect
+Side Effect::C0948594,Musculoskeletal discomfort,Side Effect
+Side Effect::C0948595,Ocular discomfort,Side Effect
+Side Effect::C0948715,Infusion related reaction,Side Effect
+Side Effect::C0948786,Blanching,Side Effect
+Side Effect::C0948807,Hepatic impairment,Side Effect
+Side Effect::C0948808,Catheter blockage,Side Effect
+Side Effect::C0948815,Catheter site erythema,Side Effect
+Side Effect::C0948817,Catheter site inflammation,Side Effect
+Side Effect::C0948873,Flu symptoms,Side Effect
+Side Effect::C0949070,Upper respiratory tract congestion,Side Effect
+Side Effect::C0949691,Spondyloarthropathy,Side Effect
+Side Effect::C1096035,Infusion site pain,Side Effect
+Side Effect::C1096116,Acquired haemophilia,Side Effect
+Side Effect::C1096225,Vessel puncture site haemorrhage,Side Effect
+Side Effect::C1096250,Gastrointestinal discomfort,Side Effect
+Side Effect::C1096286,Transaminases decreased,Side Effect
+Side Effect::C1096355,Electrocardiogram U-wave abnormality,Side Effect
+Side Effect::C1112210,Catheter site infection,Side Effect
+Side Effect::C1112443,Male sexual dysfunction,Side Effect
+Side Effect::C1112525,Gastrointestinal ulcer haemorrhage,Side Effect
+Side Effect::C1112565,Pneumatosis intestinalis,Side Effect
+Side Effect::C1112632,Cross reactive drug hypersensitivity,Side Effect
+Side Effect::C1141885,Sclerosing encapsulating peritonitis,Side Effect
+Side Effect::C1142028,Peripheral nerve palsy,Side Effect
+Side Effect::C1142135,Muscle relaxant therapy,Side Effect
+Side Effect::C1142139,Drug reaction with eosinophilia and systemic symptoms,Side Effect
+Side Effect::C1142160,Application site discolouration,Side Effect
+Side Effect::C1142175,Shunt thrombosis,Side Effect
+Side Effect::C1142277,Brown urine,Side Effect
+Side Effect::C1142295,Drug-induced cough,Side Effect
+Side Effect::C1142412,Vasodilation procedure,Side Effect
+Side Effect::C1142492,Postinfarction angina,Side Effect
+Side Effect::C1145628,Unspecified disorder of autonomic nervous system,Side Effect
+Side Effect::C1145670,Respiratory failure,Side Effect
+Side Effect::C1167654,Acute prerenal failure,Side Effect
+Side Effect::C1167965,Urine output increased,Side Effect
+Side Effect::C1168290,Drug-induced hypersensitivity syndrome,Side Effect
+Side Effect::C1258215,Ileus,Side Effect
+Side Effect::C1260871,Acetonaemia,Side Effect
+Side Effect::C1260880,Rhinorrhoea,Side Effect
+Side Effect::C1260922,Respiration abnormal,Side Effect
+Side Effect::C1261989,Hepatic enzyme decreased,Side Effect
+Side Effect::C1262141,Poor quality sleep,Side Effect
+Side Effect::C1269683,Major depression,Side Effect
+Side Effect::C1274594,Lichenoid keratosis,Side Effect
+Side Effect::C1279945,Acute interstitial pneumonitis,Side Effect
+Side Effect::C1287298,Urine output,Side Effect
+Side Effect::C1291077,Abdominal bloating,Side Effect
+Side Effect::C1291078,Epigastric discomfort,Side Effect
+Side Effect::C1305875,Fibroadenosis of breast,Side Effect
+Side Effect::C1306341,Mental disability,Side Effect
+Side Effect::C1306571,Hepatic insufficiency,Side Effect
+Side Effect::C1306889,Peripheral arterial occlusive disease,Side Effect
+Side Effect::C1318520,Vasculitis necrotising,Side Effect
+Side Effect::C1320474,Nuchal rigidity,Side Effect
+Side Effect::C1320835,Drug fever,Side Effect
+Side Effect::C1321581,Bezoar,Side Effect
+Side Effect::C1321898,Blood in stool,Side Effect
+Side Effect::C1322281,Rhinitis seasonal,Side Effect
+Side Effect::C1325847,Sensitisation,Side Effect
+Side Effect::C1328327,Gastrooesophageal sphincter insufficiency,Side Effect
+Side Effect::C1368065,Vascular purpura,Side Effect
+Side Effect::C1384353,Infestation,Side Effect
+Side Effect::C1384666,Hearing impaired,Side Effect
+Side Effect::C1390484,Skull hypoplasia,Side Effect
+Side Effect::C1443060,Feeling abnormal,Side Effect
+Side Effect::C1456784,Paranoia,Side Effect
+Side Effect::C1456822,Claudication,Side Effect
+Side Effect::C1458155,Breast neoplasm,Side Effect
+Side Effect::C1504494,Tingling of extremity,Side Effect
+Side Effect::C1510410,Parosmia,Side Effect
+Side Effect::C1510471,Hypovitaminosis,Side Effect
+Side Effect::C1510497,Lenticular opacities,Side Effect
+Side Effect::C1519353,Rash papular,Side Effect
+Side Effect::C1522133,High cholesterol,Side Effect
+Side Effect::C1527336,Sjogren's syndrome,Side Effect
+Side Effect::C1527344,Dysphonia,Side Effect
+Side Effect::C1527407,Eosinophilic pneumonia,Side Effect
+Side Effect::C1535893,Orthostatic intolerance,Side Effect
+Side Effect::C1535950,Gastrointestinal inflammation,Side Effect
+Side Effect::C1536074,Osteoarticular pain,Side Effect
+Side Effect::C1536220,ST segment elevation myocardial infarction,Side Effect
+Side Effect::C1565489,Renal impairment,Side Effect
+Side Effect::C1608397,Device occlusion,Side Effect
+Side Effect::C1608945,Exfoliative rash,Side Effect
+Side Effect::C1609512,Vulvovaginal mycotic infection,Side Effect
+Side Effect::C1610056,Antinuclear antibody increased,Side Effect
+Side Effect::C1619702,Device related infection,Side Effect
+Side Effect::C1619727,Decompensated cirrhosis,Side Effect
+Side Effect::C1688637,Intraoperative floppy iris syndrome,Side Effect
+Side Effect::C1696110,Vessel puncture site haematoma,Side Effect
+Side Effect::C1696574,Application site erosion,Side Effect
+Side Effect::C1697943,Epidermal growth factor receptor decreased,Side Effect
+Side Effect::C1704272,Benign prostatic hyperplasia,Side Effect
+Side Effect::C1704436,Peripheral arterial disease,Side Effect
+Side Effect::C1720775,Renal tubular necrosis,Side Effect
+Side Effect::C1735348,Anal irritation,Side Effect
+Side Effect::C1735601,Floppy iris syndrome,Side Effect
+Side Effect::C1737211,Hypoglycaemic unconsciousness,Side Effect
+Side Effect::C1739363,Prostatic hypertrophy,Side Effect
+Side Effect::C1761613,Conjunctival hyperaemia,Side Effect
+Side Effect::C1800706,Idiopathic pulmonary fibrosis,Side Effect
+Side Effect::C1861172,Venous thromboembolism,Side Effect
+Side Effect::C1868771,Peritoneal cloudy effluent,Side Effect
+Side Effect::C1868912,Uric acid increased,Side Effect
+Side Effect::C1868980,Pharmacokinetic interaction,Side Effect
+Side Effect::C1956346,Coronary artery disease,Side Effect
+Side Effect::C1956415,Dyspnoea paroxysmal nocturnal,Side Effect
+Side Effect::C1959797,Allergic hepatitis,Side Effect
+Side Effect::C1961112,Decompensation cardiac,Side Effect
+Side Effect::C1963818,Gastrointestinal sounds abnormal,Side Effect
+Side Effect::C1963943,Atherothrombosis,Side Effect
+Side Effect::C1971624,Appetite absent,Side Effect
+Side Effect::C1994994,Excessive thirst,Side Effect
+Side Effect::C2004489,Regurgitation,Side Effect
+Side Effect::C2010560,Gastritis haemorrhagic,Side Effect
+Side Effect::C2047937,Ill-defined disorder,Side Effect
+Side Effect::C2062908,Gout acute,Side Effect
+Side Effect::C2129214,Loose stools,Side Effect
+Side Effect::C2173677,Renal cyst,Side Effect
+Side Effect::C2225524,Breast enlargement,Side Effect
+Side Effect::C2239176,Hepatocellular carcinoma,Side Effect
+Side Effect::C2242583,Acute liver injury,Side Effect
+Side Effect::C2242588,Traumatic liver injury,Side Effect
+Side Effect::C2242737,Anorectal discomfort,Side Effect
+Side Effect::C2242996,Tingling sensation,Side Effect
+Side Effect::C2363730,Oropharyngeal discomfort,Side Effect
+Side Effect::C2363731,Oropharyngeal pain,Side Effect
+Side Effect::C2363829,Semen analysis abnormal,Side Effect
+Side Effect::C2364111,Ageusia,Side Effect
+Side Effect::C2364164,Fluid imbalance,Side Effect
+Side Effect::C2697368,Gastrointestinal tract irritation,Side Effect
+Side Effect::C2711227,Hepatic steatosis,Side Effect
+Side Effect::C2712054,Dyspnoea at rest,Side Effect
+Side Effect::C2712122,Blood pressure normal,Side Effect
+Side Effect::C2712871,Gout attack,Side Effect
+Side Effect::C2720436,Pleural fibrosis,Side Effect
+Side Effect::C2747891,Device capturing issue,Side Effect
+Side Effect::C2830004,Somnolence,Side Effect
+Side Effect::C2937358,Cerebral haemorrhage,Side Effect
+Side Effect::C2938875,Upper-airway cough syndrome,Side Effect
+Side Effect::C2939147,Feeling hot,Side Effect
+Side Effect::C2939186,Mood alteration NOS,Side Effect
+Side Effect::C2939465,Glucose-6-phosphate dehydrogenase deficiency,Side Effect
+Side Effect::C2973529,Leukocytoclastic vasculitis,Side Effect
+Side Effect::C2979982,Vaginal haemorrhage,Side Effect
+Side Effect::C2981158,Loss of libido,Side Effect
+Side Effect::C3160741,Toxicity to various agents,Side Effect
+Side Effect::C3160769,Major bleed,Side Effect
+Side Effect::C3160770,Minor bleed,Side Effect
+Side Effect::C3160947,CNS toxicity,Side Effect
+Side Effect::C3203358,Hypoventilation,Side Effect
+Side Effect::C3203457,Procedural haemorrhage,Side Effect
+Side Effect::C3203695,Noninfectious peritonitis,Side Effect
+Side Effect::C3241936,Non-cardiogenic pulmonary oedema,Side Effect
+Side Effect::C3257803,Tearing eyes,Side Effect
+Side Effect::C3263723,Injury,Side Effect
+Side Effect::C3267047,Immune-mediated necrotising myopathy,Side Effect
+Side Effect::C3544060,Accidental exposure to product,Side Effect
+Side Effect::C3665346,Unspecified visual loss,Side Effect
+Side Effect::C3665347,Visual impairment,Side Effect
+Side Effect::C3665386,Abnormal vision,Side Effect
+Side Effect::C3665609,Conjunctival xerosis,Side Effect

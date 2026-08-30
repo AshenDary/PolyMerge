@@ -15,6 +15,7 @@ build/
 coverage/
 
 # Python & ML artifacts
+data/raw/
 __pycache__/
 *.py[cod]
 *$py.class
