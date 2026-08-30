@@ -61,3 +61,15 @@ PolyMerge is pre-clinical research tooling. Its outputs are theoretical and boun
 - A complete pipeline works end to end: disease cluster input → KG-grounded GNN scoring → combinatorial search → ranked candidate FDC → explainability trace → UI display.
 - At least one validated concordance between a PolyMerge-generated combination and a real published trial formulation (Polycap or PolyIran) for the chosen disease cluster.
 - All hard-coded safety rules are enforced and demonstrably block at least one known contraindicated pair in a test case, regardless of model confidence.
+
+## 10. Current Implementation Status
+
+This snapshot reflects the local implementation state at the end of the current Sprint 1 knowledge-graph loading work.
+
+- The backend runs on Fastify 5.x. It was upgraded from Fastify 4.x to resolve two high-severity `npm audit` findings in `fastify` and `find-my-way`; `npm audit` currently reports zero vulnerabilities.
+- Local MySQL uses a separate `polymerge_shadow` database so `prisma migrate dev` can run with the non-root `polymerge` app user. The shadow database is provisioned automatically by `docker/mysql/init/01-shadow-database.sql` on first container initialization. This is expected local infrastructure, not a temporary workaround to remove later.
+- Known local-dev gotcha: on macOS, `docker-compose up` can appear to start services while Neo4j is not actually reachable if Docker Desktop's daemon itself is not running. Confirm `docker info` succeeds before debugging Neo4j container state further.
+- The knowledge-graph data source is Hetionet v1.0: 47,031 node rows and 2,250,197 edge rows in the full source files. The current target disease cluster is hypertension (`Disease::DOID:10763`), type 2 diabetes mellitus (`Disease::DOID:9352`), and coronary artery disease (`Disease::DOID:3393`). Coronary artery disease substitutes for hyperlipidemia, which does not exist among Hetionet's 137 disease nodes.
+- The filtered fragment in `data/processed/` contains 3,415 node rows in `fragment_nodes.csv` and 16,230 edge rows in `fragment_edges.csv`. The local Neo4j instance has been verified against those source CSVs with `MATCH (n) RETURN count(n) AS total_nodes` returning 3,415 and `MATCH ()-[r]->() RETURN count(r) AS total_edges` returning 16,230.
+- Known data gap, by design: Hetionet has no direct Compound-Compound drug-interaction edge type. `CrC` represents chemical resemblance, not DDI labels. DDI labels for GNN training must come from TWOSIDES in a later sprint; the current fragment intentionally contains zero DDI labels.
+- Raw Hetionet downloads live in `data/raw/`, which is gitignored because those files are regenerable via `scripts/filter_hetionet_fragment.py`. The filtered fragment CSVs are committed under `data/processed/` because they are small enough that each teammate should not need to regenerate them before doing Sprint 2 work.
