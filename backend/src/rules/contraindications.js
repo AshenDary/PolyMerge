@@ -10,17 +10,28 @@ const ABSOLUTE_CONTRAINDICATION_PAIRS = [
   ['ace_inhibitor', 'potassium_sparing_diuretic'],
 ];
 
+function normalizeDrugSet(drugSet = []) {
+  return (Array.isArray(drugSet) ? drugSet : []).map((drug) => String(drug).trim().toLowerCase());
+}
+
 /**
  * @param {string[]} drugSet - candidate drug identifiers returned by the ML engine
- * @returns {string | null} a human-readable violation reason, or null if safe
+ * @returns {{ type: string, pair: string[], message: string } | null}
  */
 export function checkHardContraindications(drugSet) {
-  const normalized = drugSet.map((d) => String(d).toLowerCase());
+  const normalized = normalizeDrugSet(drugSet);
 
   for (const [a, b] of ABSOLUTE_CONTRAINDICATION_PAIRS) {
     if (normalized.includes(a) && normalized.includes(b)) {
-      return `Absolute contraindication: ${a} + ${b}`;
+      return {
+        type: 'hard_contraindication',
+        pair: [a, b],
+        message: `Absolute contraindication: ${a} + ${b}`,
+      };
     }
   }
+
   return null;
 }
+
+export { normalizeDrugSet };
