@@ -1,75 +1,85 @@
 # Project Context: PolyMerge
 
-## 1. Problem Statement
+## Purpose
 
-Patients managing multiple chronic, comorbid conditions — commonly hypertension, type 2 diabetes, and hyperlipidemia together — are typically prescribed several separate medications. This "polypharmacy" pattern creates compounding problems:
+PolyMerge is a research platform for candidate discovery in a biomedical knowledge-graph setting. It helps researchers and pharmacists explore disease clusters, retrieve graph relationships, score candidate drug combinations with research-only predictive models, apply deterministic safety rules, and compare ranked candidate sets.
 
-- **Low adherence:** pill burden (5+ tablets a day, at different times) causes patients to skip doses.
-- **Cost and complexity:** more prescriptions mean more refills, more copays, and more room for error, particularly for elderly patients or in low-resource healthcare settings.
-- **Undetected Drug-Drug Interactions (DDIs):** with many drugs prescribed independently (sometimes by different providers), no single person may be tracking the full interaction risk across the whole regimen.
-- **Redundant mechanisms:** some prescribed drugs may have overlapping or complementary mechanisms that could, in principle, be consolidated.
+PolyMerge is not an autonomous prescribing system and does not produce clinically validated safety guarantees or dosage recommendations.
 
-A **polypill** — a single Fixed-Dose Combination (FDC) tablet containing multiple active pharmaceutical ingredients — addresses this directly by combining the needed drugs into one dose. This isn't a hypothetical: the **Polycap trial** (aspirin, a statin, and multiple antihypertensives in one pill) and the **PolyIran trial** both demonstrated that polypills can improve adherence and reduce cardiovascular events at population scale.
+## Research-oriented architecture
 
-## 2. Why AI, Why Now
+The current repository reflects a staged MVP architecture:
 
-Manually screening every candidate drug combination for a disease cluster against known interaction data doesn't scale: for a cluster of *N* target diseases and a candidate pool of *M* drugs, the number of pairwise and higher-order interactions to check grows combinatorially. At the same time, large structured public datasets already exist — DrugBank, Hetionet, TWOSIDES/OFFSIDES, DrugCombDB — but none of them natively answer the question "what's the minimal safe drug set for this specific disease cluster?"
+```text
+Frontend
+  ↓
+Fastify backend
+  ↓
+FastAPI ML engine
+  ↓
+Neo4j biomedical knowledge graph
+  ↓
+Candidate generation / optimization / explainability
+```
 
-PolyMerge exists to close that gap: turn scattered pharmacological data into a queryable Knowledge Graph, learn interaction and synergy patterns with Graph Neural Networks, and use classical combinatorial optimization to surface candidate FDCs for expert review — faster than manual literature review, without replacing the human judgment that has to sign off on any real formulation.
+MySQL is used for application metadata, query history, experiments, and audit logging. The biomedical knowledge graph is not duplicated into MySQL.
 
-## 3. Who This Is For
+## Core design principles
 
-- **Primary users:** pharmaceutical researchers and pharmacists evaluating candidate FDC formulations during early-stage research.
-- **Explicitly not for:** patients, or point-of-care clinical decision-making. Nothing PolyMerge outputs is validated for direct clinical use (see Section 8).
+- Decision-support only: outputs are research candidates for expert review.
+- Deterministic safety rules always win over model scores.
+- Coverage is a knowledge-graph metric, not a clinical guarantee.
+- Evidence/provenance must be explicit for known relationships, model predictions, rule outcomes, and insufficient evidence.
+- Model scores must be labeled clearly as predictions or demo values when they are not backed by real datasets.
 
-## 4. System Design Principles
+## Data reality and current limitations
 
-- **Decision-support, not decision-making.** Every output is a candidate for expert review, never a final answer a patient or clinician should act on directly.
-- **Deep learning scores, classical search decides.** GNNs handle interaction/synergy *scoring*; a set-cover / integer-programming layer handles *selection*. The GNN never directly outputs a "final" combination — its scores always pass through the combinatorial search and rule layer (see Overview doc, Section 5: Model & Algorithm Choices).
-- **Hard-coded safety rules always win.** Absolute contraindications (e.g., MAOI + SSRI) are enforced as a backend-level check independent of any model score (`backend/src/rules/contraindications.js`) — a high model confidence score can never override a known-dangerous pairing.
-- **Explainability is non-negotiable.** Any medical-adjacent prediction ships with a reasoning trace (GNNExplainer / attention visualization). An unexplained "trust the model" output is out of scope for this project.
+- Hetionet is currently the available knowledge-graph fragment in this repository.
+- Hetionet does not directly provide drug-drug interaction labels.
+- DDI prediction is therefore still a planned capability unless a real dataset is integrated.
+- DrugBank access/licensing must be described accurately; this repository does not claim a full DrugBank integration.
+- The current implementation uses demo data where real ML outputs are not yet available.
 
-## 5. Scope Boundaries (recap)
+## Current implementation status
 
-**In scope:** knowledge graph construction, DDI/synergy prediction, combination optimization, explainability.
-**Out of scope:** autonomous prescribing, clinical validation/regulatory approval, physical/chemical manufacturing modeling of the pill itself.
+### Implemented now
 
-See the full Overview & Scope document for the complete scope table.
+- Disease selection workflow in the UI.
+- Backend endpoints for disease lookup, drug lookup, interaction metadata, search, result retrieval, explainability, and history.
+- Hard contraindication enforcement preserved and exposed in structured responses.
+- Demo ML pipeline returning labeled research candidates.
+- Candidate ranking and baseline optimization scaffolding.
+- Research-only terminology in the UI and API responses.
 
-## 6. Core Terminology
+### Planned next
 
-- **Polypill / Fixed-Dose Combination (FDC):** a single pill combining multiple active pharmaceutical ingredients.
-- **Enteric / Multiparticulate Release:** a pill design where different drug layers or pellets dissolve at different points in the GI tract, based on pH.
-- **DDI (Drug-Drug Interaction):** an adverse or beneficial effect that occurs when two or more drugs are taken together.
-- **Knowledge Graph (KG):** a structured graph of entities (drugs, diseases, targets, side effects) and the relationships between them.
-- **Link Prediction:** the ML task of predicting whether an edge (relationship) should exist between two nodes in a graph — used here for drug-disease and drug-drug relationships.
-- **Set-Cover Problem:** a classical combinatorial optimization problem — here, finding the smallest drug set that "covers" (treats) every target disease.
-- **GNNExplainer:** a technique for identifying which nodes/edges in a graph most influenced a GNN's prediction, used for explainability.
+- Real Neo4j-backed disease and drug retrieval.
+- Real ML/GNN DDI prediction and synergy prediction.
+- Real candidate optimization with configurable weights.
+- Enhanced explainability with structured graphs and provenance.
+- Real dataset integration (TWOSIDES or another legally usable DDI dataset, if available).
 
-## 7. Data & Validation Strategy
+## Scope boundaries
 
-**Primary data sources:** DrugBank (drug identities, targets, known DDIs), TWOSIDES/OFFSIDES (polypharmacy side effects), DrugCombDB (synergy scores), Hetionet (integrated biomedical KG), RxNorm/RxNav (standardized drug naming).
+### In scope
 
-**Validation approach:** rather than validating in a vacuum, generated combinations are checked against real, published, clinically-tested polypill trials — Polycap and PolyIran — as a sanity check that the system's suggestions are directionally consistent with formulations that have already been through real trials.
+- Knowledge-graph retrieval.
+- Candidate generation.
+- Hard safety rules.
+- Baseline optimization.
+- Candidate ranking.
+- Explainability structures.
 
-## 8. Regulatory & Ethical Positioning
+### Out of scope
 
-PolyMerge is pre-clinical research tooling. Its outputs are theoretical and bounded by the completeness and quality of the open-source datasets it's built on. Any path from a PolyMerge suggestion to a real polypill requires full clinical trials and FDA (or equivalent regional) regulatory approval — this system does not shortcut, replace, or substitute for that process.
+- Autonomous prescribing.
+- Dosage recommendations.
+- Clinical validation or regulatory approval.
+- Chemical stability/formulation modeling.
 
-## 9. Success Criteria for the MVP (end of Sprint 4)
+## Success criteria for the current phase
 
-- A complete pipeline works end to end: disease cluster input → KG-grounded GNN scoring → combinatorial search → ranked candidate FDC → explainability trace → UI display.
-- At least one validated concordance between a PolyMerge-generated combination and a real published trial formulation (Polycap or PolyIran) for the chosen disease cluster.
-- All hard-coded safety rules are enforced and demonstrably block at least one known contraindicated pair in a test case, regardless of model confidence.
-
-## 10. Current Implementation Status
-
-This snapshot reflects the local implementation state at the end of the current Sprint 1 knowledge-graph loading work.
-
-- The backend runs on Fastify 5.x. It was upgraded from Fastify 4.x to resolve two high-severity `npm audit` findings in `fastify` and `find-my-way`; `npm audit` currently reports zero vulnerabilities.
-- Local MySQL uses a separate `polymerge_shadow` database so `prisma migrate dev` can run with the non-root `polymerge` app user. The shadow database is provisioned automatically by `docker/mysql/init/01-shadow-database.sql` on first container initialization. This is expected local infrastructure, not a temporary workaround to remove later.
-- Known local-dev gotcha: on macOS, `docker-compose up` can appear to start services while Neo4j is not actually reachable if Docker Desktop's daemon itself is not running. Confirm `docker info` succeeds before debugging Neo4j container state further.
-- The knowledge-graph data source is Hetionet v1.0: 47,031 node rows and 2,250,197 edge rows in the full source files. The current target disease cluster is hypertension (`Disease::DOID:10763`), type 2 diabetes mellitus (`Disease::DOID:9352`), and coronary artery disease (`Disease::DOID:3393`). Coronary artery disease substitutes for hyperlipidemia, which does not exist among Hetionet's 137 disease nodes.
-- The filtered fragment in `data/processed/` contains 3,415 node rows in `fragment_nodes.csv` and 16,230 edge rows in `fragment_edges.csv`. The local Neo4j instance has been verified against those source CSVs with `MATCH (n) RETURN count(n) AS total_nodes` returning 3,415 and `MATCH ()-[r]->() RETURN count(r) AS total_edges` returning 16,230.
-- Known data gap, by design: Hetionet has no direct Compound-Compound drug-interaction edge type. `CrC` represents chemical resemblance, not DDI labels. DDI labels for GNN training must come from TWOSIDES in a later sprint; the current fragment intentionally contains zero DDI labels.
-- Raw Hetionet downloads live in `data/raw/`, which is gitignored because those files are regenerable via `scripts/filter_hetionet_fragment.py`. The filtered fragment CSVs are committed under `data/processed/` because they are small enough that each teammate should not need to regenerate them before doing Sprint 2 work.
+- Disease selection can be exercised through the UI and backend.
+- Candidate results are clearly labeled as demo values when real ML data are unavailable.
+- Hard contraindications can reject a candidate even when model risk is low.
+- The repository documents the difference between implemented MVP functionality and planned ML features.

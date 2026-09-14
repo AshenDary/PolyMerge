@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PolyMerge Research Dashboard</title>
+    <link rel="stylesheet" href="/frontend/styles.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">PolyMerge</p>
+          <h1>Create Formulation Candidate</h1>
+        </div>
+        <div class="pill">Research decision-support only</div>
+      </header>
+
+      <main class="layout">
+        <section class="panel">
+          <h2>Disease Selection</h2>
+          <p class="muted">Select the target disease cluster for research candidate generation.</p>
+
+          <div id="disease-list" class="disease-list"></div>
+
+          <button id="analyze-btn" class="primary">Analyze Combination</button>
+        </section>
+
+        <section class="panel workflow-panel">
+          <h2>Analysis Workflow</h2>
+          <ol class="workflow">
+            <li class="done">Knowledge Graph Retrieval</li>
+            <li class="done">Candidate Drug Mapping</li>
+            <li class="active">DDI Prediction</li>
+            <li class="pending">Safety Filtering</li>
+            <li class="pending">Combination Optimization</li>
+            <li class="pending">Explainability</li>
+          </ol>
+        </section>
+
+        <section class="panel results-panel">
+          <div class="results-header">
+            <div>
+              <p class="eyebrow">Screen 3</p>
+              <h2>Polypill Candidates</h2>
+            </div>
+            <div id="status-tag" class="status-tag">Waiting</div>
+          </div>
+
+          <div id="summary-cards" class="summary-cards"></div>
+          <div id="results" class="results-list"></div>
+        </section>
+
+        <section class="panel explainability-panel">
+          <div class="results-header">
+            <div>
+              <p class="eyebrow">Screen 4</p>
+              <h2>Explainability</h2>
+            </div>
+          </div>
+          <div id="explainability" class="explainability"></div>
+        </section>
+      </main>
+    </div>
+
+    <script src="/frontend/app.js"></script>
+  </body>
+</html>
