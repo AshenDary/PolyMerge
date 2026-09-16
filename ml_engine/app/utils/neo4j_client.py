@@ -1,4 +1,4 @@
-"""Small Neo4j helper for loading and querying PolyMerge graph fragments."""
+"""Neo4j helpers for loading and querying PolyMerge graph fragments."""
 
 from __future__ import annotations
 
@@ -10,8 +10,8 @@ from pathlib import Path
 from typing import Any, Iterable
 
 from dotenv import load_dotenv
-from neo4j import GraphDatabase
-from neo4j import ManagedTransaction
+from neo4j import GraphDatabase, ManagedTransaction
+from neo4j.exceptions import Neo4jError, ServiceUnavailable
 
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
@@ -38,9 +38,24 @@ class Neo4jClient:
         user: str | None = None,
         password: str | None = None,
     ) -> None:
-        self.uri = uri or os.getenv("NEO4J_URI", "bolt://localhost:7687")
-        self.user = user or os.getenv("NEO4J_USER", "neo4j")
-        self.password = password or os.getenv("NEO4J_PASSWORD", "password")
+        self.uri = uri or os.getenv("NEO4J_URI")
+        self.user = user or os.getenv("NEO4J_USER") or os.getenv("NEO4J_USERNAME")
+        self.password = password or os.getenv("NEO4J_PASSWORD")
+
+        missing = [
+            name
+            for name, value in {
+                "NEO4J_URI": self.uri,
+                "NEO4J_USER": self.user,
+                "NEO4J_PASSWORD": self.password,
+            }.items()
+            if not value
+        ]
+        if missing:
+            raise Neo4jConnectionError(
+                f"Missing Neo4j environment variable(s): {', '.join(missing)}"
+            )
+
         self.driver = GraphDatabase.driver(
             self.uri,
             auth=(self.user, self.password),
@@ -52,9 +67,19 @@ class Neo4jClient:
         self.driver.close()
 
     def query(self, cypher: str, **params: Any) -> list[dict[str, Any]]:
-        with self.driver.session() as session:
-            result = session.run(cypher, **params)
-            return [record.data() for record in result]
+        try:
+            with self.driver.session() as session:
+                result = session.run(cypher, **params)
+                return [record.data() for record in result]
+        except (Neo4jError, ServiceUnavailable) as error:
+            raise Neo4jConnectionError("Neo4j query failed") from error
+
+    def verify_connectivity(self) -> bool:
+        try:
+            self.driver.verify_connectivity()
+        except (Neo4jError, ServiceUnavailable) as error:
+            raise Neo4jConnectionError("Neo4j connectivity check failed") from error
+        return True
 
     def load_fragment(self, nodes_csv: Path | str, edges_csv: Path | str) -> dict[str, Any]:
         nodes_by_kind = _group_csv_rows_by_column(Path(nodes_csv), "kind")
@@ -122,3 +147,7 @@ def _group_csv_rows_by_column(path: Path, column: str) -> dict[str, list[dict[st
         for row in reader:
             grouped[row[column]].append(row)
     return dict(grouped)
+
+
+class Neo4jConnectionError(RuntimeError):
+    """Raised when the Neo4j dependency is unavailable or misconfigured."""
