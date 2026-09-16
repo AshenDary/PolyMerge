@@ -1,19 +1,13 @@
 import assert from 'node:assert/strict';
-import { spawn } from 'node:child_process';
 import http from 'node:http';
-import net from 'node:net';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { after, before, test } from 'node:test';
 
-const backendRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-
-let backendProcess;
-let backendUrl;
+let app;
 let mockMlServer;
 let mockMode = 'success';
 let mockRequestCount = 0;
-let backendLogs = '';
+let originalMlServiceUrl;
+let originalMlServiceTimeoutMs;
 
 const graphPayload = {
   queryId: 'graph-integration-test',
@@ -55,27 +49,6 @@ function close(server) {
   return new Promise((resolve, reject) => {
     server.close((error) => (error ? reject(error) : resolve()));
   });
-}
-
-async function findAvailablePort() {
-  const server = net.createServer();
-  const port = await listen(server);
-  await close(server);
-  return port;
-}
-
-async function waitForBackend(url) {
-  const deadline = Date.now() + 10000;
-  while (Date.now() < deadline) {
-    try {
-      const response = await fetch(`${url}/health`);
-      if (response.ok) return;
-    } catch {
-      // The child process may still be binding its port.
-    }
-    await new Promise((resolve) => setTimeout(resolve, 50));
-  }
-  throw new Error(`Backend did not start. Logs:\n${backendLogs}`);
 }
 
 function sendJson(response, statusCode, payload) {
@@ -131,43 +104,38 @@ before(async () => {
   });
 
   const mlPort = await listen(mockMlServer);
-  const backendPort = await findAvailablePort();
-  backendUrl = `http://127.0.0.1:${backendPort}`;
+  originalMlServiceUrl = process.env.ML_SERVICE_URL;
+  originalMlServiceTimeoutMs = process.env.ML_SERVICE_TIMEOUT_MS;
+  process.env.ML_SERVICE_URL = `http://127.0.0.1:${mlPort}`;
+  process.env.ML_SERVICE_TIMEOUT_MS = '75';
 
-  backendProcess = spawn(process.execPath, ['src/server.js'], {
-    cwd: backendRoot,
-    env: {
-      ...process.env,
-      HOST: '127.0.0.1',
-      PORT: String(backendPort),
-      ML_SERVICE_URL: `http://127.0.0.1:${mlPort}`,
-      ML_SERVICE_TIMEOUT_MS: '75',
-    },
-    stdio: ['ignore', 'pipe', 'pipe'],
-  });
-
-  const captureLogs = (chunk) => {
-    backendLogs = `${backendLogs}${chunk}`.slice(-12000);
-  };
-  backendProcess.stdout.on('data', captureLogs);
-  backendProcess.stderr.on('data', captureLogs);
-
-  await waitForBackend(backendUrl);
+  ({ app } = await import(`../src/server.js?integration-test=${Date.now()}`));
+  await app.ready();
 });
 
 after(async () => {
-  if (backendProcess && !backendProcess.killed) {
-    backendProcess.kill();
+  if (app) {
+    await app.close();
   }
   if (mockMlServer?.listening) {
     await close(mockMlServer);
   }
+  if (originalMlServiceUrl === undefined) {
+    delete process.env.ML_SERVICE_URL;
+  } else {
+    process.env.ML_SERVICE_URL = originalMlServiceUrl;
+  }
+  if (originalMlServiceTimeoutMs === undefined) {
+    delete process.env.ML_SERVICE_TIMEOUT_MS;
+  } else {
+    process.env.ML_SERVICE_TIMEOUT_MS = originalMlServiceTimeoutMs;
+  }
 });
 
 test('backend and ML health boundary remains available', async () => {
-  const response = await fetch(`${backendUrl}/health`);
-  assert.equal(response.status, 200);
-  assert.deepEqual(await response.json(), {
+  const response = await app.inject({ method: 'GET', url: '/health' });
+  assert.equal(response.statusCode, 200);
+  assert.deepEqual(response.json(), {
     status: 'ok',
     service: 'polymerge-backend',
   });
@@ -175,14 +143,14 @@ test('backend and ML health boundary remains available', async () => {
 
 test('candidate search preserves graph provenance and explicit ML status', async () => {
   mockMode = 'success';
-  const response = await fetch(`${backendUrl}/api/combinations/search`, {
+  const response = await app.inject({
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ diseases: ['hypertension'] }),
+    url: '/api/combinations/search',
+    payload: { diseases: ['hypertension'] },
   });
-  const payload = await response.json();
+  const payload = response.json();
 
-  assert.equal(response.status, 200);
+  assert.equal(response.statusCode, 200);
   assert.equal(payload.metadata.dataStatus, 'real_graph');
   assert.equal(payload.metadata.mlStatus, 'not_applied');
   assert.equal(payload.candidates[0].dataStatus, 'real_graph');
@@ -195,26 +163,26 @@ test('candidate search preserves graph provenance and explicit ML status', async
 test('invalid requests are rejected before calling the ML service', async () => {
   const requestsBefore = mockRequestCount;
   const responses = await Promise.all([
-    fetch(`${backendUrl}/api/combinations/search`, {
+    app.inject({
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ diseases: [] }),
+      url: '/api/combinations/search',
+      payload: { diseases: [] },
     }),
-    fetch(`${backendUrl}/api/combinations/search`, {
+    app.inject({
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ diseases: [42] }),
+      url: '/api/combinations/search',
+      payload: { diseases: [42] },
     }),
-    fetch(`${backendUrl}/api/combinations/search`, {
+    app.inject({
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ diseases: ['hypertension'], optimizationConfig: [] }),
+      url: '/api/combinations/search',
+      payload: { diseases: ['hypertension'], optimizationConfig: [] },
     }),
   ]);
 
   for (const response of responses) {
-    assert.equal(response.status, 400);
-    assert.equal((await response.json()).code, 'INVALID_REQUEST');
+    assert.equal(response.statusCode, 400);
+    assert.equal(response.json().code, 'INVALID_REQUEST');
   }
   assert.equal(mockRequestCount, requestsBefore);
 });
@@ -222,14 +190,14 @@ test('invalid requests are rejected before calling the ML service', async () => 
 for (const mode of ['http-error', 'malformed', 'inconsistent-prediction', 'timeout']) {
   test(`candidate search returns explicitly labeled demo fallback for ${mode}`, async () => {
     mockMode = mode;
-    const response = await fetch(`${backendUrl}/api/combinations/search`, {
+    const response = await app.inject({
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ diseases: ['hypertension'] }),
+      url: '/api/combinations/search',
+      payload: { diseases: ['hypertension'] },
     });
-    const payload = await response.json();
+    const payload = response.json();
 
-    assert.equal(response.status, 200);
+    assert.equal(response.statusCode, 200);
     assert.equal(payload.metadata.dataStatus, 'demo');
     assert.equal(payload.metadata.mlStatus, 'demo_placeholder');
     assert.equal(payload.metadata.fallback, true);

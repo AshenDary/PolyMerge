@@ -503,7 +503,14 @@ app.get('/api/history', async () => ({
   history: Array.from(history.values()),
 }));
 
-app.listen({ port: PORT, host: HOST }).catch((err) => {
-  app.log.error(err);
-  process.exit(1);
-});
+export { app };
+
+const isDirectRun = process.argv[1]
+  && path.resolve(process.argv[1]) === path.resolve(fileURLToPath(import.meta.url));
+
+if (isDirectRun) {
+  app.listen({ port: PORT, host: HOST }).catch((err) => {
+    app.log.error(err);
+    process.exit(1);
+  });
+}
