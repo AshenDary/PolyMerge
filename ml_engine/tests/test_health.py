@@ -11,6 +11,16 @@ def test_health():
     assert response.json()["status"] == "ok"
 
 
+def test_predict_combination_rejects_empty_disease_list():
+    response = client.post("/predict/combination", json={"diseases": []})
+    assert response.status_code == 422
+
+
+def test_predict_combination_rejects_blank_disease_name():
+    response = client.post("/predict/combination", json={"diseases": ["   "]})
+    assert response.status_code == 422
+
+
 def test_predict_combination_graph_pipeline(monkeypatch):
     def fake_build_graph_candidates(diseases):
         return {
@@ -64,4 +74,6 @@ def test_predict_combination_graph_pipeline(monkeypatch):
     assert payload["diseases"] == ["hypertension"]
     assert payload["metadata"]["dataStatus"] == "real_graph"
     assert payload["metadata"]["mlStatus"] == "not_applied"
+    assert payload["candidates"][0]["interactionRisk"] is None
+    assert payload["candidates"][0]["synergyScore"] is None
     assert len(payload["candidates"]) >= 1

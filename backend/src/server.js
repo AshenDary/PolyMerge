@@ -15,6 +15,10 @@ dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 const PORT = Number(process.env.PORT) || 3000;
 const HOST = process.env.HOST || '0.0.0.0';
 const ML_SERVICE_URL = process.env.ML_SERVICE_URL || 'http://localhost:8000';
+const configuredMlTimeoutMs = Number(process.env.ML_SERVICE_TIMEOUT_MS);
+const ML_SERVICE_TIMEOUT_MS = Number.isFinite(configuredMlTimeoutMs) && configuredMlTimeoutMs > 0
+  ? configuredMlTimeoutMs
+  : 15000;
 
 const DISEASES = [
   { id: 'hypertension', name: 'Hypertension', kind: 'Disease' },
@@ -116,6 +120,14 @@ function normalizeDiseases(diseases) {
     return { error: 'diseases[] is required' };
   }
 
+  if (diseases.length > 10) {
+    return { error: 'diseases[] must contain at most 10 items' };
+  }
+
+  if (diseases.some((disease) => typeof disease !== 'string')) {
+    return { error: 'diseases[] must contain only strings' };
+  }
+
   const normalized = diseases
     .map((disease) => String(disease).trim())
     .filter(Boolean)
@@ -134,7 +146,19 @@ function normalizeDiseases(diseases) {
   return { diseases: normalized };
 }
 
-function createDemoSearchResult(inputDiseases) {
+function normalizeOptimizationConfig(optimizationConfig) {
+  if (optimizationConfig == null) {
+    return { optimizationConfig: {} };
+  }
+
+  if (typeof optimizationConfig !== 'object' || Array.isArray(optimizationConfig)) {
+    return { error: 'optimizationConfig must be an object' };
+  }
+
+  return { optimizationConfig };
+}
+
+function createDemoSearchResult(inputDiseases, fallbackReason = 'ml_service_unavailable') {
   const orderedDiseases = inputDiseases.map((diseaseId) => DISEASES.find((item) => item.id === diseaseId) ?? { id: diseaseId, name: diseaseId });
 
   const candidateBuckets = {
@@ -165,6 +189,7 @@ function createDemoSearchResult(inputDiseases) {
       evidenceLevel: candidate.evidenceLevel,
       confidence: candidate.confidence,
       dataStatus: 'demo',
+      mlStatus: 'demo_placeholder',
       status: 'accepted',
       evidence: [
         {
@@ -203,9 +228,66 @@ function createDemoSearchResult(inputDiseases) {
       graph: 'Neo4j fragment',
       timestamp: new Date().toISOString(),
       dataStatus: 'demo',
+      mlStatus: 'demo_placeholder',
+      fallback: true,
+      fallbackReason,
       disclaimer: 'Research decision-support only. PolyMerge does not provide medical advice, prescriptions, or clinically validated safety guarantees. Results require expert review and appropriate clinical/regulatory validation.',
     },
   };
+}
+
+function validateMlResult(payload) {
+  if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
+    throw new Error('ML engine returned a non-object response');
+  }
+
+  if (typeof payload.queryId !== 'string' || !payload.queryId.trim()) {
+    throw new Error('ML engine response is missing queryId');
+  }
+
+  if (!Array.isArray(payload.diseases) || !Array.isArray(payload.candidates)) {
+    throw new Error('ML engine response is missing diseases or candidates');
+  }
+
+  if (payload.diseases.some((disease) => typeof disease !== 'string')) {
+    throw new Error('ML engine response diseases must be strings');
+  }
+
+  if (!payload.metadata || typeof payload.metadata !== 'object' || Array.isArray(payload.metadata)) {
+    throw new Error('ML engine response is missing metadata');
+  }
+
+  if (
+    typeof payload.metadata.dataStatus !== 'string'
+    || !payload.metadata.dataStatus
+    || typeof payload.metadata.mlStatus !== 'string'
+    || !payload.metadata.mlStatus
+  ) {
+    throw new Error('ML engine response is missing dataStatus or mlStatus');
+  }
+
+  for (const candidate of payload.candidates) {
+    if (!candidate || typeof candidate !== 'object' || !Array.isArray(candidate.drugs)) {
+      throw new Error('ML engine returned an invalid candidate');
+    }
+
+    if (candidate.drugs.some((drug) => typeof drug !== 'string')) {
+      throw new Error('ML engine candidate drugs must be strings');
+    }
+
+    if (candidate.dataStatus != null && typeof candidate.dataStatus !== 'string') {
+      throw new Error('ML engine candidate dataStatus must be a string');
+    }
+
+    if (
+      payload.metadata.mlStatus === 'not_applied'
+      && (candidate.interactionRisk != null || candidate.synergyScore != null)
+    ) {
+      throw new Error('ML engine returned prediction scores while mlStatus is not_applied');
+    }
+  }
+
+  return payload;
 }
 
 async function fetchMlResult(diseases) {
@@ -214,15 +296,19 @@ async function fetchMlResult(diseases) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ diseases }),
+      signal: AbortSignal.timeout(ML_SERVICE_TIMEOUT_MS),
     });
 
     if (!response.ok) {
       throw new Error(`ML engine responded ${response.status}`);
     }
 
-    return await response.json();
+    return validateMlResult(await response.json());
   } catch (error) {
-    return createDemoSearchResult(diseases);
+    const fallbackReason = error?.name === 'TimeoutError'
+      ? 'ml_service_timeout'
+      : 'ml_service_unavailable_or_invalid';
+    return createDemoSearchResult(diseases, fallbackReason);
   }
 }
 
@@ -322,12 +408,26 @@ app.get('/api/drugs/:id/interactions', async (request, reply) => {
 });
 
 app.post('/api/combinations/search', async (request, reply) => {
-  const { diseases = [], optimizationConfig = {} } = request.body ?? {};
+  if (!request.body || typeof request.body !== 'object' || Array.isArray(request.body)) {
+    return reply.code(400).send({
+      error: 'Request body must be a JSON object',
+      code: 'INVALID_REQUEST',
+    });
+  }
+
+  const { diseases = [], optimizationConfig: requestedOptimizationConfig = {} } = request.body;
   const normalized = normalizeDiseases(diseases);
 
   if (normalized.error) {
-    return reply.code(400).send({ error: normalized.error });
+    return reply.code(400).send({ error: normalized.error, code: 'INVALID_REQUEST' });
   }
+
+  const normalizedConfig = normalizeOptimizationConfig(requestedOptimizationConfig);
+  if (normalizedConfig.error) {
+    return reply.code(400).send({ error: normalizedConfig.error, code: 'INVALID_REQUEST' });
+  }
+
+  const optimizationConfig = normalizedConfig.optimizationConfig;
 
   const mlResult = await fetchMlResult(normalized.diseases);
 
@@ -352,6 +452,7 @@ app.post('/api/combinations/search', async (request, reply) => {
           ]
         : candidate.reasons ?? [],
       dataStatus: candidate.dataStatus ?? mlResult.metadata?.dataStatus ?? 'demo',
+      mlStatus: candidate.mlStatus ?? mlResult.metadata?.mlStatus ?? 'not_applied',
       optimizationConfig,
     };
   });

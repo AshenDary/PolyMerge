@@ -23,6 +23,7 @@ PolyMerge is a research-oriented platform for polypill candidate discovery. It h
   - candidate ranking
 - Static frontend dashboard for disease selection, workflow status, candidate summary, and explainability views.
 - Clear evidence/provenance and model metadata fields in API responses.
+- Validated Fastify-to-FastAPI requests with bounded timeouts and explicit demo fallback status.
 
 ### Mocked / planned
 
@@ -94,6 +95,20 @@ Then open the frontend at http://localhost:3000/ and verify health endpoints:
 - `GET /api/combinations/:id`: returns a stored combination result.
 - `GET /api/combinations/:id/explain`: returns explainability metadata for each candidate.
 - `GET /api/history`: returns prior query history stored in memory.
+
+### Backend-to-ML response contract
+
+`POST /api/combinations/search` validates disease input before forwarding a
+request to FastAPI. The backend requires the ML response to include structured
+`diseases`, `candidates`, and `metadata`, including both `dataStatus` and
+`mlStatus`. Calls are bounded by `ML_SERVICE_TIMEOUT_MS`.
+
+Graph-backed responses use `dataStatus: "real_graph"` and
+`mlStatus: "not_applied"`; their interaction-risk and synergy fields remain
+`null` because no predictive model is integrated. If the ML service is
+unavailable, times out, or violates the response contract, the backend returns
+an explicitly labeled demo fallback with `dataStatus: "demo"`,
+`mlStatus: "demo_placeholder"`, and `metadata.fallback: true`.
 
 ## Terminology updates
 

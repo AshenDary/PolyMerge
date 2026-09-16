@@ -7,12 +7,10 @@ from __future__ import annotations
 
 import os
 from pathlib import Path
-from typing import Any
-
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from app.services.candidate_generator import build_graph_candidates
 from app.services.candidate_ranker import rank_candidates
@@ -34,14 +32,42 @@ app.add_middleware(
 
 
 class CombinationRequest(BaseModel):
-    diseases: list[str]
+    diseases: list[str] = Field(min_length=1, max_length=10)
+
+    @field_validator("diseases")
+    @classmethod
+    def validate_diseases(cls, diseases: list[str]) -> list[str]:
+        normalized = [disease.strip() for disease in diseases]
+        if any(not disease for disease in normalized):
+            raise ValueError("diseases must contain non-empty strings")
+        return list(dict.fromkeys(normalized))
+
+
+class CandidateResponse(BaseModel):
+    model_config = ConfigDict(extra="allow")
+
+    rank: int
+    drugs: list[str]
+    coverage: float
+    interactionRisk: float | None = None
+    synergyScore: float | None = None
+    dataStatus: str
+
+
+class CombinationMetadata(BaseModel):
+    model_config = ConfigDict(extra="allow")
+
+    dataStatus: str
+    mlStatus: str
+    model: str
+    modelVersion: str | None = None
 
 
 class CombinationResponse(BaseModel):
     queryId: str
     diseases: list[str]
-    candidates: list[dict[str, Any]]
-    metadata: dict[str, Any]
+    candidates: list[CandidateResponse]
+    metadata: CombinationMetadata
 
 
 @app.get("/health")
@@ -70,20 +96,7 @@ async def predict_combination(payload: CombinationRequest) -> CombinationRespons
     Predictive ML/DDI/synergy scores are not applied in this phase. The response
     distinguishes real graph evidence from later placeholder/model fields.
     """
-    diseases = [str(disease).strip() for disease in payload.diseases if str(disease).strip()]
-
-    if not diseases:
-        return CombinationResponse(
-            queryId="demo-empty",
-            diseases=[],
-            candidates=[],
-            metadata={
-                "dataStatus": "real_graph",
-                "mlStatus": "not_applied",
-                "model": "No predictive ML model applied",
-                "modelVersion": None,
-            },
-        )
+    diseases = payload.diseases
 
     result = build_graph_candidates(diseases)
 
