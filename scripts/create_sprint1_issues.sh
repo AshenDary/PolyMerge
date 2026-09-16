@@ -2,6 +2,10 @@
 set -euo pipefail
 
 REPO="${REPO:-AshenDary/PolyMerge}"
+JARED_GH="${JARED_GH:-AshenDary}"
+PAMELA_GH="${PAMELA_GH:-Qiuyuan26}"
+RANEE_GH="${RANEE_GH:-seavens3nt}"
+TEAM_GH="${TEAM_GH:-}"
 
 if ! command -v gh >/dev/null 2>&1; then
   echo "GitHub CLI (gh) is not installed. Install it or use the GitHub connector." >&2
