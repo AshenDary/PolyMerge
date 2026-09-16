@@ -14,7 +14,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-from app.services.candidate_generator import build_demo_candidates
+from app.services.candidate_generator import build_graph_candidates
 from app.services.candidate_ranker import rank_candidates
 from app.services.knowledge_graph import get_available_diseases, get_drug_metadata
 from app.services.set_cover_optimizer import greedy_set_cover
@@ -65,11 +65,10 @@ async def drug_by_id(drug_id: str):
 
 @app.post("/predict/combination", response_model=CombinationResponse)
 async def predict_combination(payload: CombinationRequest) -> CombinationResponse:
-    """MVP endpoint returning demo research candidate data.
+    """Return research candidates from represented knowledge-graph relationships.
 
-    The results are explicitly labeled as mock/demo data until a real model is
-    introduced. The response still follows the requested research-oriented
-    structure needed by the backend and UI.
+    Predictive ML/DDI/synergy scores are not applied in this phase. The response
+    distinguishes real graph evidence from later placeholder/model fields.
     """
     diseases = [str(disease).strip() for disease in payload.diseases if str(disease).strip()]
 
@@ -79,13 +78,14 @@ async def predict_combination(payload: CombinationRequest) -> CombinationRespons
             diseases=[],
             candidates=[],
             metadata={
-                "dataStatus": "demo",
-                "model": "PolyMerge Demo Pipeline",
-                "modelVersion": "demo-0.1.0",
+                "dataStatus": "real_graph",
+                "mlStatus": "not_applied",
+                "model": "No predictive ML model applied",
+                "modelVersion": None,
             },
         )
 
-    result = build_demo_candidates(diseases)
+    result = build_graph_candidates(diseases)
 
     for candidate in result["candidates"]:
         violation = check_hard_contraindications(candidate["drugs"])
@@ -103,7 +103,18 @@ async def predict_combination(payload: CombinationRequest) -> CombinationRespons
 
     result["candidates"] = rank_candidates(result["candidates"])
 
-    selected_drugs = [drug for candidate in result["candidates"] for drug in candidate["drugs"]]
-    result["metadata"]["selectedDrugs"] = greedy_set_cover(selected_drugs, diseases)
+    selected_drugs = [candidate["drugId"] for candidate in result["candidates"]]
+    target_disease_ids = [
+        disease["id"] for disease in result["metadata"].get("resolvedDiseases", [])
+    ]
+    coverage_by_drug = {
+        drug_id: set(disease_ids)
+        for drug_id, disease_ids in result["metadata"].get("candidateCoverage", {}).items()
+    }
+    result["metadata"]["selectedDrugs"] = greedy_set_cover(
+        selected_drugs,
+        target_disease_ids,
+        coverage_by_drug=coverage_by_drug,
+    )
 
     return CombinationResponse(**result)

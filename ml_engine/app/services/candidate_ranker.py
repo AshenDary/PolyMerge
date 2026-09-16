@@ -13,9 +13,15 @@ def rank_candidates(candidates: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return sorted(
         candidates,
         key=lambda candidate: (
-            -float(candidate.get("confidence", 0.0)),
-            -float(candidate.get("coverage", 0.0)),
-            -float(candidate.get("synergyScore", 0.0)),
+            -_score(candidate.get("confidence")),
+            -_score(candidate.get("coverage")),
+            -_score(candidate.get("synergyScore")),
             int(candidate.get("drugCount", 0)),
         ),
     )
+
+
+def _score(value: Any) -> float:
+    if value is None:
+        return 0.0
+    return float(value)

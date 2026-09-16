@@ -1,126 +1,40 @@
-"""Knowledge-graph data access placeholders for the PolyMerge MVP.
-
-This module intentionally exposes a small, deterministic catalog so the
-backend can validate the research workflow before any real Neo4j-backed
-retrieval or GNN model is implemented.
-"""
+"""Compatibility wrappers around the real Neo4j graph service."""
 
 from __future__ import annotations
 
-DISEASES = [
-    {"id": "hypertension", "name": "Hypertension", "kind": "Disease"},
-    {"id": "type-2-diabetes", "name": "Type 2 Diabetes", "kind": "Disease"},
-    {"id": "coronary-artery-disease", "name": "Coronary Artery Disease", "kind": "Disease"},
-]
+from typing import Any
 
-DRUGS = {
-    "lisinopril": {
-        "id": "lisinopril",
-        "name": "Lisinopril",
-        "kind": "Drug",
-        "dosageForms": ["tablet"],
-        "availableStrengths": ["5 mg", "10 mg", "20 mg"],
-        "source": "Hetionet fragment",
-        "relationships": [
-            {"type": "treats", "target": "hypertension", "source": "Hetionet", "evidenceType": "known"}
-        ],
-    },
-    "amlodipine": {
-        "id": "amlodipine",
-        "name": "Amlodipine",
-        "kind": "Drug",
-        "dosageForms": ["tablet"],
-        "availableStrengths": ["5 mg", "10 mg"],
-        "source": "Hetionet fragment",
-        "relationships": [
-            {"type": "treats", "target": "hypertension", "source": "Hetionet", "evidenceType": "known"}
-        ],
-    },
-    "metformin": {
-        "id": "metformin",
-        "name": "Metformin",
-        "kind": "Drug",
-        "dosageForms": ["tablet"],
-        "availableStrengths": ["500 mg", "850 mg", "1000 mg"],
-        "source": "Hetionet fragment",
-        "relationships": [
-            {"type": "treats", "target": "type-2-diabetes", "source": "Hetionet", "evidenceType": "known"}
-        ],
-    },
-    "empagliflozin": {
-        "id": "empagliflozin",
-        "name": "Empagliflozin",
-        "kind": "Drug",
-        "dosageForms": ["tablet"],
-        "availableStrengths": ["10 mg", "25 mg"],
-        "source": "Hetionet fragment",
-        "relationships": [
-            {"type": "treats", "target": "type-2-diabetes", "source": "Hetionet", "evidenceType": "known"}
-        ],
-    },
-    "aspirin": {
-        "id": "aspirin",
-        "name": "Aspirin",
-        "kind": "Drug",
-        "dosageForms": ["tablet"],
-        "availableStrengths": ["81 mg", "325 mg"],
-        "source": "Hetionet fragment",
-        "relationships": [
-            {"type": "treats", "target": "coronary-artery-disease", "source": "Hetionet", "evidenceType": "known"}
-        ],
-    },
-    "atorvastatin": {
-        "id": "atorvastatin",
-        "name": "Atorvastatin",
-        "kind": "Drug",
-        "dosageForms": ["tablet"],
-        "availableStrengths": ["10 mg", "20 mg", "40 mg"],
-        "source": "Hetionet fragment",
-        "relationships": [
-            {"type": "treats", "target": "coronary-artery-disease", "source": "Hetionet", "evidenceType": "known"}
-        ],
-    },
-    "maoi": {
-        "id": "maoi",
-        "name": "MAOI",
-        "kind": "Drug",
-        "dosageForms": ["reference"],
-        "availableStrengths": ["reference only"],
-        "source": "PolyMerge Safety Rules",
-        "relationships": [],
-    },
-    "ssri": {
-        "id": "ssri",
-        "name": "SSRI",
-        "kind": "Drug",
-        "dosageForms": ["reference"],
-        "availableStrengths": ["reference only"],
-        "source": "PolyMerge Safety Rules",
-        "relationships": [],
-    },
-}
+from app.services.graph_service import GraphService
 
 
-def get_available_diseases() -> list[dict[str, str]]:
-    return [dict(disease) for disease in DISEASES]
+def get_available_diseases() -> list[dict[str, Any]]:
+    return GraphService().search_diseases("")
 
 
-def get_drug_metadata(drug_id: str) -> dict[str, object] | None:
-    drug = DRUGS.get(drug_id)
+def search_diseases(query: str) -> list[dict[str, Any]]:
+    return GraphService().search_diseases(query)
+
+
+def get_drug_metadata(drug_id: str) -> dict[str, Any] | None:
+    relationships = GraphService().get_drug_relationships(drug_id)
+    drug = relationships["drug"]
     if drug is None:
         return None
-    return dict(drug)
+    return {
+        **drug,
+        "relationships": {
+            "targets": relationships["targets"],
+            "sideEffects": relationships["sideEffects"],
+        },
+    }
 
 
 def find_treating_drugs(diseases: list[str]) -> dict[str, list[str]]:
-    disease_to_drugs: dict[str, list[str]] = {}
-    for disease in diseases:
-        disease_key = disease.lower()
-        disease_to_drugs[disease_key] = []
-        for drug_id, metadata in DRUGS.items():
-            if any(
-                relationship.get("target") == disease_key and relationship.get("type") == "treats"
-                for relationship in metadata.get("relationships", [])
-            ):
-                disease_to_drugs[disease_key].append(drug_id)
+    graph_result = GraphService().build_candidate_drugs(diseases)
+    disease_to_drugs: dict[str, list[str]] = {
+        disease["id"]: [] for disease in graph_result["resolvedDiseases"]
+    }
+    for candidate in graph_result["candidates"]:
+        for disease_id in candidate["treatedDiseaseIds"]:
+            disease_to_drugs.setdefault(disease_id, []).append(candidate["drugId"])
     return disease_to_drugs

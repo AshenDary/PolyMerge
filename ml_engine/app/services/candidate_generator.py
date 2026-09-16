@@ -1,76 +1,85 @@
-"""Candidate generation module for the PolyMerge MVP.
-
-This module intentionally keeps the implementation deterministic and research-oriented.
-It maps selected diseases to candidate drugs and produces a small list of mock
-ranked candidates with explicit evidence labeling.
-"""
+"""Candidate generation from represented knowledge-graph relationships."""
 
 from __future__ import annotations
 
+from datetime import datetime, timezone
 from typing import Any
 
-from app.services.knowledge_graph import find_treating_drugs
+from app.services.graph_service import GRAPH_VERSION, GraphService, Neo4jConnectionError
+
+
+def build_graph_candidates(
+    diseases: list[str],
+    graph_service: GraphService | None = None,
+) -> dict[str, Any]:
+    service = graph_service or GraphService()
+
+    try:
+        graph_result = service.build_candidate_drugs(diseases)
+    except Neo4jConnectionError as error:
+        return _empty_result(
+            diseases=diseases,
+            data_status="graph_unavailable",
+            warning=str(error),
+        )
+
+    candidates = [
+        {**candidate, "rank": index}
+        for index, candidate in enumerate(graph_result["candidates"], start=1)
+    ]
+
+    return {
+        "queryId": f"graph-{int(datetime.now(timezone.utc).timestamp())}",
+        "diseases": [disease["name"] for disease in graph_result["resolvedDiseases"]],
+        "candidates": candidates,
+        "metadata": {
+            "model": "No predictive ML model applied",
+            "modelVersion": None,
+            "dataset": "Hetionet fragment",
+            "graph": GRAPH_VERSION,
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "dataStatus": "real_graph",
+            "mlStatus": "not_applied",
+            "resolvedDiseases": graph_result["resolvedDiseases"],
+            "missingDiseases": graph_result["missingDiseases"],
+            "candidateCoverage": {
+                drug_id: sorted(disease_ids)
+                for drug_id, disease_ids in graph_result["candidateCoverage"].items()
+            },
+            "disclaimer": "Research decision-support only. PolyMerge does not provide medical advice, prescriptions, or clinically validated safety guarantees. Results require expert review and appropriate clinical/regulatory validation.",
+        },
+    }
 
 
 def build_demo_candidates(diseases: list[str]) -> dict[str, Any]:
-    disease_map = find_treating_drugs(diseases)
+    """Backward-compatible name for the now graph-backed candidate builder."""
+    return build_graph_candidates(diseases)
 
-    candidates = []
-    for index, disease in enumerate(diseases, start=1):
-        candidate_drugs = disease_map.get(disease.lower(), [])
-        if not candidate_drugs:
-            continue
 
-        candidates.append(
-            {
-                "rank": index,
-                "drugs": candidate_drugs[:2],
-                "coverage": 1.0,
-                "interactionRisk": 0.12,
-                "synergyScore": 0.81,
-                "drugCount": min(2, len(candidate_drugs)),
-                "evidenceLevel": "medium",
-                "confidence": 0.78,
-                "dataStatus": "demo",
-                "status": "accepted",
-                "evidence": [
-                    {
-                        "source": "Hetionet",
-                        "relationship": "treats",
-                        "evidenceType": "known",
-                        "confidence": None,
-                    },
-                    {
-                        "source": "PolyMerge Demo Pipeline",
-                        "relationship": "DDI",
-                        "evidenceType": "predicted",
-                        "score": 0.12,
-                        "modelVersion": "demo-0.1.0",
-                    },
-                    {
-                        "source": "PolyMerge Safety Rules",
-                        "evidenceType": "rule",
-                        "status": "passed",
-                    },
-                ],
-                "reasons": [
-                    "Coverage is computed from treatment relationships represented in the knowledge graph.",
-                    "Demo scores are labeled and are not clinical guarantees.",
-                ],
-            }
-        )
+def _empty_result(
+    diseases: list[str],
+    data_status: str,
+    warning: str | None = None,
+) -> dict[str, Any]:
+    metadata: dict[str, Any] = {
+        "model": "No predictive ML model applied",
+        "modelVersion": None,
+        "dataset": "Hetionet fragment",
+        "graph": GRAPH_VERSION,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "dataStatus": data_status,
+        "mlStatus": "not_applied",
+        "resolvedDiseases": [],
+        "missingDiseases": diseases,
+        "candidateCoverage": {},
+        "disclaimer": "Research decision-support only. PolyMerge does not provide medical advice, prescriptions, or clinically validated safety guarantees. Results require expert review and appropriate clinical/regulatory validation.",
+    }
+    if warning:
+        metadata["warning"] = warning
 
     return {
-        "queryId": f"demo-{index}",
-        "diseases": diseases,
-        "candidates": candidates,
-        "metadata": {
-            "model": "PolyMerge Demo Pipeline",
-            "modelVersion": "demo-0.1.0",
-            "dataset": "Hetionet fragment",
-            "graph": "Neo4j fragment",
-            "timestamp": "2026-09-14T00:00:00Z",
-            "dataStatus": "demo",
-            "disclaimer": "Research decision-support only. PolyMerge does not provide medical advice, prescriptions, or clinically validated safety guarantees. Results require expert review and appropriate clinical/regulatory validation.",
-        },
+        "queryId": f"graph-empty-{int(datetime.now(timezone.utc).timestamp())}",
+        "diseases": [],
+        "candidates": [],
+        "metadata": metadata,
     }
