@@ -208,12 +208,12 @@ function createDemoSearchResult(inputDiseases) {
   };
 }
 
-async function fetchMlResult(diseases) {
+async function fetchMlResult(diseases, optimizationConfig = {}) {
   try {
     const response = await fetch(`${ML_SERVICE_URL}/predict/combination`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ diseases }),
+      body: JSON.stringify({ diseases, optimizationConfig }),
     });
 
     if (!response.ok) {
@@ -329,7 +329,7 @@ app.post('/api/combinations/search', async (request, reply) => {
     return reply.code(400).send({ error: normalized.error });
   }
 
-  const mlResult = await fetchMlResult(normalized.diseases);
+  const mlResult = await fetchMlResult(normalized.diseases, optimizationConfig);
 
   const candidates = (mlResult.candidates ?? []).map((candidate, index) => {
     const violation = checkHardContraindications(candidate.drugs ?? []);

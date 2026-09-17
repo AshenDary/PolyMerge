@@ -46,6 +46,7 @@ def build_graph_candidates(
                 drug_id: sorted(disease_ids)
                 for drug_id, disease_ids in graph_result["candidateCoverage"].items()
             },
+            "coverageDefinition": "Drug-to-disease matrix from represented CtD relationships; not clinical efficacy.",
             "disclaimer": "Research decision-support only. PolyMerge does not provide medical advice, prescriptions, or clinically validated safety guarantees. Results require expert review and appropriate clinical/regulatory validation.",
         },
     }
@@ -72,6 +73,7 @@ def _empty_result(
         "resolvedDiseases": [],
         "missingDiseases": diseases,
         "candidateCoverage": {},
+        "coverageDefinition": "Drug-to-disease matrix from represented CtD relationships; not clinical efficacy.",
         "disclaimer": "Research decision-support only. PolyMerge does not provide medical advice, prescriptions, or clinically validated safety guarantees. Results require expert review and appropriate clinical/regulatory validation.",
     }
     if warning:
