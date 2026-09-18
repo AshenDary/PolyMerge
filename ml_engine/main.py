@@ -17,7 +17,7 @@ from pydantic import BaseModel
 from app.services.candidate_generator import build_graph_candidates
 from app.services.candidate_ranker import rank_candidates
 from app.services.knowledge_graph import get_available_diseases, get_drug_metadata
-from app.services.set_cover_optimizer import greedy_set_cover
+from app.services.set_cover_optimizer import optimize_set_cover
 from app.services.safety_filter import check_hard_contraindications
 
 # Single shared .env lives at the repo root, not inside ml_engine/.
@@ -35,6 +35,7 @@ app.add_middleware(
 
 class CombinationRequest(BaseModel):
     diseases: list[str]
+    optimizationConfig: dict[str, Any] = {}
 
 
 class CombinationResponse(BaseModel):
@@ -63,7 +64,7 @@ async def drug_by_id(drug_id: str):
     return drug
 
 
-@app.post("/predict/combination", response_model=CombinationResponse)
+@app.post("/predict/combination")
 async def predict_combination(payload: CombinationRequest) -> CombinationResponse:
     """Return research candidates from represented knowledge-graph relationships.
 
@@ -103,7 +104,11 @@ async def predict_combination(payload: CombinationRequest) -> CombinationRespons
 
     result["candidates"] = rank_candidates(result["candidates"])
 
-    selected_drugs = [candidate["drugId"] for candidate in result["candidates"]]
+    selected_drugs = [
+        candidate["drugId"]
+        for candidate in result["candidates"]
+        if candidate.get("status") != "rejected"
+    ]
     target_disease_ids = [
         disease["id"] for disease in result["metadata"].get("resolvedDiseases", [])
     ]
@@ -111,10 +116,18 @@ async def predict_combination(payload: CombinationRequest) -> CombinationRespons
         drug_id: set(disease_ids)
         for drug_id, disease_ids in result["metadata"].get("candidateCoverage", {}).items()
     }
-    result["metadata"]["selectedDrugs"] = greedy_set_cover(
+    optimization = optimize_set_cover(
         selected_drugs,
         target_disease_ids,
         coverage_by_drug=coverage_by_drug,
+        config=payload.optimizationConfig,
     )
+    result["metadata"]["optimization"] = optimization
+    result["metadata"]["selectedDrugs"] = optimization["selectedDrugs"]
+    result["metadata"]["selectedDrugCount"] = optimization["selectedDrugCount"]
+    result["metadata"]["coveredDiseaseIds"] = optimization["coveredDiseaseIds"]
+    result["metadata"]["uncoveredDiseaseIds"] = optimization["uncoveredDiseaseIds"]
+    result["metadata"]["coverage"] = optimization["coverage"]
+    result["metadata"]["coverageMatrix"] = optimization["coverageMatrix"]
 
     return CombinationResponse(**result)

@@ -117,3 +117,18 @@ LIMIT $limit
 - Coverage means knowledge-graph treatment coverage for the selected disease set.
 - Predictive ML, DDI, synergy, and clinical validation are not applied in this phase.
 - Side effects and gene relationships are returned as evidence/provenance context, not as safety predictions.
+
+## Baseline Research Optimization
+
+The ML engine represents graph-derived candidate coverage as a matrix:
+
+- Rows are candidate compound IDs.
+- Columns are resolved disease IDs.
+- A populated cell means the graph contains a represented `CtD` treatment relationship.
+
+The baseline optimizer greedily selects the candidate with the greatest uncovered
+disease count, up to `maxDrugCount`, and stops when `minimumCoverage` is reached.
+Its result preserves `coverageMatrix`, `coveredDiseaseIds`, `uncoveredDiseaseIds`,
+`selectedDrugs`, and `selectedDrugCount`. These values describe knowledge-graph
+treatment coverage for research candidate discovery, not clinical efficacy,
+prescribing suitability, or validated safety.

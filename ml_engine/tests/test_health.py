@@ -58,10 +58,22 @@ def test_predict_combination_graph_pipeline(monkeypatch):
 
     monkeypatch.setattr(main, "build_graph_candidates", fake_build_graph_candidates)
 
-    response = client.post("/predict/combination", json={"diseases": ["hypertension"]})
+    response = client.post(
+        "/predict/combination",
+        json={"diseases": ["hypertension"], "optimizationConfig": {"maxDrugCount": 1}},
+    )
     assert response.status_code == 200
     payload = response.json()
     assert payload["diseases"] == ["hypertension"]
     assert payload["metadata"]["dataStatus"] == "real_graph"
     assert payload["metadata"]["mlStatus"] == "not_applied"
+    assert payload["metadata"]["selectedDrugs"] == ["Compound::DB00177"]
+    assert payload["metadata"]["selectedDrugCount"] == 1
+    assert payload["metadata"]["coverage"] == 1.0
+    assert payload["metadata"]["coveredDiseaseIds"] == ["Disease::DOID:10763"]
+    assert payload["metadata"]["optimization"]["selectedDrugCount"] == 1
+    assert payload["metadata"]["optimization"]["coverageMatrix"] == {
+        "Compound::DB00177": ["Disease::DOID:10763"]
+    }
+    assert payload["metadata"]["coverageMatrix"] == payload["metadata"]["optimization"]["coverageMatrix"]
     assert len(payload["candidates"]) >= 1
