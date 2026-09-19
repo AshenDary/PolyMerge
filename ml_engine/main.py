@@ -17,8 +17,7 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator
 from app.services.candidate_generator import build_graph_candidates
 from app.services.candidate_ranker import rank_candidates
 from app.services.knowledge_graph import get_available_diseases, get_drug_metadata
-from app.services.set_cover_optimizer import optimize_set_cover
-from app.services.safety_filter import check_hard_contraindications
+from app.services.set_cover_optimizer import optimize_candidate_sets
 
 # Single shared .env lives at the repo root, not inside ml_engine/.
 load_dotenv(Path(__file__).resolve().parent.parent / ".env")
@@ -90,48 +89,27 @@ async def predict_combination(payload: CombinationRequest) -> CombinationRespons
     """
     diseases = payload.diseases
 
-    result = build_graph_candidates(diseases)
-
-    for candidate in result["candidates"]:
-        violation = check_hard_contraindications(candidate["drugs"])
-        if violation:
-            candidate["status"] = "rejected"
-            candidate["reason"] = {
-                "type": "hard_contraindication",
-                "message": violation["message"],
-                "pair": violation["pair"],
-            }
-            candidate["reasons"] = [
-                "Candidate contains a prohibited interaction according to the configured safety rule.",
-                "The hard safety rule blocks this candidate regardless of model score.",
-            ]
+    optimization_config = payload.optimizationConfig.model_dump(exclude_none=True)
+    result = build_graph_candidates(diseases, config=optimization_config)
 
     result["candidates"] = rank_candidates(result["candidates"])
 
-    selected_drugs = [
-        candidate["drugId"]
-        for candidate in result["candidates"]
-        if candidate.get("status") != "rejected"
-    ]
     target_disease_ids = [
         disease["id"] for disease in result["metadata"].get("resolvedDiseases", [])
     ]
-    coverage_by_drug = {
-        drug_id: set(disease_ids)
-        for drug_id, disease_ids in result["metadata"].get("candidateCoverage", {}).items()
-    }
-    optimization = optimize_set_cover(
-        selected_drugs,
+    optimization = optimize_candidate_sets(
+        result["candidates"],
         target_disease_ids,
-        coverage_by_drug=coverage_by_drug,
-        config=payload.optimizationConfig.model_dump(exclude_none=True),
+        config=optimization_config,
     )
     result["metadata"]["optimization"] = optimization
+    result["metadata"]["selectedCandidateSetIds"] = optimization["selectedCandidateSetIds"]
+    result["metadata"]["selectedCandidateSets"] = optimization["selectedCandidateSets"]
     result["metadata"]["selectedDrugs"] = optimization["selectedDrugs"]
     result["metadata"]["selectedDrugCount"] = optimization["selectedDrugCount"]
     result["metadata"]["coveredDiseaseIds"] = optimization["coveredDiseaseIds"]
     result["metadata"]["uncoveredDiseaseIds"] = optimization["uncoveredDiseaseIds"]
     result["metadata"]["coverage"] = optimization["coverage"]
-    result["metadata"]["coverageMatrix"] = optimization["coverageMatrix"]
+    result["metadata"]["rejectedCandidateSetIds"] = optimization["rejectedCandidateSetIds"]
 
     return CombinationResponse(**result)

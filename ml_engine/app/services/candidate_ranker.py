@@ -1,7 +1,7 @@
 """Candidate ranking module for the PolyMerge MVP.
 
-Ranking remains intentionally simple: candidates are ordered by confidence,
-coverage, synergy, and fewer drugs, while still preserving explicit evidence status.
+Ranking remains intentionally simple: accepted candidates are ordered by
+coverage, fewer drugs, confidence, and evidence status.
 """
 
 from __future__ import annotations
@@ -10,15 +10,20 @@ from typing import Any
 
 
 def rank_candidates(candidates: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    return sorted(
+    ranked = sorted(
         candidates,
         key=lambda candidate: (
-            -_score(candidate.get("confidence")),
+            candidate.get("status") == "rejected",
             -_score(candidate.get("coverage")),
-            -_score(candidate.get("synergyScore")),
             int(candidate.get("drugCount", 0)),
+            -_score(candidate.get("confidence")),
+            -_score(candidate.get("synergyScore")),
         ),
     )
+    return [
+        {**candidate, "rank": index}
+        for index, candidate in enumerate(ranked, start=1)
+    ]
 
 
 def _score(value: Any) -> float:

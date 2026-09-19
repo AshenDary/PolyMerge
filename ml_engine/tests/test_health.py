@@ -33,13 +33,14 @@ def test_predict_combination_rejects_invalid_optimization_config():
 
 
 def test_predict_combination_graph_pipeline(monkeypatch):
-    def fake_build_graph_candidates(diseases):
+    def fake_build_graph_candidates(diseases, config=None):
         return {
             "queryId": "graph-test",
             "diseases": ["hypertension"],
             "candidates": [
                 {
                     "rank": 1,
+                    "candidateSetId": "candidate-set:Compound::DB00177",
                     "drugId": "Compound::DB00177",
                     "drugName": "Valsartan",
                     "drugs": ["Compound::DB00177"],
@@ -93,8 +94,7 @@ def test_predict_combination_graph_pipeline(monkeypatch):
     assert payload["metadata"]["coverage"] == 1.0
     assert payload["metadata"]["coveredDiseaseIds"] == ["Disease::DOID:10763"]
     assert payload["metadata"]["optimization"]["selectedDrugCount"] == 1
-    assert payload["metadata"]["optimization"]["coverageMatrix"] == {
-        "Compound::DB00177": ["Disease::DOID:10763"]
-    }
-    assert payload["metadata"]["coverageMatrix"] == payload["metadata"]["optimization"]["coverageMatrix"]
+    assert payload["metadata"]["selectedCandidateSetIds"] == [
+        "candidate-set:Compound::DB00177"
+    ]
     assert len(payload["candidates"]) >= 1
