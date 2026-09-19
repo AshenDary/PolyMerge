@@ -11,6 +11,27 @@ def test_health():
     assert response.json()["status"] == "ok"
 
 
+def test_predict_combination_rejects_empty_disease_list():
+    response = client.post("/predict/combination", json={"diseases": []})
+    assert response.status_code == 422
+
+
+def test_predict_combination_rejects_blank_disease_name():
+    response = client.post("/predict/combination", json={"diseases": ["   "]})
+    assert response.status_code == 422
+
+
+def test_predict_combination_rejects_invalid_optimization_config():
+    response = client.post(
+        "/predict/combination",
+        json={
+            "diseases": ["hypertension"],
+            "optimizationConfig": {"minimumCoverage": 1.5},
+        },
+    )
+    assert response.status_code == 422
+
+
 def test_predict_combination_graph_pipeline(monkeypatch):
     def fake_build_graph_candidates(diseases):
         return {
