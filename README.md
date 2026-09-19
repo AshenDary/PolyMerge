@@ -81,7 +81,17 @@ python3 -m uvicorn main:app --reload --port 8000
 Then open the frontend at http://localhost:3000/ and verify health endpoints:
 
 - `curl http://localhost:3000/health`
+- `curl http://localhost:3000/health/dependencies`
 - `curl http://localhost:8000/health`
+
+The backend liveness endpoint remains available even if the ML engine is down.
+`/health/dependencies` reports HTTP 503 when the ML engine cannot be reached.
+Candidate-search calls are time-bounded by `ML_SERVICE_TIMEOUT_MS`. If the ML
+engine is unavailable or violates the response contract, the backend preserves
+the existing demo fallback but labels it with `dataStatus: "demo"`,
+`mlStatus: "demo"`, and `upstreamStatus: "fallback"`. Graph-backed responses
+retain `dataStatus: "real_graph"` and `mlStatus: "not_applied"`; null ML scores
+must not be interpreted as predictions.
 
 ## API overview
 

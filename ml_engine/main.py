@@ -12,7 +12,7 @@ from typing import Any
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from app.services.candidate_generator import build_graph_candidates
 from app.services.candidate_ranker import rank_candidates
@@ -33,9 +33,26 @@ app.add_middleware(
 )
 
 
+class OptimizationConfig(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    maxDrugCount: int | None = Field(default=None, ge=0, le=50)
+    minimumCoverage: float | None = Field(default=None, ge=0.0, le=1.0)
+
+
 class CombinationRequest(BaseModel):
-    diseases: list[str]
-    optimizationConfig: dict[str, Any] = {}
+    model_config = ConfigDict(extra="forbid")
+
+    diseases: list[str] = Field(min_length=1, max_length=10)
+    optimizationConfig: OptimizationConfig = Field(default_factory=OptimizationConfig)
+
+    @field_validator("diseases")
+    @classmethod
+    def validate_diseases(cls, diseases: list[str]) -> list[str]:
+        normalized = [disease.strip() for disease in diseases]
+        if any(not disease for disease in normalized):
+            raise ValueError("disease names and IDs must not be blank")
+        return list(dict.fromkeys(normalized))
 
 
 class CombinationResponse(BaseModel):
@@ -71,20 +88,7 @@ async def predict_combination(payload: CombinationRequest) -> CombinationRespons
     Predictive ML/DDI/synergy scores are not applied in this phase. The response
     distinguishes real graph evidence from later placeholder/model fields.
     """
-    diseases = [str(disease).strip() for disease in payload.diseases if str(disease).strip()]
-
-    if not diseases:
-        return CombinationResponse(
-            queryId="demo-empty",
-            diseases=[],
-            candidates=[],
-            metadata={
-                "dataStatus": "real_graph",
-                "mlStatus": "not_applied",
-                "model": "No predictive ML model applied",
-                "modelVersion": None,
-            },
-        )
+    diseases = payload.diseases
 
     result = build_graph_candidates(diseases)
 
@@ -120,7 +124,7 @@ async def predict_combination(payload: CombinationRequest) -> CombinationRespons
         selected_drugs,
         target_disease_ids,
         coverage_by_drug=coverage_by_drug,
-        config=payload.optimizationConfig,
+        config=payload.optimizationConfig.model_dump(exclude_none=True),
     )
     result["metadata"]["optimization"] = optimization
     result["metadata"]["selectedDrugs"] = optimization["selectedDrugs"]
