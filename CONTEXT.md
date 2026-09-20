@@ -2,84 +2,86 @@
 
 ## Purpose
 
-PolyMerge is a research platform for candidate discovery in a biomedical knowledge-graph setting. It helps researchers and pharmacists explore disease clusters, retrieve graph relationships, score candidate drug combinations with research-only predictive models, apply deterministic safety rules, and compare ranked candidate sets.
+PolyMerge is a research decision-support platform for candidate discovery in a biomedical knowledge-graph setting. It helps researchers and pharmacists explore disease clusters, retrieve graph relationships, apply deterministic safety rules, run a greedy set-cover baseline, and inspect evidence/provenance for research candidates.
 
-PolyMerge is not an autonomous prescribing system and does not produce clinically validated safety guarantees or dosage recommendations.
+PolyMerge is not an autonomous prescribing system and does not produce clinically validated safety guarantees, dosage recommendations, or clinical treatment decisions.
 
-## Research-oriented architecture
-
-The current repository reflects a staged MVP architecture:
+## Current Sprint 1 Architecture
 
 ```text
 Frontend
   ↓
 Fastify backend
   ↓
-FastAPI ML engine
+FastAPI ML/Graph service
   ↓
 Neo4j biomedical knowledge graph
   ↓
-Candidate generation / optimization / explainability
+Graph-backed candidate generation / safety filtering / greedy set-cover baseline
 ```
 
-MySQL is used for application metadata, query history, experiments, and audit logging. The biomedical knowledge graph is not duplicated into MySQL.
+MySQL is used as the application/system data foundation. The biomedical knowledge graph is not duplicated into MySQL.
 
-## Core design principles
+## Core Design Principles
 
 - Decision-support only: outputs are research candidates for expert review.
-- Deterministic safety rules always win over model scores.
-- Coverage is a knowledge-graph metric, not a clinical guarantee.
-- Evidence/provenance must be explicit for known relationships, model predictions, rule outcomes, and insufficient evidence.
-- Model scores must be labeled clearly as predictions or demo values when they are not backed by real datasets.
+- Deterministic safety rules remain independent from model scores.
+- Coverage is a knowledge-graph metric, not a clinical efficacy claim.
+- Evidence/provenance must be explicit for known graph relationships, rule outcomes, and future model outputs.
+- Future model scores must be labeled clearly as predictions and separated from graph evidence.
 
-## Data reality and current limitations
+## Current Implementation Status
 
-- Hetionet is currently the available knowledge-graph fragment in this repository.
-- Hetionet does not directly provide drug-drug interaction labels.
-- DDI prediction is therefore still a planned capability unless a real dataset is integrated.
-- DrugBank access/licensing must be described accurately; this repository does not claim a full DrugBank integration.
-- The current implementation uses demo data where real ML outputs are not yet available.
-
-## Current implementation status
-
-### Implemented now
+### Implemented Now
 
 - Disease selection workflow in the UI.
-- Backend endpoints for disease lookup, drug lookup, interaction metadata, search, result retrieval, explainability, and history.
-- Hard contraindication enforcement preserved and exposed in structured responses.
-- Demo ML pipeline returning labeled research candidates.
-- Candidate ranking and baseline optimization scaffolding.
-- Research-only terminology in the UI and API responses.
+- Backend `/api/diseases` retrieves the disease catalog from the graph-backed ML service.
+- Backend validates selected diseases against the graph-backed catalog before candidate search.
+- ML/Graph service retrieves diseases and compounds from Neo4j.
+- Disease to compound retrieval uses represented `CtD` treatment relationships.
+- Compound-gene evidence uses `CbG`, `CuG`, and `CdG`.
+- Side-effect evidence uses `CcSE`.
+- Graph-backed candidate generation returns individual compound candidates with evidence/provenance.
+- Hard contraindication rules are preserved and exposed with structured reason payloads.
+- Greedy set-cover baseline consumes graph-derived coverage.
+- Backend fallback behavior is explicitly labeled as demo fallback when the ML/Graph service is unavailable.
+- Research-only terminology is used in API and UI text.
 
-### Planned next
+### Planned Next
 
-- Real Neo4j-backed disease and drug retrieval.
-- Real ML/GNN DDI prediction and synergy prediction.
-- Real candidate optimization with configurable weights.
-- Enhanced explainability with structured graphs and provenance.
-- Real dataset integration (TWOSIDES or another legally usable DDI dataset, if available).
+- Real multi-drug candidate-set generation.
+- Candidate-set ranking and comparison.
+- Enhanced rejection reasons and explainability.
+- Graph visualization.
+- Real ML/graph embedding baseline such as TransE.
+- Real DDI prediction using a dedicated dataset such as TWOSIDES if available and appropriate.
+- Synergy prediction.
 
-## Scope boundaries
+## Data Reality and Current Limitations
 
-### In scope
+- Hetionet is currently the available knowledge-graph source.
+- Hetionet does not directly provide drug-drug interaction labels.
+- `CrC` means compound resemblance and must not be treated as DDI.
+- DDI prediction is planned future work and requires a dedicated interaction dataset.
+- Current graph-backed candidates use `mlStatus: "not_applied"`.
+- Current candidate generation is not yet the final multi-drug optimization pipeline.
+- The optimizer is a greedy baseline, not a production-grade optimizer.
+
+## Scope Boundaries
+
+### In Scope
 
 - Knowledge-graph retrieval.
-- Candidate generation.
+- Candidate generation from represented graph relationships.
 - Hard safety rules.
-- Baseline optimization.
-- Candidate ranking.
-- Explainability structures.
+- Greedy set-cover baseline.
+- Candidate ranking foundation.
+- Evidence/provenance structures.
 
-### Out of scope
+### Out of Scope
 
 - Autonomous prescribing.
 - Dosage recommendations.
 - Clinical validation or regulatory approval.
-- Chemical stability/formulation modeling.
-
-## Success criteria for the current phase
-
-- Disease selection can be exercised through the UI and backend.
-- Candidate results are clearly labeled as demo values when real ML data are unavailable.
-- Hard contraindications can reject a candidate even when model risk is low.
-- The repository documents the difference between implemented MVP functionality and planned ML features.
+- Chemical stability/formulation guarantees.
+- Real DDI/synergy predictions until a real model and dataset are integrated.

@@ -6,6 +6,8 @@ candidate even when the model predicts low risk.
 
 from __future__ import annotations
 
+from typing import Optional
+
 
 ABSOLUTE_CONTRAINDICATION_PAIRS = [
     ("maoi", "ssri"),
@@ -14,7 +16,7 @@ ABSOLUTE_CONTRAINDICATION_PAIRS = [
 ]
 
 
-def check_hard_contraindications(drug_set: list[str]) -> dict[str, object] | None:
+def check_hard_contraindications(drug_set: list[str]) -> Optional[dict[str, object]]:
     normalized = [str(drug).strip().lower() for drug in drug_set]
 
     for first, second in ABSOLUTE_CONTRAINDICATION_PAIRS:

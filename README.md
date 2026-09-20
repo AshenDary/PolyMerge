@@ -1,12 +1,26 @@
 # PolyMerge
 
-PolyMerge is a research-oriented platform for polypill candidate discovery. It helps researchers and pharmacists explore biomedical relationships, candidate drug sets, and explainability traces for selected disease clusters, but it is not an autonomous prescribing system.
+PolyMerge is a research decision-support platform for exploring multi-drug candidate combinations using biomedical knowledge-graph data and future machine-learning models. It is not an autonomous prescribing system and does not provide medical advice, dosage recommendations, clinical safety guarantees, or final formulation decisions.
 
-## Current implementation status
+## Current Architecture
 
-### Implemented in this repository
+```text
+Frontend
+  ↓
+Fastify Backend
+  ↓
+FastAPI ML/Graph Service
+  ↓
+Neo4j / Hetionet Knowledge Graph
+```
+
+MySQL and Prisma are used for application/system data foundations. Neo4j remains the source of truth for biomedical graph entities and relationships.
+
+## Current Sprint 1 Capabilities
 
 - Fastify backend with research-oriented APIs:
+  - `GET /health`
+  - `GET /health/dependencies`
   - `GET /api/diseases`
   - `GET /api/drugs/:id`
   - `GET /api/drugs/:id/interactions`
@@ -14,119 +28,156 @@ PolyMerge is a research-oriented platform for polypill candidate discovery. It h
   - `GET /api/combinations/:id`
   - `GET /api/combinations/:id/explain`
   - `GET /api/history`
-- Deterministic hard safety/contraindication checks that run independently from ML scores.
-- FastAPI ML engine scaffold with modular placeholder services for:
-  - knowledge graph access
-  - candidate generation
-  - safety filtering
-  - set-cover optimization
-  - candidate ranking
-- Static frontend dashboard for disease selection, workflow status, candidate summary, and explainability views.
-- Clear evidence/provenance and model metadata fields in API responses.
+- FastAPI ML/Graph service:
+  - `GET /health`
+  - `GET /api/diseases`
+  - `GET /api/drugs/{drug_id}`
+  - `POST /predict/combination`
+- Real Neo4j integration through environment-configured connection settings.
+- Hetionet-derived graph data loaded into Neo4j.
+- Graph-backed disease retrieval from Neo4j disease nodes.
+- Graph-backed disease to compound retrieval using `CtD`.
+- Compound-gene evidence using `CbG`, `CuG`, and `CdG`.
+- Compound side-effect evidence using `CcSE`.
+- Evidence/provenance fields such as `source`, `graphVersion`, `relationship`, `metaedge`, `targetId`, and `evidenceType`.
+- Graph-backed candidate generation from represented knowledge-graph relationships.
+- Deterministic hard safety filtering that runs independently from ML predictions.
+- Greedy set-cover baseline that consumes graph-derived candidate coverage.
+- Backend to ML/Graph service integration with request validation and dependency health checks.
+- Static frontend disease-selection workflow that loads diseases from the backend and sends stable disease IDs.
 
-### Mocked / planned
+## Current ML Status
 
-- Real Neo4j-backed disease and drug retrieval is not yet implemented end-to-end.
-- No real GNN/DDI prediction model is currently integrated.
-- No real synergy prediction model is currently integrated.
-- No real Cytoscape graph visualization is implemented yet; the UI currently uses a simple explainability panel.
-- No real TWOSIDES or DrugBank integration is implemented yet.
-- No clinical validation or dosage recommendation logic is implemented.
+No predictive ML model is applied in Sprint 1 graph-backed candidate responses.
 
-## Revised architecture
+- Graph-backed responses use `dataStatus: "real_graph"`.
+- Predictive model status is `mlStatus: "not_applied"`.
+- `interactionRisk` and `synergyScore` are `null`/not applied for real graph-backed candidates.
+- TransE, graph embeddings, GNN/DDI prediction, and synergy prediction are future work.
 
-```text
-Frontend
-  ↓
-Fastify Backend
-  ↓
-FastAPI ML Engine
-  ↓
-Neo4j knowledge graph + demo ML services
-  ↓
-Candidate ranking / research explainability
-```
+If the ML/Graph service is unavailable or violates the response contract, the backend returns an explicitly labeled fallback:
 
-MySQL remains the application/audit/query storage layer. Neo4j stores the biomedical graph. The biomedical graph is not duplicated into MySQL.
+- `dataStatus: "demo"`
+- `mlStatus: "demo"`
+- `upstreamStatus: "fallback"`
+- no graph-backed candidates are returned from that fallback path
 
-## Repository structure
+Fallback responses must not be interpreted as real graph evidence or real ML predictions.
 
-- `backend/`: Fastify + Prisma API, hard safety rules, query/history support.
-- `ml_engine/`: FastAPI service plus service modules for graph, candidate generation, safety filtering, optimization, and ranking.
+## Current Limitations
+
+- Candidate generation currently returns graph-derived individual compound candidates; this is not yet the final multi-drug candidate-set generator.
+- The optimizer is a greedy set-cover baseline, not a production-grade optimization system.
+- `/api/drugs/:id` and `/api/drugs/:id/interactions` still provide reference/demo backend responses and are not the primary Sprint 1 graph candidate flow.
+- Explainability is limited and does not yet provide advanced graph visualization or model explanation.
+- Hetionet `CrC` means compound resemblance and is not a DDI label.
+- DDI prediction requires a dedicated interaction dataset in future work.
+- Synergy prediction is future work.
+- Clinical recommendations, dosage decisions, and autonomous prescribing are outside project scope.
+
+## Repository Structure
+
+- `backend/`: Fastify API, request validation, fallback handling, safety-rule integration.
+- `ml_engine/`: FastAPI ML/Graph service, Neo4j graph service, candidate generation, safety filtering, greedy set-cover baseline.
 - `frontend/`: static research dashboard.
 - `data/processed/`: filtered Hetionet fragment used for local development.
-- `scripts/`: graph fragment generation helpers.
+- `docs/`: graph schema and API documentation.
+- `scripts/`: graph fragment generation/loading and repository management helpers.
 - `docker/`: MySQL init scripts.
+- `Sprints/`: sprint planning notes.
 
-## Quick start
+## Local Setup
+
+Use:
+
+- Node.js `>=20`
+- Python `>=3.9`
+- Docker / Docker Compose
+
+Copy the environment template:
 
 ```bash
-# 1) Copy the environment template and start infrastructure
 cp .env.example .env
-docker-compose up -d
+```
 
-# 2) Backend
+The `.env` file is ignored by Git and must not be committed.
+
+Start infrastructure:
+
+```bash
+docker compose up -d
+```
+
+Expected local services:
+
+- Neo4j Browser: `http://localhost:7474`
+- Neo4j Bolt: `bolt://localhost:7687`
+- MySQL: `localhost:3306`
+
+Backend:
+
+```bash
 cd backend
 npm install
 npx prisma generate
-npx prisma migrate dev --name init
+npx prisma migrate dev
 npm run dev
-
-# 3) ML engine (separate terminal)
-cd ml_engine
-python3 -m pip install -r requirements.txt
-python3 -m uvicorn main:app --reload --port 8000
 ```
 
-Then open the frontend at http://localhost:3000/ and verify health endpoints:
+ML/Graph service:
 
-- `curl http://localhost:3000/health`
-- `curl http://localhost:3000/health/dependencies`
-- `curl http://localhost:8000/health`
+```bash
+cd ml_engine
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements.txt
+python -m uvicorn main:app --reload --port 8000
+```
 
-The backend liveness endpoint remains available even if the ML engine is down.
-`/health/dependencies` reports HTTP 503 when the ML engine cannot be reached.
-Candidate-search calls are time-bounded by `ML_SERVICE_TIMEOUT_MS`. If the ML
-engine is unavailable or violates the response contract, the backend preserves
-the existing demo fallback but labels it with `dataStatus: "demo"`,
-`mlStatus: "demo"`, and `upstreamStatus: "fallback"`. Graph-backed responses
-retain `dataStatus: "real_graph"` and `mlStatus: "not_applied"`; null ML scores
-must not be interpreted as predictions.
+Verification:
 
-## API overview
+```bash
+curl http://localhost:3000/health
+curl http://localhost:3000/health/dependencies
+curl http://localhost:3000/api/diseases
+curl http://localhost:8000/health
+curl http://localhost:8000/api/diseases
+```
 
-### Current research-facing endpoints
+Example graph-backed candidate request:
 
-- `GET /api/diseases`: returns the known disease catalog.
-- `GET /api/drugs/:id`: returns drug metadata and relevant graph relationships.
-- `GET /api/drugs/:id/interactions`: returns interaction metadata where available.
-- `POST /api/combinations/search`: returns demo research candidates and applies hard contraindication filtering.
-- `GET /api/combinations/:id`: returns a stored combination result.
-- `GET /api/combinations/:id/explain`: returns explainability metadata for each candidate.
-- `GET /api/history`: returns prior query history stored in memory.
+```bash
+curl -X POST http://localhost:3000/api/combinations/search \
+  -H "Content-Type: application/json" \
+  -d '{"diseases":["Disease::DOID:10763","Disease::DOID:9352"]}'
+```
 
-## Terminology updates
+## Tests
 
-The implementation intentionally uses research-oriented wording:
+Backend:
 
-- “knowledge-graph treatment coverage” instead of “100% disease treatment”.
-- “Predicted Interaction Risk” / “Model Risk Score” / “PolyMerge Safety Index” instead of a clinical safety claim.
-- “Reference information” instead of dosage recommendations.
-- “Evidence type” and “evidence source” are represented explicitly.
-- Hard safety rules are separated from model predictions.
+```bash
+cd backend
+npm test
+```
 
-## Data and scientific reality
+ML/Graph service:
 
-- Hetionet is used as the current knowledge graph fragment.
+```bash
+cd ml_engine
+source .venv/bin/activate
+python -m pytest -q
+```
+
+## API Overview
+
+See `docs/api.md` for the current Sprint 1 API contract.
+
+## Data and Scientific Boundaries
+
+- Hetionet is the current biomedical graph source.
 - Hetionet does not directly provide DDI labels.
-- Current DDI/synergy values are demo placeholders unless real model data are integrated.
-- DrugBank access and licensing must be described accurately; this repository does not claim full DrugBank integration.
-
-## Definition of done for this phase
-
-- Disease selection workflow is available.
-- Neo4j disease/drug retrieval is prepared through the ML engine boundary.
-- Hard safety rules remain enforced and cannot be bypassed by low model risk.
-- Candidate generation and baseline set-cover-style ranking are available.
-- Research-only UI and evidence/provenance metadata are present.
-- Remaining ML and explainability work is explicitly marked as planned.
+- `CrC` is compound resemblance, not interaction risk.
+- Graph coverage is knowledge-graph treatment coverage, not clinical efficacy.
+- Safety rules are deterministic guardrails, not a clinical safety guarantee.
+- Future DDI/synergy predictions must be clearly separated from graph evidence.

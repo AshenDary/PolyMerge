@@ -3,14 +3,14 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
-from typing import Any
+from typing import Any, Optional
 
 from app.services.graph_service import GRAPH_VERSION, GraphService, Neo4jConnectionError
 
 
 def build_graph_candidates(
     diseases: list[str],
-    graph_service: GraphService | None = None,
+    graph_service: Optional[GraphService] = None,
 ) -> dict[str, Any]:
     service = graph_service or GraphService()
 
@@ -60,7 +60,7 @@ def build_demo_candidates(diseases: list[str]) -> dict[str, Any]:
 def _empty_result(
     diseases: list[str],
     data_status: str,
-    warning: str | None = None,
+    warning: Optional[str] = None,
 ) -> dict[str, Any]:
     metadata: dict[str, Any] = {
         "model": "No predictive ML model applied",

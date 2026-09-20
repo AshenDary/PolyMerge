@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import re
-from typing import Any, Protocol
+from typing import Any, Optional, Protocol
 
 from app.utils.neo4j_client import Neo4jClient, Neo4jConnectionError
 
@@ -21,7 +21,7 @@ class QueryClient(Protocol):
 
 
 class GraphService:
-    def __init__(self, client: QueryClient | None = None) -> None:
+    def __init__(self, client: Optional[QueryClient] = None) -> None:
         self.client = client or Neo4jClient()
 
     def verify_connection(self) -> bool:
@@ -64,7 +64,7 @@ class GraphService:
         )
         return [_disease_from_row(row) for row in rows]
 
-    def get_disease_by_id(self, disease_id: str) -> dict[str, Any] | None:
+    def get_disease_by_id(self, disease_id: str) -> Optional[dict[str, Any]]:
         rows = self.client.query(
             """
             MATCH (d:Disease {id: $diseaseId})
@@ -77,7 +77,7 @@ class GraphService:
         )
         return _disease_from_row(rows[0]) if rows else None
 
-    def get_disease_by_name(self, name: str) -> dict[str, Any] | None:
+    def get_disease_by_name(self, name: str) -> Optional[dict[str, Any]]:
         matches = self.search_diseases(name, limit=1)
         return matches[0] if matches else None
 
@@ -149,7 +149,7 @@ class GraphService:
         )
         return rows
 
-    def get_drug_by_id(self, drug_id: str) -> dict[str, Any] | None:
+    def get_drug_by_id(self, drug_id: str) -> Optional[dict[str, Any]]:
         rows = self.client.query(
             """
             MATCH (compound:Compound {id: $drugId})

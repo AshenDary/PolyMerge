@@ -132,3 +132,8 @@ Its result preserves `coverageMatrix`, `coveredDiseaseIds`, `uncoveredDiseaseIds
 `selectedDrugs`, and `selectedDrugCount`. These values describe knowledge-graph
 treatment coverage for research candidate discovery, not clinical efficacy,
 prescribing suitability, or validated safety.
+
+Hard safety filtering happens before optimization. Candidates marked as rejected
+are excluded from the `selectedDrugs` input passed to the optimizer. The current
+Sprint 1 optimizer is a greedy set-cover baseline over graph-derived individual
+compound candidates; it is not yet the final multi-drug candidate-set generator.

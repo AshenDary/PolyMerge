@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Optional, Union
 
 from app.services.safety_filter import check_hard_contraindications
 
@@ -16,8 +16,8 @@ DEFAULT_OPTIMIZATION_CONFIG = {
 def optimize_set_cover(
     candidate_drugs: list[str],
     diseases: list[str],
-    coverage_by_drug: dict[str, set[str] | list[str]],
-    config: dict[str, Any] | None = None,
+    coverage_by_drug: dict[str, Union[set[str], list[str]]],
+    config: Optional[dict[str, Any]] = None,
 ) -> dict[str, Any]:
     """Select a research candidate set from a graph-derived coverage matrix."""
     effective_config = _optimization_config(config)
@@ -54,8 +54,8 @@ def optimize_set_cover(
 def greedy_set_cover(
     candidate_drugs: list[str],
     diseases: list[str],
-    config: dict[str, Any] | None = None,
-    coverage_by_drug: dict[str, set[str] | list[str]] | None = None,
+    config: Optional[dict[str, Any]] = None,
+    coverage_by_drug: Optional[dict[str, Union[set[str], list[str]]]] = None,
 ) -> list[str]:
     config = _optimization_config(config)
     max_drugs = config["maxDrugCount"]
@@ -96,7 +96,7 @@ def greedy_set_cover(
     return selected
 
 
-def _optimization_config(config: dict[str, Any] | None) -> dict[str, Any]:
+def _optimization_config(config: Optional[dict[str, Any]]) -> dict[str, Any]:
     supplied = config or {}
     max_drugs = max(0, int(supplied.get("maxDrugCount", DEFAULT_OPTIMIZATION_CONFIG["maxDrugCount"])))
     minimum_coverage = min(
@@ -109,7 +109,7 @@ def _optimization_config(config: dict[str, Any] | None) -> dict[str, Any]:
 def _coverage_matrix(
     candidate_drugs: list[str],
     diseases: list[str],
-    coverage_by_drug: dict[str, set[str] | list[str]],
+    coverage_by_drug: dict[str, Union[set[str], list[str]]],
 ) -> dict[str, list[str]]:
     target_diseases = set(diseases)
     return {
