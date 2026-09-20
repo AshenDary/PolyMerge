@@ -7,7 +7,7 @@ import os
 import re
 from collections import defaultdict
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any, Iterable, Optional, Union
 
 from dotenv import load_dotenv
 from neo4j import GraphDatabase, ManagedTransaction
@@ -34,9 +34,9 @@ def _batched(items: list[dict[str, str]], size: int = 500) -> Iterable[list[dict
 class Neo4jClient:
     def __init__(
         self,
-        uri: str | None = None,
-        user: str | None = None,
-        password: str | None = None,
+        uri: Optional[str] = None,
+        user: Optional[str] = None,
+        password: Optional[str] = None,
     ) -> None:
         self.uri = uri or os.getenv("NEO4J_URI")
         self.user = user or os.getenv("NEO4J_USER") or os.getenv("NEO4J_USERNAME")
@@ -81,7 +81,7 @@ class Neo4jClient:
             raise Neo4jConnectionError("Neo4j connectivity check failed") from error
         return True
 
-    def load_fragment(self, nodes_csv: Path | str, edges_csv: Path | str) -> dict[str, Any]:
+    def load_fragment(self, nodes_csv: Union[Path, str], edges_csv: Union[Path, str]) -> dict[str, Any]:
         nodes_by_kind = _group_csv_rows_by_column(Path(nodes_csv), "kind")
         edges_by_metaedge = _group_csv_rows_by_column(Path(edges_csv), "metaedge")
 

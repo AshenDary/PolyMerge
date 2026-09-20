@@ -17,12 +17,6 @@ const HOST = process.env.HOST || '0.0.0.0';
 const ML_SERVICE_URL = process.env.ML_SERVICE_URL || 'http://localhost:8000';
 const ML_SERVICE_TIMEOUT_MS = Number(process.env.ML_SERVICE_TIMEOUT_MS) || 15000;
 
-const DISEASES = [
-  { id: 'hypertension', name: 'Hypertension', kind: 'Disease' },
-  { id: 'type-2-diabetes', name: 'Type 2 Diabetes', kind: 'Disease' },
-  { id: 'coronary-artery-disease', name: 'Coronary Artery Disease', kind: 'Disease' },
-];
-
 const DRUGS = {
   lisinopril: {
     id: 'lisinopril',
@@ -124,19 +118,52 @@ export function normalizeDiseases(diseases) {
   const normalized = [...new Set(diseases
     .map((disease) => disease.trim())
     .filter(Boolean)
-    .map((disease) => disease.toLowerCase()))];
+  )];
 
   if (normalized.length === 0) {
     return { error: 'diseases[] is required' };
   }
 
-  const unknown = normalized.filter((disease) => !DISEASES.some((item) => item.id === disease || item.name.toLowerCase() === disease));
+  return { diseases: normalized };
+}
 
-  if (unknown.length > 0) {
-    return { error: `Unknown disease requested: ${unknown.join(', ')}` };
+function normalizeLookupKey(value) {
+  return String(value).trim().toLowerCase();
+}
+
+export function resolveDiseasesFromCatalog(diseases, catalog) {
+  const byId = new Map();
+  const byName = new Map();
+
+  for (const disease of catalog) {
+    byId.set(normalizeLookupKey(disease.id), disease);
+    byName.set(normalizeLookupKey(disease.name), disease);
   }
 
-  return { diseases: normalized };
+  const resolved = [];
+  const unknown = [];
+  const seen = new Set();
+
+  for (const disease of diseases) {
+    const key = normalizeLookupKey(disease);
+    const match = byId.get(key) ?? byName.get(key);
+
+    if (!match) {
+      unknown.push(disease);
+      continue;
+    }
+
+    if (!seen.has(match.id)) {
+      resolved.push(match);
+      seen.add(match.id);
+    }
+  }
+
+  if (unknown.length > 0) {
+    return { error: `Unknown disease requested: ${unknown.join(', ')}`, unknown };
+  }
+
+  return { diseases: resolved };
 }
 
 export function normalizeOptimizationConfig(config) {
@@ -168,81 +195,66 @@ export function normalizeOptimizationConfig(config) {
 }
 
 function createDemoSearchResult(inputDiseases, warning = 'ML engine unavailable; returning explicitly labeled demo output.') {
-  const orderedDiseases = inputDiseases.map((diseaseId) => DISEASES.find((item) => item.id === diseaseId) ?? { id: diseaseId, name: diseaseId });
-
-  const candidateBuckets = {
-    hypertension: [
-      { drugs: ['lisinopril', 'metformin'], coverage: 1.0, interactionRisk: 0.12, synergyScore: 0.81, confidence: 0.78, evidenceLevel: 'medium' },
-      { drugs: ['amlodipine', 'metformin'], coverage: 1.0, interactionRisk: 0.18, synergyScore: 0.74, confidence: 0.71, evidenceLevel: 'medium' },
-    ],
-    'type-2-diabetes': [
-      { drugs: ['metformin', 'empagliflozin'], coverage: 1.0, interactionRisk: 0.16, synergyScore: 0.83, confidence: 0.80, evidenceLevel: 'medium' },
-      { drugs: ['metformin', 'lisinopril'], coverage: 1.0, interactionRisk: 0.14, synergyScore: 0.75, confidence: 0.73, evidenceLevel: 'medium' },
-    ],
-    'coronary-artery-disease': [
-      { drugs: ['aspirin', 'atorvastatin'], coverage: 1.0, interactionRisk: 0.11, synergyScore: 0.86, confidence: 0.82, evidenceLevel: 'high' },
-      { drugs: ['aspirin', 'lisinopril'], coverage: 1.0, interactionRisk: 0.15, synergyScore: 0.76, confidence: 0.70, evidenceLevel: 'medium' },
-    ],
-  };
-
-  const diseasePool = orderedDiseases.flatMap((disease) => candidateBuckets[disease.id] ?? []);
-  const candidates = diseasePool
-    .slice(0, 3)
-    .map((candidate, index) => ({
-      rank: index + 1,
-      drugs: candidate.drugs,
-      coverage: candidate.coverage,
-      interactionRisk: candidate.interactionRisk,
-      synergyScore: candidate.synergyScore,
-      drugCount: candidate.drugs.length,
-      evidenceLevel: candidate.evidenceLevel,
-      confidence: candidate.confidence,
-      dataStatus: 'demo',
-      mlStatus: 'demo',
-      status: 'accepted',
-      evidence: [
-        {
-          source: 'Hetionet',
-          relationship: 'treats',
-          evidenceType: 'known',
-          confidence: null,
-        },
-        {
-          source: 'PolyMerge Demo Pipeline',
-          relationship: 'DDI',
-          evidenceType: 'predicted',
-          score: candidate.interactionRisk,
-          modelVersion: 'demo-0.1.0',
-        },
-        {
-          source: 'PolyMerge Safety Rules',
-          evidenceType: 'rule',
-          status: 'passed',
-        },
-      ],
-      reasons: [
-        'Selected disease cluster coverage is computed from treatment relationships represented in the knowledge graph.',
-        'Demo interaction and synergy values are clearly labeled and should not be used as clinical claims.',
-      ],
-    }));
+  const orderedDiseases = inputDiseases.map((disease) => (
+    typeof disease === 'string' ? { id: disease, name: disease } : disease
+  ));
 
   return {
     queryId: `demo-${Date.now()}`,
     diseases: orderedDiseases.map((disease) => disease.name),
-    candidates,
+    candidates: [],
     metadata: {
-      model: 'PolyMerge Demo Pipeline',
-      modelVersion: 'demo-0.1.0',
-      dataset: 'Hetionet fragment',
-      graph: 'Neo4j fragment',
+      model: 'No predictive ML model applied',
+      modelVersion: null,
+      dataset: null,
+      graph: null,
       timestamp: new Date().toISOString(),
       dataStatus: 'demo',
       mlStatus: 'demo',
       upstreamStatus: 'fallback',
       warning,
+      fallbackReason: 'No graph-backed candidate data returned because the ML graph service was unavailable or invalid.',
       disclaimer: 'Research decision-support only. PolyMerge does not provide medical advice, prescriptions, or clinically validated safety guarantees. Results require expert review and appropriate clinical/regulatory validation.',
     },
   };
+}
+
+function validateDiseaseCatalog(payload) {
+  if (payload === null || typeof payload !== 'object' || Array.isArray(payload) || !Array.isArray(payload.diseases)) {
+    throw new Error('ML disease catalog response is missing diseases[]');
+  }
+
+  const diseases = payload.diseases.map((disease) => {
+    if (disease === null || typeof disease !== 'object' || Array.isArray(disease)
+      || typeof disease.id !== 'string' || typeof disease.name !== 'string') {
+      throw new Error('ML disease catalog returned an invalid disease schema');
+    }
+
+    return {
+      id: disease.id,
+      name: disease.name,
+      kind: disease.kind ?? 'Disease',
+      source: disease.source,
+      graphVersion: disease.graphVersion,
+    };
+  });
+
+  return diseases;
+}
+
+async function fetchDiseaseCatalog(options = {}) {
+  const fetchImpl = options.fetchImpl ?? fetch;
+  const mlServiceUrl = options.mlServiceUrl ?? ML_SERVICE_URL;
+  const timeoutMs = options.timeoutMs ?? ML_SERVICE_TIMEOUT_MS;
+  const response = await fetchImpl(`${mlServiceUrl}/api/diseases`, {
+    signal: AbortSignal.timeout(timeoutMs),
+  });
+
+  if (!response.ok) {
+    throw new Error(`ML disease catalog responded ${response.status}`);
+  }
+
+  return validateDiseaseCatalog(await response.json());
 }
 
 export function validateMlResult(payload) {
@@ -284,7 +296,7 @@ async function fetchMlResult(diseases, optimizationConfig = {}, options = {}) {
     return validateMlResult(await response.json());
   } catch (error) {
     options.logger?.warn({ error: error.message }, 'ML engine request failed; using demo fallback');
-    return createDemoSearchResult(diseases, error.message);
+    return createDemoSearchResult(options.resolvedDiseases ?? diseases, error.message);
   }
 }
 
@@ -362,9 +374,17 @@ app.get('/frontend/:file', async (request, reply) => {
   }
 });
 
-app.get('/api/diseases', async () => ({
-  diseases: DISEASES,
-}));
+app.get('/api/diseases', async (request, reply) => {
+  try {
+    return { diseases: await fetchDiseaseCatalog() };
+  } catch (error) {
+    request.log?.warn?.({ error: error.message }, 'Disease catalog request failed');
+    return reply.code(503).send({
+      error: 'Disease catalog unavailable',
+      detail: error.message,
+    });
+  }
+});
 
 app.get('/api/drugs/:id', async (request, reply) => {
   const paramId = String(request.params.id).trim().toLowerCase();
@@ -420,8 +440,26 @@ app.post('/api/combinations/search', async (request, reply) => {
     return reply.code(400).send({ error: normalizedConfig.error });
   }
 
-  const mlResult = await fetchMlResult(normalized.diseases, normalizedConfig.optimizationConfig, {
+  let diseaseCatalog;
+  try {
+    diseaseCatalog = await fetchDiseaseCatalog();
+  } catch (error) {
+    request.log?.warn?.({ error: error.message }, 'Disease catalog validation failed');
+    return reply.code(503).send({
+      error: 'Disease catalog unavailable',
+      detail: error.message,
+    });
+  }
+
+  const resolved = resolveDiseasesFromCatalog(normalized.diseases, diseaseCatalog);
+  if (resolved.error) {
+    return reply.code(400).send({ error: resolved.error, unknownDiseases: resolved.unknown });
+  }
+
+  const diseaseIds = resolved.diseases.map((disease) => disease.id);
+  const mlResult = await fetchMlResult(diseaseIds, normalizedConfig.optimizationConfig, {
     logger: request.log,
+    resolvedDiseases: resolved.diseases,
   });
   const dataStatus = mlResult.metadata.dataStatus;
   const mlStatus = mlResult.metadata.mlStatus;

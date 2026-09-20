@@ -25,7 +25,7 @@ model QueryLog {
   userId         Int?
   user           User?    @relation(fields: [userId], references: [id])
   targetDiseases Json // disease IDs sent to the combination search
-  resultDrugSet  Json // minimal safe drug set returned
+  resultDrugSet  Json // research candidate drug set returned
   mlEngineMs     Int? // latency of the ML engine call, for perf tracking
   createdAt      DateTime @default(now())
 }

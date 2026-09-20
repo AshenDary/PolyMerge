@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import os
 from pathlib import Path
-from typing import Any
+from typing import Any, Optional
 
 from dotenv import load_dotenv
 from fastapi import FastAPI
@@ -36,8 +36,8 @@ app.add_middleware(
 class OptimizationConfig(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
-    maxDrugCount: int | None = Field(default=None, ge=0, le=50)
-    minimumCoverage: float | None = Field(default=None, ge=0.0, le=1.0)
+    maxDrugCount: Optional[int] = Field(default=None, ge=0, le=50)
+    minimumCoverage: Optional[float] = Field(default=None, ge=0.0, le=1.0)
 
 
 class CombinationRequest(BaseModel):
@@ -86,7 +86,7 @@ async def predict_combination(payload: CombinationRequest) -> CombinationRespons
     """Return research candidates from represented knowledge-graph relationships.
 
     Predictive ML/DDI/synergy scores are not applied in this phase. The response
-    distinguishes real graph evidence from later placeholder/model fields.
+    distinguishes real graph evidence from future model fields.
     """
     diseases = payload.diseases
 

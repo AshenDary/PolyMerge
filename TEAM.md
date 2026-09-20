@@ -1,33 +1,59 @@
-# PolyMerge Team & Task Overview
+# PolyMerge Team & Sprint 1 Status
 
-## Current role split
+## Jared — Knowledge Graph / Biomedical Data Engineer
 
-| Role | Focus | Current status |
-| --- | --- | --- |
-| Backend engineer | Fastify API, Prisma, query/history support, safety layer | Implemented |
-| ML engineer | FastAPI services, graph abstraction, candidate generation, baseline optimization | Partially implemented with demo data |
-| Research/UI engineer | Research dashboard, explainability display, evidence presentation | Implemented in static frontend |
+### Current Sprint 1 Work
 
-## Current working status
+- Neo4j integration.
+- Hetionet graph schema verification.
+- Graph data loading/preprocessing support.
+- Disease retrieval from Neo4j.
+- Disease to compound retrieval using represented `CtD` relationships.
+- Compound-gene evidence using `CbG`, `CuG`, and `CdG`.
+- Side-effect evidence using `CcSE`.
+- Evidence/provenance structure.
+- Graph-backed candidate generation.
+- Backend disease catalog integration through the ML/Graph service.
 
-### Backend
+### Current Status
 
-- Research-oriented API surface now exists.
-- Hard contraindication rules are preserved and exposed with structured reason payloads.
-- Query history is stored in memory for the current runtime.
+Sprint 1 graph foundation is implemented and ready for review. Future work includes graph integrity checks against larger datasets, DDI dataset preparation, and RDKit/molecular feature preparation.
 
-### ML engine
+## Ranee — Backend / ML Integration
 
-- Modular placeholder services exist for knowledge graph access, candidate generation, safety filtering, optimization, and ranking.
-- The API currently returns clearly labeled demo data until real ML models are integrated.
+### Current Sprint 1 Work
 
-### Frontend
+- Fastify backend API.
+- FastAPI ML/Graph service integration.
+- Request validation.
+- API response contract checks.
+- Backend fallback behavior.
+- Dependency health checks.
+- Python environment compatibility for ML tests.
+- Backend and integration tests.
 
-- Static dashboard supports disease selection, workflow status, candidate summaries, and a simple explainability panel.
-- The UI uses research-only messaging and explicitly labels demo data as such.
+### Current Status
 
-## Handoff expectations
+Backend and ML/Graph integration is implemented for Sprint 1. Real graph-backed responses are labeled with `dataStatus: "real_graph"` and `mlStatus: "not_applied"`. Demo fallback remains available only as clearly labeled fallback output.
 
-- Any new model or dataset integration must be declared as real or demo in the API output.
-- Any hard contraindication must remain traceable and must not be bypassed by model scores.
-- All new artifacts should be documented as implemented, planned, or stretch-goal work.
+## Pamela — Optimization / Explainability
+
+### Current Sprint 1 Work
+
+- Greedy set-cover baseline.
+- Candidate ranking foundation.
+- Optimization tests.
+- Safety and optimization verification.
+- Sprint 2 multi-drug optimization planning.
+
+### Current Status
+
+The Sprint 1 optimizer consumes graph-derived coverage and produces baseline selected compounds. Future work is multi-drug candidate-set generation, richer constraints, comparison, rejection explanations, and frontend visualization.
+
+## Handoff Expectations
+
+- Graph evidence must remain separate from future ML predictions.
+- Hard safety rules must remain deterministic and independent of model scores.
+- `CrC` must not be treated as a DDI label.
+- Coverage means knowledge-graph treatment coverage, not clinical efficacy.
+- Any future model or dataset integration must include provenance and model/version metadata.

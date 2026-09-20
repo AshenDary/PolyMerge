@@ -41,8 +41,8 @@ function renderSummaryCards(candidates) {
 
   const cards = [
     { label: 'Treatment Coverage', value: `${(candidate.coverage ?? 0) * 100}% KG Coverage` },
-    { label: 'Predicted Interaction Risk', value: candidate.interactionRisk != null ? candidate.interactionRisk.toFixed(2) : 'N/A' },
-    { label: 'Synergy', value: candidate.synergyScore != null ? candidate.synergyScore.toFixed(2) : 'N/A' },
+    { label: 'Interaction Risk', value: candidate.interactionRisk != null ? candidate.interactionRisk.toFixed(2) : 'Not applied' },
+    { label: 'Synergy Model', value: candidate.synergyScore != null ? candidate.synergyScore.toFixed(2) : 'Not applied' },
     { label: 'Drug Count', value: candidate.drugCount ?? 'N/A' },
     { label: 'Evidence Level', value: candidate.evidenceLevel ?? 'N/A' },
   ];
@@ -78,8 +78,8 @@ function renderResults(data) {
               </div>
               <div class="result-meta">
                 <span>Coverage: ${(candidate.coverage ?? 0) * 100}% KG Coverage</span>
-                <span>Interaction Risk: ${candidate.interactionRisk ?? 'N/A'}</span>
-                <span>Synergy: ${candidate.synergyScore ?? 'N/A'}</span>
+                <span>Interaction Risk: ${candidate.interactionRisk ?? 'Not applied'}</span>
+                <span>Synergy Model: ${candidate.synergyScore ?? 'Not applied'}</span>
                 <span>Evidence: ${candidate.evidenceLevel ?? 'N/A'}</span>
                 <span>Status: ${candidate.status ?? 'accepted'}</span>
               </div>
@@ -119,9 +119,21 @@ function renderResults(data) {
 }
 
 async function loadDiseases() {
-  const response = await fetch('/api/diseases');
-  const data = await response.json();
-  renderDiseases(data.diseases || []);
+  try {
+    const response = await fetch('/api/diseases');
+    const data = await response.json();
+
+    if (!response.ok) {
+      diseaseList.innerHTML = `<p class="muted">${data.error || 'Unable to load disease catalog.'}</p>`;
+      statusTag.textContent = 'Catalog error';
+      return;
+    }
+
+    renderDiseases(data.diseases || []);
+  } catch (error) {
+    diseaseList.innerHTML = `<p class="muted">Unable to load disease catalog: ${error.message}</p>`;
+    statusTag.textContent = 'Catalog error';
+  }
 }
 
 async function analyzeCombination() {
@@ -152,7 +164,7 @@ async function analyzeCombination() {
       <div class="explainability-list">
         <div class="explainability-item">
           <h3>Evidence panel</h3>
-          <p class="muted">Demo output is clearly labeled as MOCK/DEMO and should not be interpreted as clinical evidence.</p>
+          <p class="muted">${data.metadata?.dataStatus === 'real_graph' ? 'Candidates are based on represented knowledge-graph relationships. ML DDI and synergy prediction are not applied.' : 'Demo fallback output is clearly labeled and should not be interpreted as graph evidence or clinical evidence.'}</p>
         </div>
       </div>
     `;
