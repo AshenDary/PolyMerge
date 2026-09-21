@@ -16,7 +16,7 @@
 - Evidence/provenance fields preserved in graph-derived candidate output.
 - Backend `/api/diseases` uses the ML/Graph service rather than a hard-coded disease catalog.
 - Backend validates selected diseases against the graph-backed catalog before candidate search.
-- Candidate generation returns graph-derived individual compound candidates.
+- Candidate generation returns graph-derived single-compound candidates with stable IDs, treatment evidence, and provenance.
 - `dataStatus` and `mlStatus` distinguish real graph data from future ML prediction.
 - Deterministic hard safety rules remain independent of model outputs.
 - Greedy set-cover baseline consumes graph-derived coverage.
@@ -24,7 +24,7 @@
 
 ### Sprint 1 Known Limitations
 
-- Candidate generation is still individual compound oriented; it is not yet the final multi-drug candidate-set generator.
+- Sprint 1 candidate generation produced the single-compound graph foundation consumed by later candidate-set generation.
 - Greedy set-cover is a baseline, not the final optimization system.
 - `/api/drugs/:id` and `/api/drugs/:id/interactions` remain reference/demo backend endpoints.
 - Explainability is basic and does not yet include advanced graph visualization or model explainers.
@@ -32,16 +32,19 @@
 
 ## Sprint 2 — Real Multi-Drug Candidate Generation & Optimization
 
-### Status: Planned
+### Status: Partially Implemented / In Review
 
-- Build multi-drug candidate-set generation from graph-derived candidate coverage.
-- Preserve disease/compound coverage matrix through the full pipeline.
-- Apply hard safety filtering to candidate drug sets before optimization.
-- Extend greedy set-cover to candidate sets and configurable constraints.
-- Rank candidate sets, not only individual graph candidates.
-- Add candidate comparison structures.
-- Add rejection explanations for blocked or lower-ranked candidate sets.
-- Update frontend support for multi-drug candidate sets.
+- Implemented: graph-derived disease x drug coverage matrix from represented `CtD` relationships.
+- Implemented: stable disease IDs, stable compound IDs, treatment evidence, and provenance are preserved through candidate generation.
+- Implemented: multi-drug candidate-set generation from graph-derived candidate coverage.
+- Implemented: deterministic hard safety filtering runs on candidate drug sets before optimization.
+- Implemented: greedy set-cover baseline consumes candidate sets and configurable constraints.
+- Implemented: candidate sets are ranked separately from individual graph candidates.
+- Implemented: candidate comparison structures show per-drug coverage contribution.
+- Implemented: rejected candidate sets include pre-optimization hard-safety reasons.
+- Remaining: broaden graph/integration coverage against live Neo4j fixtures where available.
+- Remaining: refine frontend support for reviewing multi-drug candidate-set comparisons and rejection details.
+- Remaining: continue optimization work beyond the greedy baseline without treating future DDI, synergy, or GNN models as active.
 
 ## Sprint 3 — Graph Embedding Baseline
 

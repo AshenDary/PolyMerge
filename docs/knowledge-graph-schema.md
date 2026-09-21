@@ -126,14 +126,19 @@ The ML engine represents graph-derived candidate coverage as a matrix:
 - Columns are resolved disease IDs.
 - A populated cell means the graph contains a represented `CtD` treatment relationship.
 
-The baseline optimizer greedily selects the candidate with the greatest uncovered
-disease count, up to `maxDrugCount`, and stops when `minimumCoverage` is reached.
-Its result preserves `coverageMatrix`, `coveredDiseaseIds`, `uncoveredDiseaseIds`,
-`selectedDrugs`, and `selectedDrugCount`. These values describe knowledge-graph
-treatment coverage for research candidate discovery, not clinical efficacy,
-prescribing suitability, or validated safety.
+Candidate-set generation builds single-drug and multi-drug research candidate
+sets from this graph-derived matrix, preserving stable compound IDs, covered
+disease IDs, treatment evidence, and provenance.
 
-Hard safety filtering happens before optimization. Candidates marked as rejected
-are excluded from the `selectedDrugs` input passed to the optimizer. The current
-Sprint 1 optimizer is a greedy set-cover baseline over graph-derived individual
-compound candidates; it is not yet the final multi-drug candidate-set generator.
+The baseline optimizer greedily selects accepted candidate sets with the greatest
+uncovered disease count, up to `maxDrugCount`, and stops when `minimumCoverage`
+is reached. Its result preserves `selectedCandidateSetIds`,
+`selectedCandidateSets`, `selectedDrugs`, `coveredDiseaseIds`,
+`uncoveredDiseaseIds`, and coverage summary fields. These values describe
+knowledge-graph treatment coverage for research candidate discovery, not
+clinical efficacy, prescribing suitability, or validated safety.
+
+Hard safety filtering happens before optimization. Candidate sets marked as
+rejected are excluded from optimizer selection. The current optimizer remains a
+greedy set-cover baseline; learned DDI, synergy, graph embedding, and GNN
+inference are not applied.

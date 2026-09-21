@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-from app.services.graph_service import GraphService, Neo4jConnectionError
+from app.services.graph_service import GRAPH_VERSION, GraphService, Neo4jConnectionError
 
 
 DISEASES = {
@@ -27,14 +27,18 @@ DRUG_ROWS = [
         "treatment_evidence": [
             {
                 "source": "Hetionet",
+                "graphVersion": GRAPH_VERSION,
                 "relationship": "CtD",
+                "metaedge": "CtD",
                 "targetId": "Disease::DOID:10763",
                 "targetName": "hypertension",
                 "evidenceType": "known",
             },
             {
                 "source": "Hetionet",
+                "graphVersion": GRAPH_VERSION,
                 "relationship": "CtD",
+                "metaedge": "CtD",
                 "targetId": "Disease::DOID:9352",
                 "targetName": "type 2 diabetes mellitus",
                 "evidenceType": "known",
@@ -49,7 +53,9 @@ DRUG_ROWS = [
         "treatment_evidence": [
             {
                 "source": "Hetionet",
+                "graphVersion": GRAPH_VERSION,
                 "relationship": "CtD",
+                "metaedge": "CtD",
                 "targetId": "Disease::DOID:10763",
                 "targetName": "hypertension",
                 "evidenceType": "known",
@@ -212,6 +218,33 @@ def test_coverage_calculation_uses_represented_diseases():
     )
     assert valsartan["coverage"] == 1.0
     assert amlodipine["coverage"] == 0.5
+
+
+def test_each_covered_disease_has_matching_ctd_evidence():
+    result = GraphService(FakeGraphClient()).build_candidate_drugs(
+        ["hypertension", "type-2-diabetes"]
+    )
+
+    for candidate in result["candidates"]:
+        for disease_id in candidate["treatedDiseaseIds"]:
+            matching_evidence = [
+                evidence
+                for evidence in candidate["evidence"]
+                if evidence.get("relationship") == "CtD"
+                and evidence.get("targetId") == disease_id
+            ]
+
+            assert matching_evidence, (
+                f"{candidate['drugId']} covers {disease_id} without matching CtD evidence"
+            )
+            assert all(
+                evidence["source"] == "Hetionet"
+                and evidence["graphVersion"] == GRAPH_VERSION
+                and evidence["metaedge"] == "CtD"
+                and evidence["targetName"]
+                and evidence["evidenceType"] == "known"
+                for evidence in matching_evidence
+            )
 
 
 def test_drug_evidence_includes_targets_and_side_effects():
