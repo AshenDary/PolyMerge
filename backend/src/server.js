@@ -194,6 +194,31 @@ export function normalizeOptimizationConfig(config) {
   return { optimizationConfig: normalized };
 }
 
+export function normalizeCandidateSetConfig(config) {
+  if (config === undefined) {
+    return { candidateSetConfig: {} };
+  }
+  if (config === null || typeof config !== 'object' || Array.isArray(config)) {
+    return { error: 'candidateSetConfig must be an object' };
+  }
+
+  const normalized = {};
+  if (config.maxDrugCount !== undefined) {
+    if (!Number.isInteger(config.maxDrugCount) || config.maxDrugCount < 1 || config.maxDrugCount > 10) {
+      return { error: 'candidateSetConfig.maxDrugCount must be an integer between 1 and 10' };
+    }
+    normalized.maxDrugCount = config.maxDrugCount;
+  }
+  if (config.maxCandidateSets !== undefined) {
+    if (!Number.isInteger(config.maxCandidateSets)
+      || config.maxCandidateSets < 1 || config.maxCandidateSets > 500) {
+      return { error: 'candidateSetConfig.maxCandidateSets must be an integer between 1 and 500' };
+    }
+    normalized.maxCandidateSets = config.maxCandidateSets;
+  }
+  return { candidateSetConfig: normalized };
+}
+
 function createDemoSearchResult(inputDiseases, warning = 'ML engine unavailable; returning explicitly labeled demo output.') {
   const orderedDiseases = inputDiseases.map((disease) => (
     typeof disease === 'string' ? { id: disease, name: disease } : disease
@@ -201,8 +226,10 @@ function createDemoSearchResult(inputDiseases, warning = 'ML engine unavailable;
 
   return {
     queryId: `demo-${Date.now()}`,
+    diseaseIds: orderedDiseases.map((disease) => disease.id),
     diseases: orderedDiseases.map((disease) => disease.name),
     candidates: [],
+    candidateSets: [],
     metadata: {
       model: 'No predictive ML model applied',
       modelVersion: null,
@@ -277,6 +304,67 @@ export function validateMlResult(payload) {
   return payload;
 }
 
+export function validateCandidateSetResult(payload) {
+  if (payload === null || typeof payload !== 'object' || Array.isArray(payload)) {
+    throw new Error('ML engine returned a non-object candidate-set response');
+  }
+  if (!Array.isArray(payload.diseaseIds) || !Array.isArray(payload.diseases)
+    || !Array.isArray(payload.candidateSets)) {
+    throw new Error('ML candidate-set response is missing diseaseIds[], diseases[], or candidateSets[]');
+  }
+  if (payload.metadata === null || typeof payload.metadata !== 'object' || Array.isArray(payload.metadata)
+    || typeof payload.metadata.dataStatus !== 'string'
+    || typeof payload.metadata.mlStatus !== 'string') {
+    throw new Error('ML candidate-set response is missing provenance metadata');
+  }
+
+  if (payload.diseaseIds.some((diseaseId) => typeof diseaseId !== 'string' || !diseaseId)
+    || new Set(payload.diseaseIds).size !== payload.diseaseIds.length
+    || payload.diseases.some((disease) => disease === null || typeof disease !== 'object'
+      || typeof disease.id !== 'string' || typeof disease.name !== 'string')
+    || payload.diseases.some((disease) => !payload.diseaseIds.includes(disease.id))) {
+    throw new Error('ML engine returned invalid or unstable disease identifiers');
+  }
+
+  const candidateSetIds = new Set();
+  for (const candidateSet of payload.candidateSets) {
+    const validStatus = candidateSet?.status === 'accepted' || candidateSet?.status === 'rejected';
+    if (candidateSet === null || typeof candidateSet !== 'object' || Array.isArray(candidateSet)
+      || typeof candidateSet.candidateSetId !== 'string' || !candidateSet.candidateSetId
+      || !Array.isArray(candidateSet.drugs) || candidateSet.drugs.length === 0
+      || candidateSet.drugs.some((drugId) => typeof drugId !== 'string' || !drugId)
+      || new Set(candidateSet.drugs).size !== candidateSet.drugs.length
+      || !Array.isArray(candidateSet.treatedDiseaseIds)
+      || !Array.isArray(candidateSet.uncoveredDiseaseIds)
+      || candidateSet.treatedDiseaseIds.some((diseaseId) => !payload.diseaseIds.includes(diseaseId))
+      || candidateSet.uncoveredDiseaseIds.some((diseaseId) => !payload.diseaseIds.includes(diseaseId))
+      || typeof candidateSet.coverage !== 'number'
+      || candidateSet.coverage < 0 || candidateSet.coverage > 1
+      || candidateSet.drugCount !== candidateSet.drugs.length
+      || !validStatus
+      || !Array.isArray(candidateSet.rejectionReasons)
+      || (candidateSet.status === 'rejected' && candidateSet.rejectionReasons.length === 0)
+      || !Array.isArray(candidateSet.evidence)
+      || typeof candidateSet.dataStatus !== 'string'
+      || typeof candidateSet.mlStatus !== 'string') {
+      throw new Error('ML engine returned an invalid candidate-set schema');
+    }
+    if (candidateSetIds.has(candidateSet.candidateSetId)) {
+      throw new Error('ML engine returned duplicate candidate-set IDs');
+    }
+    candidateSetIds.add(candidateSet.candidateSetId);
+    if (candidateSet.mlStatus === 'not_applied'
+      && (candidateSet.interactionRisk != null || candidateSet.synergyScore != null)) {
+      throw new Error('ML engine returned prediction scores while mlStatus is not_applied');
+    }
+    if (candidateSet.dataStatus !== payload.metadata.dataStatus
+      || candidateSet.mlStatus !== payload.metadata.mlStatus) {
+      throw new Error('ML candidate-set provenance does not match response metadata');
+    }
+  }
+  return payload;
+}
+
 async function fetchMlResult(diseases, optimizationConfig = {}, options = {}) {
   const fetchImpl = options.fetchImpl ?? fetch;
   const mlServiceUrl = options.mlServiceUrl ?? ML_SERVICE_URL;
@@ -297,6 +385,32 @@ async function fetchMlResult(diseases, optimizationConfig = {}, options = {}) {
   } catch (error) {
     options.logger?.warn({ error: error.message }, 'ML engine request failed; using demo fallback');
     return createDemoSearchResult(options.resolvedDiseases ?? diseases, error.message);
+  }
+}
+
+async function fetchCandidateSetResult(
+  diseaseIds,
+  candidateSetConfig = {},
+  optimizationConfig = {},
+  options = {},
+) {
+  const fetchImpl = options.fetchImpl ?? fetch;
+  const mlServiceUrl = options.mlServiceUrl ?? ML_SERVICE_URL;
+  const timeoutMs = options.timeoutMs ?? ML_SERVICE_TIMEOUT_MS;
+  try {
+    const response = await fetchImpl(`${mlServiceUrl}/predict/candidate-sets`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ diseaseIds, candidateSetConfig, optimizationConfig }),
+      signal: AbortSignal.timeout(timeoutMs),
+    });
+    if (!response.ok) {
+      throw new Error(`ML candidate-set service responded ${response.status}`);
+    }
+    return validateCandidateSetResult(await response.json());
+  } catch (error) {
+    options.logger?.warn({ error: error.message }, 'ML candidate-set request failed; using empty fallback');
+    return createDemoSearchResult(options.resolvedDiseases ?? diseaseIds, error.message);
   }
 }
 
@@ -421,6 +535,91 @@ app.get('/api/drugs/:id/interactions', async (request, reply) => {
       },
     ],
   };
+});
+
+app.post('/api/candidate-sets/search', async (request, reply) => {
+  if (request.body === null || typeof request.body !== 'object' || Array.isArray(request.body)) {
+    return reply.code(400).send({ error: 'Request body must be a JSON object' });
+  }
+
+  const { diseaseIds = [], candidateSetConfig, optimizationConfig } = request.body ?? {};
+  const normalizedDiseases = normalizeDiseases(diseaseIds);
+  if (normalizedDiseases.error) {
+    return reply.code(400).send({ error: normalizedDiseases.error });
+  }
+  const normalizedCandidateConfig = normalizeCandidateSetConfig(candidateSetConfig);
+  if (normalizedCandidateConfig.error) {
+    return reply.code(400).send({ error: normalizedCandidateConfig.error });
+  }
+  const normalizedOptimization = normalizeOptimizationConfig(optimizationConfig);
+  if (normalizedOptimization.error) {
+    return reply.code(400).send({ error: normalizedOptimization.error });
+  }
+
+  let diseaseCatalog;
+  try {
+    diseaseCatalog = await fetchDiseaseCatalog();
+  } catch (error) {
+    request.log?.warn?.({ error: error.message }, 'Disease catalog validation failed');
+    return reply.code(503).send({ error: 'Disease catalog unavailable', detail: error.message });
+  }
+
+  const resolved = resolveDiseasesFromCatalog(normalizedDiseases.diseases, diseaseCatalog);
+  if (resolved.error) {
+    return reply.code(400).send({
+      error: resolved.error,
+      unknownDiseaseIds: resolved.unknown,
+    });
+  }
+
+  const resolvedDiseaseIds = resolved.diseases.map((disease) => disease.id);
+  const mlResult = await fetchCandidateSetResult(
+    resolvedDiseaseIds,
+    normalizedCandidateConfig.candidateSetConfig,
+    normalizedOptimization.optimizationConfig,
+    { logger: request.log, resolvedDiseases: resolved.diseases },
+  );
+  const dataStatus = mlResult.metadata.dataStatus;
+  const mlStatus = mlResult.metadata.mlStatus;
+  const candidateSets = (mlResult.candidateSets ?? []).map((candidateSet, index) => {
+    const violation = checkHardContraindications(candidateSet.drugs);
+    const rejectionReasons = [...(candidateSet.rejectionReasons ?? [])];
+    if (violation && !rejectionReasons.some((reason) => reason.type === violation.type)) {
+      rejectionReasons.push({
+        type: violation.type,
+        message: violation.message,
+        pair: violation.pair,
+        stage: 'backend_validation',
+      });
+    }
+    return {
+      ...candidateSet,
+      rank: candidateSet.rank ?? index + 1,
+      status: violation ? 'rejected' : candidateSet.status,
+      rejectionReasons,
+      dataStatus: candidateSet.dataStatus ?? dataStatus,
+      mlStatus: candidateSet.mlStatus ?? mlStatus,
+      interactionRisk: null,
+      synergyScore: null,
+    };
+  });
+
+  const result = {
+    queryId: mlResult.queryId ?? `candidate-sets-${Date.now()}`,
+    diseaseIds: mlResult.diseaseIds ?? resolvedDiseaseIds,
+    diseases: mlResult.diseases ?? resolved.diseases,
+    candidateSets,
+    metadata: {
+      ...mlResult.metadata,
+      dataStatus,
+      mlStatus,
+      candidateSetConfig: normalizedCandidateConfig.candidateSetConfig,
+      optimizationConfig: normalizedOptimization.optimizationConfig,
+      disclaimer: 'Research decision-support only. Candidate-set coverage is graph-derived and is not a clinical efficacy, safety, or prescribing claim.',
+    },
+  };
+  history.set(result.queryId, result);
+  return result;
 });
 
 app.post('/api/combinations/search', async (request, reply) => {

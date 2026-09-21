@@ -17,7 +17,8 @@ Fallback responses use:
 - `upstreamStatus: "fallback"`
 
 No trained DDI, synergy, graph embedding, or GNN model is applied to current
-graph-backed candidate responses.
+candidate sets therefore retain `mlStatus: "not_applied"`, and
+`interactionRisk` / `synergyScore` remain `null`.
 
 ## Backend Endpoints
 
@@ -85,11 +86,87 @@ If the graph-backed catalog cannot be loaded, the backend returns HTTP 503:
 }
 ```
 
-### `POST /api/combinations/search`
+### `POST /api/candidate-sets/search`
 
 Purpose: validates selected diseases against the graph-backed disease catalog,
 calls the ML/Graph service, applies hard safety checks, and returns graph-derived
 research candidate-set results.
+
+Request:
+
+```json
+{
+  "diseaseIds": ["Disease::DOID:10763", "Disease::DOID:9352"],
+  "candidateSetConfig": {
+    "maxDrugCount": 3,
+    "maxCandidateSets": 100
+  },
+  "optimizationConfig": {
+    "maxDrugCount": 3,
+    "minimumCoverage": 0.8
+  }
+}
+```
+
+Validation:
+
+- `diseaseIds` contains 1–10 nonblank IDs from `GET /api/diseases`.
+- Unknown IDs return HTTP 400 with `unknownDiseaseIds` and are not forwarded.
+- `candidateSetConfig.maxDrugCount` is an integer from 1 to 10.
+- `candidateSetConfig.maxCandidateSets` is an integer from 1 to 500.
+- `optimizationConfig.maxDrugCount` is an integer from 0 to 50.
+- `optimizationConfig.minimumCoverage` is a number from 0 to 1.
+
+Response shape:
+
+```json
+{
+  "queryId": "graph-...",
+  "diseaseIds": ["Disease::DOID:10763", "Disease::DOID:9352"],
+  "diseases": [
+    { "id": "Disease::DOID:10763", "name": "hypertension" },
+    { "id": "Disease::DOID:9352", "name": "type 2 diabetes mellitus" }
+  ],
+  "candidateSets": [
+    {
+      "candidateSetId": "candidate-set:Compound::DB00177+Compound::DB00331",
+      "rank": 1,
+      "drugs": ["Compound::DB00177", "Compound::DB00331"],
+      "drugNames": ["Valsartan", "Metformin"],
+      "treatedDiseaseIds": ["Disease::DOID:10763", "Disease::DOID:9352"],
+      "uncoveredDiseaseIds": [],
+      "coverage": 1.0,
+      "drugCount": 2,
+      "status": "accepted",
+      "rejectionReasons": [],
+      "evidence": [{ "source": "Hetionet", "relationship": "CtD" }],
+      "dataStatus": "real_graph",
+      "mlStatus": "not_applied",
+      "interactionRisk": null,
+      "synergyScore": null
+    }
+  ],
+  "metadata": {
+    "dataStatus": "real_graph",
+    "mlStatus": "not_applied"
+  }
+}
+```
+
+`status` is `accepted` or `rejected`. Rejected sets retain structured
+`rejectionReasons`, including the prohibited pair and the stage at which the
+rule was applied. Graph evidence is preserved per set. A valid search with no
+sets returns HTTP 200 and `candidateSets: []`.
+
+If the ML/graph candidate-set endpoint is unavailable or returns an invalid
+schema, the backend returns an empty, explicitly labeled fallback with
+`dataStatus: "demo"`, `mlStatus: "demo"`, and `upstreamStatus: "fallback"`.
+It does not fabricate candidate sets.
+
+### `POST /api/combinations/search` (compatibility)
+
+Retained for the existing frontend and Sprint 1 clients. New integrations should
+use `POST /api/candidate-sets/search`.
 
 Request:
 
@@ -229,7 +306,20 @@ Returns diseases from Neo4j through the graph service.
 
 Returns graph-backed drug metadata where the compound ID exists in Neo4j.
 
-### `POST /predict/combination`
+### `POST /predict/candidate-sets`
+
+Canonical ML/graph service endpoint. It accepts the same `diseaseIds`,
+`candidateSetConfig`, and `optimizationConfig` structures documented for the
+backend endpoint. It returns the typed candidate-set response shown above.
+
+Direct requests containing unknown disease IDs return HTTP 422 with
+`detail.unknownDiseaseIds`. Invalid request configuration also returns HTTP 422.
+If Neo4j is unavailable, the endpoint returns HTTP 503 with
+`detail.error: "Graph service unavailable"`.
+Hard safety filtering occurs before optimization, so rejected candidate sets do
+not enter the selected result.
+
+### `POST /predict/combination` (compatibility)
 
 Accepts disease IDs/names and optional optimization config. Resolves graph
 diseases, retrieves `CtD` compound candidates, attaches graph
