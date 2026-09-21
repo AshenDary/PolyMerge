@@ -10,15 +10,20 @@ Graph-backed candidate responses use:
 - `dataStatus: "real_graph"`
 - `mlStatus: "not_applied"`
 
-Fallback responses use:
+Candidate-set fallback responses use:
 
-- `dataStatus: "demo"`
-- `mlStatus: "demo"`
+- `dataStatus: "graph_unavailable"`
+- `mlStatus: "not_applied"`
 - `upstreamStatus: "fallback"`
+- `candidateSets: []`
 
 No trained DDI, synergy, graph embedding, or GNN model is applied to current
-candidate sets therefore retain `mlStatus: "not_applied"`, and
+candidate sets. Graph-backed candidate sets therefore retain
+`mlStatus: "not_applied"`, and
 `interactionRisk` / `synergyScore` remain `null`.
+
+The legacy `POST /api/combinations/search` compatibility endpoint retains its
+Sprint 1 demo fallback (`dataStatus: "demo"`, `mlStatus: "demo"`).
 
 ## Backend Endpoints
 
@@ -160,8 +165,9 @@ sets returns HTTP 200 and `candidateSets: []`.
 
 If the ML/graph candidate-set endpoint is unavailable or returns an invalid
 schema, the backend returns an empty, explicitly labeled fallback with
-`dataStatus: "demo"`, `mlStatus: "demo"`, and `upstreamStatus: "fallback"`.
-It does not fabricate candidate sets.
+`dataStatus: "graph_unavailable"`, `mlStatus: "not_applied"`,
+`upstreamStatus: "fallback"`, and `candidateSets: []`. It does not fabricate
+candidate sets or prediction scores.
 
 ### `POST /api/combinations/search` (compatibility)
 

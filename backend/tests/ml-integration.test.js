@@ -307,6 +307,61 @@ test('forwards candidate-set requests and preserves IDs, safety, coverage, and p
   assert.equal(payload.candidateSets[0].synergyScore, null);
 });
 
+test('candidate-set endpoint preserves structured rejection reasons from the ML service', async () => {
+  globalThis.fetch = async (url) => {
+    if (String(url).endsWith('/api/diseases')) {
+      return jsonResponse({ diseases: graphDiseases });
+    }
+    return jsonResponse({
+      queryId: 'rejected-candidate-set',
+      diseaseIds: ['Disease::DOID:10763'],
+      diseases: [graphDiseases[0]],
+      candidateSets: [{
+        candidateSetId: 'candidate-set:drug-a+drug-b',
+        rank: 1,
+        drugs: ['drug-a', 'drug-b'],
+        drugNames: ['Drug A', 'Drug B'],
+        treatedDiseaseIds: ['Disease::DOID:10763'],
+        uncoveredDiseaseIds: [],
+        coverage: 1,
+        drugCount: 2,
+        status: 'rejected',
+        rejectionReasons: [{
+          type: 'hard_contraindication',
+          message: 'Known prohibited pair',
+          pair: ['drug-a', 'drug-b'],
+          stage: 'pre_optimization',
+        }],
+        evidence: [{ source: 'Hetionet', relationship: 'CtD' }],
+        dataStatus: 'real_graph',
+        mlStatus: 'not_applied',
+        interactionRisk: null,
+        synergyScore: null,
+      }],
+      metadata: {
+        dataStatus: 'real_graph',
+        mlStatus: 'not_applied',
+      },
+    });
+  };
+
+  const response = await app.inject({
+    method: 'POST',
+    url: '/api/candidate-sets/search',
+    payload: { diseaseIds: ['Disease::DOID:10763'] },
+  });
+
+  assert.equal(response.statusCode, 200);
+  const [candidateSet] = response.json().candidateSets;
+  assert.equal(candidateSet.status, 'rejected');
+  assert.deepEqual(candidateSet.rejectionReasons, [{
+    type: 'hard_contraindication',
+    message: 'Known prohibited pair',
+    pair: ['drug-a', 'drug-b'],
+    stage: 'pre_optimization',
+  }]);
+});
+
 test('candidate-set endpoint rejects invalid IDs and configuration before prediction', async () => {
   const calls = [];
   globalThis.fetch = async (url) => {
@@ -381,8 +436,8 @@ test('candidate-set endpoint returns an explicit empty fallback on upstream fail
   assert.equal(response.statusCode, 200);
   const payload = response.json();
   assert.deepEqual(payload.candidateSets, []);
-  assert.equal(payload.metadata.dataStatus, 'demo');
-  assert.equal(payload.metadata.mlStatus, 'demo');
+  assert.equal(payload.metadata.dataStatus, 'graph_unavailable');
+  assert.equal(payload.metadata.mlStatus, 'not_applied');
   assert.equal(payload.metadata.upstreamStatus, 'fallback');
 });
 
@@ -426,6 +481,8 @@ test('candidate-set endpoint rejects fake prediction scores when ML is not appli
   assert.equal(response.statusCode, 200);
   const payload = response.json();
   assert.deepEqual(payload.candidateSets, []);
+  assert.equal(payload.metadata.dataStatus, 'graph_unavailable');
+  assert.equal(payload.metadata.mlStatus, 'not_applied');
   assert.equal(payload.metadata.upstreamStatus, 'fallback');
   assert.match(payload.metadata.warning, /prediction scores while mlStatus is not_applied/);
 });

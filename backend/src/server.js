@@ -246,6 +246,35 @@ function createDemoSearchResult(inputDiseases, warning = 'ML engine unavailable;
   };
 }
 
+function createCandidateSetFallback(
+  inputDiseases,
+  warning = 'ML/graph candidate-set service unavailable; returning no candidate sets.',
+) {
+  const orderedDiseases = inputDiseases.map((disease) => (
+    typeof disease === 'string' ? { id: disease, name: disease } : disease
+  ));
+
+  return {
+    queryId: `candidate-sets-fallback-${Date.now()}`,
+    diseaseIds: orderedDiseases.map((disease) => disease.id),
+    diseases: orderedDiseases,
+    candidateSets: [],
+    metadata: {
+      model: 'No predictive ML model applied',
+      modelVersion: null,
+      dataset: null,
+      graph: null,
+      timestamp: new Date().toISOString(),
+      dataStatus: 'graph_unavailable',
+      mlStatus: 'not_applied',
+      upstreamStatus: 'fallback',
+      warning,
+      fallbackReason: 'No candidate sets were returned because the ML/graph service was unavailable or returned an invalid response.',
+      disclaimer: 'Research decision-support only. No clinical or predictive result was produced.',
+    },
+  };
+}
+
 function validateDiseaseCatalog(payload) {
   if (payload === null || typeof payload !== 'object' || Array.isArray(payload) || !Array.isArray(payload.diseases)) {
     throw new Error('ML disease catalog response is missing diseases[]');
@@ -410,7 +439,7 @@ async function fetchCandidateSetResult(
     return validateCandidateSetResult(await response.json());
   } catch (error) {
     options.logger?.warn({ error: error.message }, 'ML candidate-set request failed; using empty fallback');
-    return createDemoSearchResult(options.resolvedDiseases ?? diseaseIds, error.message);
+    return createCandidateSetFallback(options.resolvedDiseases ?? diseaseIds, error.message);
   }
 }
 
