@@ -16,7 +16,7 @@ Neo4j / Hetionet Knowledge Graph
 
 MySQL and Prisma are used for application/system data foundations. Neo4j remains the source of truth for biomedical graph entities and relationships.
 
-## Current Sprint 1 Capabilities
+## Current Capabilities
 
 - Fastify backend with research-oriented APIs:
   - `GET /health`
@@ -41,14 +41,17 @@ MySQL and Prisma are used for application/system data foundations. Neo4j remains
 - Compound side-effect evidence using `CcSE`.
 - Evidence/provenance fields such as `source`, `graphVersion`, `relationship`, `metaedge`, `targetId`, and `evidenceType`.
 - Graph-backed candidate generation from represented knowledge-graph relationships.
+- Disease x drug coverage matrix derived from represented `CtD` edges for the requested target diseases.
+- Candidate-set generation from graph-derived single-drug candidates, including multi-drug sets up to the configured maximum drug count.
 - Deterministic hard safety filtering that runs independently from ML predictions.
-- Greedy set-cover baseline that consumes graph-derived candidate coverage.
+- Greedy set-cover baseline that consumes graph-derived candidate-set coverage.
+- Candidate comparison structures that show each drug's contribution to candidate-set disease coverage.
 - Backend to ML/Graph service integration with request validation and dependency health checks.
 - Static frontend disease-selection workflow that loads diseases from the backend and sends stable disease IDs.
 
 ## Current ML Status
 
-No predictive ML model is applied in Sprint 1 graph-backed candidate responses.
+No predictive ML model is applied in current graph-backed candidate responses.
 
 - Graph-backed responses use `dataStatus: "real_graph"`.
 - Predictive model status is `mlStatus: "not_applied"`.
@@ -66,9 +69,9 @@ Fallback responses must not be interpreted as real graph evidence or real ML pre
 
 ## Current Limitations
 
-- Candidate generation currently returns graph-derived individual compound candidates; this is not yet the final multi-drug candidate-set generator.
-- The optimizer is a greedy set-cover baseline, not a production-grade optimization system.
-- `/api/drugs/:id` and `/api/drugs/:id/interactions` still provide reference/demo backend responses and are not the primary Sprint 1 graph candidate flow.
+- Candidate-set generation is a deterministic graph-derived foundation for Sprint 2, not a final production optimization system.
+- The optimizer is a greedy set-cover baseline over candidate sets, not a production-grade optimization system.
+- `/api/drugs/:id` and `/api/drugs/:id/interactions` still provide reference/demo backend responses and are not the primary graph-backed candidate-search flow.
 - Explainability is limited and does not yet provide advanced graph visualization or model explanation.
 - Hetionet `CrC` means compound resemblance and is not a DDI label.
 - DDI prediction requires a dedicated interaction dataset in future work.
@@ -171,7 +174,7 @@ python -m pytest -q
 
 ## API Overview
 
-See `docs/api.md` for the current Sprint 1 API contract.
+See `docs/api.md` for the current API contract.
 
 ## Data and Scientific Boundaries
 
