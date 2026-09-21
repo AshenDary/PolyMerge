@@ -51,6 +51,104 @@ def optimize_set_cover(
     }
 
 
+def optimize_candidate_sets(
+    candidate_sets: list[dict[str, Any]],
+    diseases: list[str],
+    config: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Select accepted candidate sets with a greedy set-cover baseline."""
+    effective_config = _optimization_config(config)
+    target_diseases = list(dict.fromkeys(diseases))
+    target_disease_set = set(target_diseases)
+    selected_sets: list[dict[str, Any]] = []
+    selected_drugs: list[str] = []
+    covered: set[str] = set()
+    rejected_candidate_set_ids = [
+        _candidate_set_id(candidate)
+        for candidate in candidate_sets
+        if candidate.get("status") == "rejected"
+    ]
+    remaining = [
+        candidate
+        for candidate in candidate_sets
+        if candidate.get("status", "accepted") == "accepted"
+    ]
+
+    while remaining and len(selected_drugs) < effective_config["maxDrugCount"]:
+        eligible = [
+            candidate
+            for candidate in remaining
+            if len(_merged_drugs(selected_drugs, candidate.get("drugs", [])))
+            <= effective_config["maxDrugCount"]
+        ]
+        if not eligible:
+            break
+
+        best_candidate = max(
+            eligible,
+            key=lambda candidate: (
+                len((set(candidate.get("treatedDiseaseIds", [])) & target_disease_set) - covered),
+                _score(candidate.get("coverage")),
+                -int(candidate.get("drugCount", len(candidate.get("drugs", [])))),
+                _score(candidate.get("confidence")),
+            ),
+        )
+        newly_covered = (
+            set(best_candidate.get("treatedDiseaseIds", [])) & target_disease_set
+        ) - covered
+        remaining.remove(best_candidate)
+        if not newly_covered:
+            break
+
+        selected_sets.append(best_candidate)
+        selected_drugs = _merged_drugs(selected_drugs, best_candidate.get("drugs", []))
+        covered.update(newly_covered)
+
+        if (
+            target_diseases
+            and len(covered & target_disease_set) / len(target_diseases)
+            >= effective_config["minimumCoverage"]
+        ):
+            break
+
+    covered_diseases = sorted(covered & target_disease_set)
+
+    return {
+        "selectedCandidateSetIds": [
+            _candidate_set_id(candidate) for candidate in selected_sets
+        ],
+        "selectedCandidateSets": [
+            {
+                "candidateSetId": _candidate_set_id(candidate),
+                "drugs": candidate.get("drugs", []),
+                "drugNames": candidate.get("drugNames", []),
+                "coveredDiseaseIds": sorted(
+                    set(candidate.get("treatedDiseaseIds", [])) & target_disease_set
+                ),
+                "coverage": candidate.get("coverage", 0.0),
+                "comparison": candidate.get("comparison", {}),
+            }
+            for candidate in selected_sets
+        ],
+        "selectedDrugs": selected_drugs,
+        "selectedDrugCount": len(selected_drugs),
+        "coveredDiseaseIds": covered_diseases,
+        "uncoveredDiseaseIds": [
+            disease for disease in target_diseases if disease not in covered_diseases
+        ],
+        "coverage": len(covered_diseases) / len(target_diseases) if target_diseases else 0.0,
+        "targetDiseaseCount": len(target_diseases),
+        "rejectedCandidateSetIds": rejected_candidate_set_ids,
+        "acceptedCandidateSetCount": len(
+            [candidate for candidate in candidate_sets if candidate.get("status") != "rejected"]
+        ),
+        "rejectedCandidateSetCount": len(rejected_candidate_set_ids),
+        "config": effective_config,
+        "dataStatus": "real_graph",
+        "disclaimer": "Greedy coverage is a research baseline, not a clinically safest or clinically optimal polypill claim.",
+    }
+
+
 def greedy_set_cover(
     candidate_drugs: list[str],
     diseases: list[str],
@@ -127,3 +225,17 @@ def _legacy_selection(
     ]
     selected = filtered_candidates[: min(len(filtered_candidates), max_drugs)]
     return selected
+
+
+def _candidate_set_id(candidate: dict[str, Any]) -> str:
+    return str(candidate.get("candidateSetId") or candidate.get("drugId") or "")
+
+
+def _merged_drugs(existing: list[str], incoming: list[str]) -> list[str]:
+    return list(dict.fromkeys([*existing, *incoming]))
+
+
+def _score(value: Any) -> float:
+    if value is None:
+        return 0.0
+    return float(value)
