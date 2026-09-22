@@ -237,6 +237,256 @@ test('rejects malformed upstream provenance and uses the labeled fallback', asyn
   assert.match(payload.metadata.warning, /missing dataStatus or mlStatus provenance/);
 });
 
+test('forwards candidate-set requests and preserves IDs, safety, coverage, and provenance', async () => {
+  const calls = [];
+  globalThis.fetch = async (url, options = {}) => {
+    calls.push({ url: String(url), body: options.body ? JSON.parse(options.body) : null });
+    if (String(url).endsWith('/api/diseases')) {
+      return jsonResponse({ diseases: graphDiseases });
+    }
+    return jsonResponse({
+      queryId: 'candidate-set-query',
+      diseaseIds: ['Disease::DOID:10763', 'Disease::DOID:9352'],
+      diseases: graphDiseases,
+      candidateSets: [{
+        candidateSetId: 'candidate-set:Compound::DB00177+Compound::DB00331',
+        rank: 1,
+        drugs: ['Compound::DB00177', 'Compound::DB00331'],
+        drugNames: ['Valsartan', 'Metformin'],
+        treatedDiseaseIds: ['Disease::DOID:10763', 'Disease::DOID:9352'],
+        uncoveredDiseaseIds: [],
+        coverage: 1,
+        drugCount: 2,
+        status: 'accepted',
+        rejectionReasons: [],
+        evidence: [{ source: 'Hetionet', relationship: 'CtD' }],
+        dataStatus: 'real_graph',
+        mlStatus: 'not_applied',
+        interactionRisk: null,
+        synergyScore: null,
+      }],
+      metadata: {
+        dataStatus: 'real_graph',
+        mlStatus: 'not_applied',
+        model: 'No predictive ML model applied',
+        modelVersion: null,
+        graph: 'Hetionet v1.0 filtered PolyMerge fragment',
+        resolvedDiseases: graphDiseases,
+        missingDiseases: [],
+      },
+    });
+  };
+
+  const response = await app.inject({
+    method: 'POST',
+    url: '/api/candidate-sets/search',
+    payload: {
+      diseaseIds: ['Disease::DOID:10763', 'Disease::DOID:9352'],
+      candidateSetConfig: { maxDrugCount: 3, maxCandidateSets: 25 },
+      optimizationConfig: { maxDrugCount: 3, minimumCoverage: 1 },
+    },
+  });
+
+  assert.equal(response.statusCode, 200);
+  assert.match(calls[1].url, /\/predict\/candidate-sets$/);
+  assert.deepEqual(calls[1].body, {
+    diseaseIds: ['Disease::DOID:10763', 'Disease::DOID:9352'],
+    candidateSetConfig: { maxDrugCount: 3, maxCandidateSets: 25 },
+    optimizationConfig: { maxDrugCount: 3, minimumCoverage: 1 },
+  });
+  const payload = response.json();
+  assert.deepEqual(payload.diseaseIds, ['Disease::DOID:10763', 'Disease::DOID:9352']);
+  assert.equal(payload.candidateSets[0].candidateSetId, 'candidate-set:Compound::DB00177+Compound::DB00331');
+  assert.deepEqual(payload.candidateSets[0].drugs, ['Compound::DB00177', 'Compound::DB00331']);
+  assert.equal(payload.candidateSets[0].coverage, 1);
+  assert.equal(payload.candidateSets[0].status, 'accepted');
+  assert.equal(payload.candidateSets[0].evidence[0].source, 'Hetionet');
+  assert.equal(payload.candidateSets[0].dataStatus, 'real_graph');
+  assert.equal(payload.candidateSets[0].mlStatus, 'not_applied');
+  assert.equal(payload.candidateSets[0].interactionRisk, null);
+  assert.equal(payload.candidateSets[0].synergyScore, null);
+});
+
+test('candidate-set endpoint preserves structured rejection reasons from the ML service', async () => {
+  globalThis.fetch = async (url) => {
+    if (String(url).endsWith('/api/diseases')) {
+      return jsonResponse({ diseases: graphDiseases });
+    }
+    return jsonResponse({
+      queryId: 'rejected-candidate-set',
+      diseaseIds: ['Disease::DOID:10763'],
+      diseases: [graphDiseases[0]],
+      candidateSets: [{
+        candidateSetId: 'candidate-set:drug-a+drug-b',
+        rank: 1,
+        drugs: ['drug-a', 'drug-b'],
+        drugNames: ['Drug A', 'Drug B'],
+        treatedDiseaseIds: ['Disease::DOID:10763'],
+        uncoveredDiseaseIds: [],
+        coverage: 1,
+        drugCount: 2,
+        status: 'rejected',
+        rejectionReasons: [{
+          type: 'hard_contraindication',
+          message: 'Known prohibited pair',
+          pair: ['drug-a', 'drug-b'],
+          stage: 'pre_optimization',
+        }],
+        evidence: [{ source: 'Hetionet', relationship: 'CtD' }],
+        dataStatus: 'real_graph',
+        mlStatus: 'not_applied',
+        interactionRisk: null,
+        synergyScore: null,
+      }],
+      metadata: {
+        dataStatus: 'real_graph',
+        mlStatus: 'not_applied',
+      },
+    });
+  };
+
+  const response = await app.inject({
+    method: 'POST',
+    url: '/api/candidate-sets/search',
+    payload: { diseaseIds: ['Disease::DOID:10763'] },
+  });
+
+  assert.equal(response.statusCode, 200);
+  const [candidateSet] = response.json().candidateSets;
+  assert.equal(candidateSet.status, 'rejected');
+  assert.deepEqual(candidateSet.rejectionReasons, [{
+    type: 'hard_contraindication',
+    message: 'Known prohibited pair',
+    pair: ['drug-a', 'drug-b'],
+    stage: 'pre_optimization',
+  }]);
+});
+
+test('candidate-set endpoint rejects invalid IDs and configuration before prediction', async () => {
+  const calls = [];
+  globalThis.fetch = async (url) => {
+    calls.push(String(url));
+    return jsonResponse({ diseases: graphDiseases });
+  };
+
+  const invalidId = await app.inject({
+    method: 'POST',
+    url: '/api/candidate-sets/search',
+    payload: { diseaseIds: ['Disease::DOID:DOES-NOT-EXIST'] },
+  });
+  assert.equal(invalidId.statusCode, 400);
+  assert.deepEqual(invalidId.json().unknownDiseaseIds, ['Disease::DOID:DOES-NOT-EXIST']);
+  assert.equal(calls.length, 1);
+
+  calls.length = 0;
+  const invalidConfig = await app.inject({
+    method: 'POST',
+    url: '/api/candidate-sets/search',
+    payload: {
+      diseaseIds: ['Disease::DOID:10763'],
+      candidateSetConfig: { maxCandidateSets: 0 },
+    },
+  });
+  assert.equal(invalidConfig.statusCode, 400);
+  assert.equal(calls.length, 0);
+});
+
+test('candidate-set endpoint preserves an empty valid result', async () => {
+  globalThis.fetch = async (url) => {
+    if (String(url).endsWith('/api/diseases')) {
+      return jsonResponse({ diseases: graphDiseases });
+    }
+    return jsonResponse({
+      queryId: 'empty-candidate-sets',
+      diseaseIds: ['Disease::DOID:10763'],
+      diseases: [graphDiseases[0]],
+      candidateSets: [],
+      metadata: {
+        dataStatus: 'real_graph',
+        mlStatus: 'not_applied',
+        model: 'No predictive ML model applied',
+        modelVersion: null,
+        resolvedDiseases: [graphDiseases[0]],
+        missingDiseases: [],
+      },
+    });
+  };
+  const response = await app.inject({
+    method: 'POST',
+    url: '/api/candidate-sets/search',
+    payload: { diseaseIds: ['Disease::DOID:10763'] },
+  });
+  assert.equal(response.statusCode, 200);
+  assert.deepEqual(response.json().candidateSets, []);
+  assert.equal(response.json().metadata.dataStatus, 'real_graph');
+});
+
+test('candidate-set endpoint returns an explicit empty fallback on upstream failure', async () => {
+  globalThis.fetch = async (url) => {
+    if (String(url).endsWith('/api/diseases')) {
+      return jsonResponse({ diseases: graphDiseases });
+    }
+    return jsonResponse({ error: 'unavailable' }, 503);
+  };
+  const response = await app.inject({
+    method: 'POST',
+    url: '/api/candidate-sets/search',
+    payload: { diseaseIds: ['Disease::DOID:10763'] },
+  });
+  assert.equal(response.statusCode, 200);
+  const payload = response.json();
+  assert.deepEqual(payload.candidateSets, []);
+  assert.equal(payload.metadata.dataStatus, 'graph_unavailable');
+  assert.equal(payload.metadata.mlStatus, 'not_applied');
+  assert.equal(payload.metadata.upstreamStatus, 'fallback');
+});
+
+test('candidate-set endpoint rejects fake prediction scores when ML is not applied', async () => {
+  globalThis.fetch = async (url) => {
+    if (String(url).endsWith('/api/diseases')) {
+      return jsonResponse({ diseases: graphDiseases });
+    }
+    return jsonResponse({
+      queryId: 'invalid-prediction-claim',
+      diseaseIds: ['Disease::DOID:10763'],
+      diseases: [graphDiseases[0]],
+      candidateSets: [{
+        candidateSetId: 'candidate-set:drug-a',
+        rank: 1,
+        drugs: ['drug-a'],
+        drugNames: ['Drug A'],
+        treatedDiseaseIds: ['Disease::DOID:10763'],
+        uncoveredDiseaseIds: [],
+        coverage: 1,
+        drugCount: 1,
+        status: 'accepted',
+        rejectionReasons: [],
+        evidence: [],
+        dataStatus: 'real_graph',
+        mlStatus: 'not_applied',
+        interactionRisk: 0.01,
+        synergyScore: null,
+      }],
+      metadata: {
+        dataStatus: 'real_graph',
+        mlStatus: 'not_applied',
+      },
+    });
+  };
+  const response = await app.inject({
+    method: 'POST',
+    url: '/api/candidate-sets/search',
+    payload: { diseaseIds: ['Disease::DOID:10763'] },
+  });
+  assert.equal(response.statusCode, 200);
+  const payload = response.json();
+  assert.deepEqual(payload.candidateSets, []);
+  assert.equal(payload.metadata.dataStatus, 'graph_unavailable');
+  assert.equal(payload.metadata.mlStatus, 'not_applied');
+  assert.equal(payload.metadata.upstreamStatus, 'fallback');
+  assert.match(payload.metadata.warning, /prediction scores while mlStatus is not_applied/);
+});
+
 test('reports ML dependency health without changing backend liveness', async () => {
   globalThis.fetch = async () => jsonResponse({
     status: 'ok',
