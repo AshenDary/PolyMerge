@@ -2,14 +2,14 @@
 
 ## Tasks
 
-- [ ] Prepare graph data for embedding
-- [ ] Validate entity mappings
-- [ ] Validate relation mappings
-- [ ] Prepare training data
-- [ ] Document graph preprocessing
+- [ ] Prepare graph-derived tabular features
+- [ ] Validate compound and disease identifier mappings
+- [ ] Document feature provenance
+- [ ] Prepare training data inputs after dataset selection
+- [ ] Document graph preprocessing and leakage controls
 
 ## Definition of Done
 
-- [ ] Embedding data pipeline is reproducible
-- [ ] Entity/relation mappings are versioned or documented
+- [ ] Feature-generation pipeline is reproducible
+- [ ] Entity mappings are versioned or documented
 - [ ] Preprocessing does not introduce clinical claims

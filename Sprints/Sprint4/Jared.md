@@ -2,13 +2,13 @@
 
 ## Tasks
 
-- [ ] Evaluate candidate DDI datasets
-- [ ] Map DDI drug identifiers to graph compounds
+- [ ] Evaluate candidate supervised DDI datasets
+- [ ] Map dataset drug identifiers to graph compounds
 - [ ] Document dataset provenance
-- [ ] Prepare graph/data joins for DDI training
+- [ ] Prepare graph/data joins for traditional feature engineering
 
 ## Definition of Done
 
-- [ ] DDI dataset choice is documented
+- [ ] Supervised dataset choice is documented
 - [ ] Identifier mapping strategy is documented
 - [ ] Hetionet `CrC` is not used as a DDI label
