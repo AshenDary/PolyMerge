@@ -1,4 +1,4 @@
-"""Build Sprint 3 processed ML datasets from the checked-in graph fragment."""
+"""Build the Sprint 3 DDInter severity dataset and deterministic split."""
 
 from __future__ import annotations
 
@@ -9,7 +9,7 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.append(str(REPO_ROOT / "ml_engine"))
 
-from app.data.sprint3_dataset import build_and_write_sprint3_dataset  # noqa: E402
+from app.data.ddinter_dataset import build_and_write_sprint3_dataset  # noqa: E402
 
 
 def main() -> None:

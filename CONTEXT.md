@@ -52,8 +52,7 @@ MySQL is used as the application/system data foundation. The biomedical knowledg
 - Sprint 4 traditional supervised ML comparison using the Sprint 3 split and
   preprocessing contract.
 - Graph visualization.
-- Real DDI prediction only if a legitimate dedicated DDI dataset is added and
-  documented.
+- Traditional DDI severity modeling from the documented DDInter 2.0 handoff.
 - Synergy prediction.
 
 ## Data Reality and Current Limitations
@@ -61,9 +60,9 @@ MySQL is used as the application/system data foundation. The biomedical knowledg
 - Hetionet is currently the available knowledge-graph source.
 - Hetionet does not directly provide drug-drug interaction labels.
 - `CrC` means compound resemblance and must not be treated as DDI.
-- DDI prediction is planned future work and requires a dedicated interaction dataset.
-- Sprint 3 fallback supervised labels describe represented `CtD` relationships
-  in the fragment and should not be interpreted as clinical truth.
+- Sprint 3 uses DDInter 2.0 severity labels (Major, Moderate, Minor). Unknown is
+  excluded from supervised data, with no synthetic no-interaction examples.
+- Hetionet supplies optional graph features; `CrC` is resemblance only.
 - Current graph-backed candidates use `mlStatus: "not_applied"`.
 - Current candidate generation is not yet the final multi-drug optimization pipeline.
 - The optimizer is a greedy baseline, not a production-grade optimizer.

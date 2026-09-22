@@ -49,19 +49,19 @@
 
 ## Sprint 3 — Dataset, EDA & Traditional Feature Engineering
 
-### Status: Implemented / Ready For Review
+### Status: DDInter Migration Implemented / Ready For Review
 
-- Implemented: DDI dataset decision gate documented; no legitimate DDI label
-  dataset is present in the repository.
-- Implemented: fallback represented `CtD` relationship classification dataset.
-- Implemented: data dictionary, dataset profile, EDA script/findings, and six
-  reproducible figures.
+- Implemented: official DDInter 2.0 acquisition, checksums, license, and provenance.
+- Implemented: canonical Major/Moderate/Minor severity dataset; Unknown is audited.
+- Implemented: duplicate, reverse-pair, malformed, and label-conflict audits.
+- Implemented: explicit DDInter-to-Hetionet mapping and 29 graph features.
+- Implemented: data dictionary, profile, EDA findings, and seven figures.
 - Implemented: leakage-safe scikit-learn preprocessing helper for Sprint 4.
 - Implemented: deterministic 80/20 stratified train/test split.
 - Implemented: Sprint 3 tests for dataset validity, features, preprocessing,
   and split behavior.
-- Not implemented: model training, GNNs, graph embeddings, neural networks, or
-  DDI prediction.
+- Preserved: old CtD data only as a clearly named legacy prototype.
+- Not implemented: model training, GNNs, graph embeddings, neural networks, or transformers.
 
 ## Sprint 4 — Traditional Supervised ML Model Comparison
 
@@ -72,8 +72,7 @@
 - Use the Sprint 3 train/test split, preprocessing helper, target definition,
   feature definitions, and primary metric.
 - Fit preprocessing only on training data.
-- Report class-sensitive classification metrics and document the row-split
-  leakage risk.
+- Use macro F1 as primary metric and document pair-split drug overlap.
 
 Important: Hetionet `CrC` is compound resemblance and must not be treated as a DDI label.
 

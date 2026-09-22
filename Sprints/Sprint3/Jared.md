@@ -2,15 +2,16 @@
 
 ## Tasks
 
-- [x] Inspect DDI dataset availability
-- [x] Implement fallback represented CtD relationship dataset
-- [x] Validate graph fragment columns and duplicate handling
-- [x] Generate traditional graph-derived numeric features
+- [x] Acquire and checksum official DDInter 2.0 category CSVs
+- [x] Validate real schema, labels, malformed rows, duplicates, and conflicts
+- [x] Canonicalize unordered pairs and exclude Unknown from supervised data
+- [x] Map DDInter drugs to Hetionet with explicit exact-name statuses
+- [x] Generate deterministic per-drug and pairwise graph features
 - [x] Create deterministic train/test split
 - [x] Document data dictionary, EDA findings, preprocessing, and handoff
 
 ## Definition of Done
 
-- [x] Data pipeline is reproducible with `scripts/build_sprint3_dataset.py`
+- [x] Pipeline is reproducible with acquisition, build, and EDA scripts
 - [x] Feature and target semantics are documented
 - [x] Preprocessing does not introduce clinical claims

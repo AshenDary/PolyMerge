@@ -18,8 +18,8 @@
 ### Current Status
 
 Sprint 1 graph foundation is implemented and ready for review. Sprint 3 adds a
-traditional supervised data foundation using the available Hetionet fragment.
-Future DDI work still requires a legitimate dedicated DDI dataset.
+DDInter 2.0 severity data foundation and optional mapped Hetionet graph features.
+No predictive model has been trained or integrated.
 
 ## Ranee — Backend / ML Integration
 
@@ -50,14 +50,15 @@ Backend and ML/Graph integration is implemented for Sprint 1. Real graph-backed 
 
 ### Current Status
 
-The Sprint 1 optimizer consumes graph-derived coverage and produces baseline selected compounds. Future work is multi-drug candidate-set generation, richer constraints, comparison, rejection explanations, and frontend visualization.
+The Sprint 1 optimizer consumes graph-derived coverage and produces baseline selected compounds. Sprint 3 now supplies a DDInter 2.0 severity dataset for future traditional ML; no model is trained yet.
 
 ## Handoff Expectations
 
 - Graph evidence must remain separate from future ML predictions.
 - Hard safety rules must remain deterministic and independent of model scores.
 - `CrC` must not be treated as a DDI label.
-- Sprint 3 fallback `CtD` labels describe represented graph relationships, not
-  clinical truth.
+- Sprint 3 labels come only from curated DDInter severity. Unknown is excluded,
+  and absent interactions are never treated as safe negatives.
+- Hetionet features have limited exact-name coverage and do not define the target.
 - Coverage means knowledge-graph treatment coverage, not clinical efficacy.
 - Any future model or dataset integration must include provenance and model/version metadata.

@@ -1,57 +1,169 @@
 {
-  "dataset_rows": 426,
+  "ambiguous_mapping_count": 0,
+  "canonical_unique_pairs": 160235,
+  "conflicting_label_pair_count": 0,
+  "distinct_ddinter_drugs": 1939,
+  "duplicate_pair_rows": 62428,
+  "exact_duplicate_rows": 62428,
+  "exact_id_mapping_count": 0,
+  "exact_name_mapping_count": 227,
+  "excluded_conflicting_pairs": 0,
+  "excluded_unknown_rows": 29813,
   "feature_columns": [
-    "compound_other_ctd_disease_count",
-    "compound_cpD_disease_count",
-    "compound_bound_gene_count",
-    "compound_upregulated_gene_count",
-    "compound_downregulated_gene_count",
-    "compound_side_effect_count",
-    "compound_pharmacologic_class_count",
-    "compound_resemblance_neighbor_count",
-    "compound_graph_degree",
-    "disease_other_ctd_compound_count",
-    "disease_cpD_compound_count",
-    "disease_graph_degree",
-    "has_compound_palliates_disease_edge"
+    "drug_a_ctd_disease_count",
+    "drug_a_cpd_disease_count",
+    "drug_a_bound_gene_count",
+    "drug_a_upregulated_gene_count",
+    "drug_a_downregulated_gene_count",
+    "drug_a_side_effect_count",
+    "drug_a_pharmacologic_class_count",
+    "drug_a_resemblance_neighbor_count",
+    "drug_a_graph_degree",
+    "drug_b_ctd_disease_count",
+    "drug_b_cpd_disease_count",
+    "drug_b_bound_gene_count",
+    "drug_b_upregulated_gene_count",
+    "drug_b_downregulated_gene_count",
+    "drug_b_side_effect_count",
+    "drug_b_pharmacologic_class_count",
+    "drug_b_resemblance_neighbor_count",
+    "drug_b_graph_degree",
+    "shared_gene_count",
+    "shared_bound_gene_count",
+    "shared_upregulated_gene_count",
+    "shared_downregulated_gene_count",
+    "shared_side_effect_count",
+    "shared_treated_disease_count",
+    "shared_pharmacologic_class_count",
+    "gene_jaccard",
+    "side_effect_jaccard",
+    "disease_jaccard",
+    "pharmacologic_class_jaccard"
   ],
-  "metadata_columns": [
-    "row_id",
-    "compound_id",
-    "compound_name",
-    "disease_id",
-    "disease_name",
-    "label_source",
-    "label_semantics"
-  ],
-  "negative_label": "0 means the sampled pair lacks represented CtD in this fragment; it is not clinical evidence of no treatment relationship",
-  "negative_ratio": 2,
-  "positive_label": "1 means the Hetionet fragment contains a represented Compound-[:CtD]->Disease edge",
-  "random_state": 42,
-  "target_column": "ctd_label",
-  "target_distribution": {
-    "0": 284,
-    "1": 142
+  "final_supervised_rows": 130422,
+  "fully_novel_test_drugs": 19,
+  "malformed_rows": 1,
+  "mapping_percentage": 11.707,
+  "mapping_status_counts": {
+    "exact_name": 227,
+    "unmapped": 1712
   },
-  "task": "fallback_drug_disease_ctd_relationship_classification",
-  "test_rows": 86,
+  "metadata_columns": [
+    "pair_id",
+    "drug_a_ddinter_id",
+    "drug_a_name",
+    "drug_b_ddinter_id",
+    "drug_b_name",
+    "source_severity",
+    "source_file",
+    "atc_category",
+    "source_dataset",
+    "dataset_version",
+    "drug_a_hetionet_id",
+    "drug_b_hetionet_id",
+    "drug_a_mapping_status",
+    "drug_b_mapping_status",
+    "pair_mapping_coverage"
+  ],
+  "missing_values": {
+    "DDInterID_A": 0,
+    "DDInterID_B": 1,
+    "Drug_A": 0,
+    "Drug_B": 1,
+    "Level": 1,
+    "atc_category": 0,
+    "source_file": 0
+  },
+  "pair_mapping_coverage": {
+    "both_mapped": 3292,
+    "neither_mapped": 95712,
+    "only_drug_a_mapped": 16663,
+    "only_drug_b_mapped": 14755
+  },
+  "random_state": 42,
+  "raw_rows": 222664,
+  "raw_severity_distribution": {
+    "Major": 33896,
+    "Minor": 10938,
+    "Moderate": 130367,
+    "Unknown": 47462
+  },
+  "rdkit_note": "Official downloadable interaction CSVs provide no verified SMILES, InChI, or InChIKey; descriptors were not fabricated.",
+  "rdkit_structure_coverage": 0,
+  "rdkit_structure_coverage_percentage": 0.0,
+  "reverse_duplicate_pair_count": 0,
+  "source_columns": [
+    "DDInterID_A",
+    "DDInterID_B",
+    "Drug_A",
+    "Drug_B",
+    "Level",
+    "source_file",
+    "atc_category"
+  ],
+  "source_files": {
+    "ddinter_downloads_code_A.csv": {
+      "rows": 56367,
+      "sha256": "a22ca451d2b755ca2331886f7e00540c86f555f9f55704a59a19c691251f52e0"
+    },
+    "ddinter_downloads_code_B.csv": {
+      "rows": 15421,
+      "sha256": "22cee82ccfc60266f3dbf6a5db12f9390c3390c025e8dc945c2c85f00ca4fa58"
+    },
+    "ddinter_downloads_code_D.csv": {
+      "rows": 25681,
+      "sha256": "c0627ec39965dbe27829e4934cd20d71eb079f4e373287678737bba9423a306a"
+    },
+    "ddinter_downloads_code_H.csv": {
+      "rows": 11727,
+      "sha256": "f0f925f0ba1ee68c4668d3e7a6732719b34623b22a0f5d017f9090e59f63c88e"
+    },
+    "ddinter_downloads_code_L.csv": {
+      "rows": 65389,
+      "sha256": "f54f4486cc00344f8c86508c31c2ca3fad6d1d37ec3af5bcf609b4bbda5507ef"
+    },
+    "ddinter_downloads_code_P.csv": {
+      "rows": 5492,
+      "sha256": "83f8c0edb20d09ef29b8500b48f9623e208379525688ade9e70a7df2d8749d55"
+    },
+    "ddinter_downloads_code_R.csv": {
+      "rows": 30563,
+      "sha256": "1c39c3d4a6e41659b7a988538d7f363867592abc6f41a815de8746f6e2150574"
+    },
+    "ddinter_downloads_code_V.csv": {
+      "rows": 12024,
+      "sha256": "353973fb300453946aea95733e8fb52338e4b59426d2ce6ca318363d4f84f10a"
+    }
+  },
+  "target_classes": [
+    "Major",
+    "Moderate",
+    "Minor"
+  ],
+  "target_column": "ddi_severity",
+  "target_distribution": {
+    "Major": 26914,
+    "Minor": 6833,
+    "Moderate": 96675
+  },
+  "task": "DDInter drug-drug interaction severity classification",
+  "test_distinct_drugs": 1787,
+  "test_drug_overlap_percentage": 98.937,
+  "test_drugs_seen_in_train": 1768,
+  "test_rows": 26085,
   "test_size": 0.2,
   "test_target_distribution": {
-    "0": 57,
-    "1": 29
+    "Major": 5383,
+    "Minor": 1367,
+    "Moderate": 19335
   },
-  "train_rows": 340,
+  "train_rows": 104337,
   "train_target_distribution": {
-    "0": 227,
-    "1": 113
+    "Major": 21531,
+    "Minor": 5466,
+    "Moderate": 77340
   },
-  "unit_of_analysis": "one row = one Compound x Disease pair",
-  "validation": {
-    "duplicate_edge_rows_removed": 0,
-    "duplicate_node_rows_removed": 0,
-    "edge_rows": 16230,
-    "malformed_edge_rows": 0,
-    "malformed_node_rows": 0,
-    "node_rows": 3415
-  }
+  "unit_of_analysis": "one unique canonical unordered DDInter drug pair",
+  "unmapped_drug_count": 1712,
+  "verified_alias_mapping_count": 0
 }

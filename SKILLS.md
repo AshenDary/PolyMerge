@@ -12,7 +12,8 @@ data wrangling, traditional supervised feature engineering, scikit-learn.
 
 **Owns:** `ml_engine/app/utils/neo4j_client.py`,
 `scripts/filter_hetionet_fragment.py`, `scripts/load_fragment.py`,
-`data/processed/`, `ml_engine/app/data/`, Sprint 3 data scripts.
+`data/original/ddinter/source_manifest.json`, `data/processed/`,
+`ml_engine/app/data/`, and the Sprint 3 DDInter acquisition/build/EDA scripts.
 
 **"Done" looks like:** any claim about graph state is backed by an actual
 Cypher query result (`MATCH (n) RETURN count(n)`-style sanity checks), not

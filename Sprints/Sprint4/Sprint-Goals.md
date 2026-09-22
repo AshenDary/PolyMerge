@@ -14,10 +14,11 @@ Sprint 3 dataset, split, preprocessing helper, and target definition.
 - [ ] Use `data/processed/sprint3/test.csv`
 - [ ] Use `ml_engine/app/data/preprocessing.py`
 - [ ] Fit preprocessing on train only
-- [ ] Report the same primary metric for all three models
-- [ ] Document row-split leakage risk and limitations
+- [ ] Use macro F1 as the same primary metric for all three models
+- [ ] Document pair-split drug overlap and cold-start limitations
+- [ ] Keep the test split out of feature selection and tuning
 
 ## Important Constraint
 
-Hetionet `CrC` must not be treated as a DDI dataset. Sprint 3 fallback labels
-describe represented `CtD` relationships, not clinical truth.
+DDInter 2.0 is the label source. Hetionet `CrC` is resemblance context only.
+Unknown is not a supervised class, and no missing pair is a safe negative.

@@ -8,7 +8,7 @@ from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
-from app.data.sprint3_dataset import FEATURE_COLUMNS, METADATA_COLUMNS, TARGET_COLUMN
+from app.data.ddinter_dataset import FEATURE_COLUMNS, METADATA_COLUMNS, TARGET_COLUMN
 
 
 def get_feature_columns(frame: pd.DataFrame) -> list[str]:

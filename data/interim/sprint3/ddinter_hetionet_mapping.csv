@@ -1,0 +1,1940 @@
+ddinter_id,ddinter_name,hetionet_compound_id,hetionet_name,mapping_method,mapping_status
+DDInter1,Abacavir,,,none,unmapped
+DDInter10,Acamprosate,,,none,unmapped
+DDInter100,Anthrax vaccine,,,none,unmapped
+DDInter1000,Ivosidenib,,,none,unmapped
+DDInter1001,Ixabepilone,,,none,unmapped
+DDInter1002,Ixazomib,,,none,unmapped
+DDInter1003,Ixekizumab,,,none,unmapped
+DDInter1004,Kanamycin,Compound::DB01172,Kanamycin,normalized case-insensitive exact generic name,exact_name
+DDInter1005,Kaolin,,,none,unmapped
+DDInter1006,Kava,,,none,unmapped
+DDInter1007,Ketamine,,,none,unmapped
+DDInter1008,Ketoconazole,,,none,unmapped
+DDInter1009,Ketoprofen,Compound::DB01009,Ketoprofen,normalized case-insensitive exact generic name,exact_name
+DDInter101,Anti-inhibitor coagulant complex,,,none,unmapped
+DDInter1010,Ketorolac,,,none,unmapped
+DDInter1011,Ketorolac (ophthalmic),,,none,unmapped
+DDInter1012,Ketotifen,,,none,unmapped
+DDInter1013,Labetalol,Compound::DB00598,Labetalol,normalized case-insensitive exact generic name,exact_name
+DDInter1014,Lacosamide,Compound::DB06218,Lacosamide,normalized case-insensitive exact generic name,exact_name
+DDInter1015,Lactic acid,,,none,unmapped
+DDInter1016,Lactitol,,,none,unmapped
+DDInter1017,Lactobacillus acidophilus,,,none,unmapped
+DDInter1018,Lactulose,Compound::DB00581,Lactulose,normalized case-insensitive exact generic name,exact_name
+DDInter1019,Lamivudine,,,none,unmapped
+DDInter102,"Antihemophilic factor, human recombinant",,,none,unmapped
+DDInter1020,Lamotrigine,Compound::DB00555,Lamotrigine,normalized case-insensitive exact generic name,exact_name
+DDInter1021,Lanreotide,,,none,unmapped
+DDInter1022,Lansoprazole,,,none,unmapped
+DDInter1023,Lanthanum carbonate,,,none,unmapped
+DDInter1024,Lapatinib,,,none,unmapped
+DDInter1025,Laronidase,,,none,unmapped
+DDInter1026,Larotrectinib,,,none,unmapped
+DDInter1027,Lasmiditan,,,none,unmapped
+DDInter1028,Latanoprost,,,none,unmapped
+DDInter103,Antilymphocyte immunoglobulin (horse),,,none,unmapped
+DDInter1031,Ledipasvir,,,none,unmapped
+DDInter1032,Lefamulin,,,none,unmapped
+DDInter1033,Leflunomide,,,none,unmapped
+DDInter1034,Lemborexant,,,none,unmapped
+DDInter1035,Lenalidomide,,,none,unmapped
+DDInter1036,Lenvatinib,,,none,unmapped
+DDInter1037,Lepirudin,,,none,unmapped
+DDInter1038,Lesinurad,,,none,unmapped
+DDInter1039,Letermovir,,,none,unmapped
+DDInter104,Antithrombin Alfa,,,none,unmapped
+DDInter1040,Letrozole,,,none,unmapped
+DDInter1041,Leucovorin,,,none,unmapped
+DDInter1042,Leuprolide,,,none,unmapped
+DDInter1043,Levacetylmethadol,,,none,unmapped
+DDInter1044,Levamisole,,,none,unmapped
+DDInter1045,Levamlodipine,,,none,unmapped
+DDInter1046,Levetiracetam,,,none,unmapped
+DDInter1047,Levmetamfetamine (nasal),,,none,unmapped
+DDInter1048,Levobetaxolol (ophthalmic),,,none,unmapped
+DDInter1049,Levobunolol,Compound::DB01210,Levobunolol,normalized case-insensitive exact generic name,exact_name
+DDInter105,Antithrombin III human,,,none,unmapped
+DDInter1050,Levobunolol (ophthalmic),,,none,unmapped
+DDInter1051,Levobupivacaine,,,none,unmapped
+DDInter1052,Levocarnitine,,,none,unmapped
+DDInter1053,Levocetirizine,,,none,unmapped
+DDInter1054,Levodopa,,,none,unmapped
+DDInter1055,Levofloxacin,,,none,unmapped
+DDInter1056,Levoleucovorin,,,none,unmapped
+DDInter1057,Levomefolic acid,,,none,unmapped
+DDInter1058,Levomefolic acid (calcium),,,none,unmapped
+DDInter1059,Levomilnacipran,,,none,unmapped
+DDInter106,Antithymocyte immunoglobulin (rabbit),,,none,unmapped
+DDInter1060,Levonordefrin,Compound::DB06707,Levonordefrin,normalized case-insensitive exact generic name,exact_name
+DDInter1061,Levonorgestrel,,,none,unmapped
+DDInter1062,Levorphanol,,,none,unmapped
+DDInter1063,Levosalbutamol,,,none,unmapped
+DDInter1064,Levothyroxine,,,none,unmapped
+DDInter1065,Licorice,,,none,unmapped
+DDInter1066,Lidocaine,,,none,unmapped
+DDInter1067,Lidocaine (ophthalmic),,,none,unmapped
+DDInter1068,Lidocaine (topical),,,none,unmapped
+DDInter1069,Linaclotide,,,none,unmapped
+DDInter107,Apalutamide,,,none,unmapped
+DDInter1070,Linagliptin,Compound::DB08882,Linagliptin,normalized case-insensitive exact generic name,exact_name
+DDInter1071,Lincomycin,,,none,unmapped
+DDInter1072,Lindane,,,none,unmapped
+DDInter1073,Linezolid,,,none,unmapped
+DDInter1074,Liothyronine,,,none,unmapped
+DDInter1075,Liotrix,,,none,unmapped
+DDInter1076,Lipoic acid,,,none,unmapped
+DDInter1077,Liraglutide,,,none,unmapped
+DDInter1078,Lisdexamfetamine,Compound::DB01255,Lisdexamfetamine,normalized case-insensitive exact generic name,exact_name
+DDInter1079,Lisinopril,Compound::DB00722,Lisinopril,normalized case-insensitive exact generic name,exact_name
+DDInter108,Apixaban,,,none,unmapped
+DDInter1080,Lisocabtagene maraleucel,,,none,unmapped
+DDInter1081,Lithium carbonate,,,none,unmapped
+DDInter1082,Lixisenatide,,,none,unmapped
+DDInter1083,Lofexidine,Compound::DB04948,Lofexidine,normalized case-insensitive exact generic name,exact_name
+DDInter1084,Lomefloxacin,,,none,unmapped
+DDInter1085,Lomitapide,,,none,unmapped
+DDInter1086,Lomustine,,,none,unmapped
+DDInter1087,Lonafarnib,,,none,unmapped
+DDInter1088,Loperamide,,,none,unmapped
+DDInter1089,Lopinavir,,,none,unmapped
+DDInter109,Apomorphine,,,none,unmapped
+DDInter1090,Loracarbef,,,none,unmapped
+DDInter1091,Loratadine,,,none,unmapped
+DDInter1092,Lorazepam,Compound::DB00186,Lorazepam,normalized case-insensitive exact generic name,exact_name
+DDInter1093,Lorcaserin,,,none,unmapped
+DDInter1094,Lorlatinib,,,none,unmapped
+DDInter1095,Losartan,Compound::DB00678,Losartan,normalized case-insensitive exact generic name,exact_name
+DDInter1096,Loteprednol (ophthalmic),,,none,unmapped
+DDInter1097,Loteprednol etabonate,,,none,unmapped
+DDInter1098,Lovastatin,Compound::DB00227,Lovastatin,normalized case-insensitive exact generic name,exact_name
+DDInter1099,Loxapine,,,none,unmapped
+DDInter11,Acarbose,Compound::DB00284,Acarbose,normalized case-insensitive exact generic name,exact_name
+DDInter110,Apraclonidine,Compound::DB00964,Apraclonidine,normalized case-insensitive exact generic name,exact_name
+DDInter1100,Lubiprostone,,,none,unmapped
+DDInter1101,Lumacaftor,,,none,unmapped
+DDInter1102,Lumateperone,,,none,unmapped
+DDInter1103,Lumefantrine,,,none,unmapped
+DDInter1104,Lurasidone,,,none,unmapped
+DDInter1105,Lurbinectedin,,,none,unmapped
+DDInter1106,Lusutrombopag,,,none,unmapped
+DDInter1107,Lutein,,,none,unmapped
+DDInter1108,Lutetium Lu 177 dotatate,,,none,unmapped
+DDInter1109,Lyme disease vaccine (recombinant OspA),,,none,unmapped
+DDInter111,Apremilast,,,none,unmapped
+DDInter1110,Macimorelin,,,none,unmapped
+DDInter1111,Macitentan,,,none,unmapped
+DDInter1112,Magaldrate,,,none,unmapped
+DDInter1113,Magnesium carbonate,,,none,unmapped
+DDInter1114,Magnesium chloride,,,none,unmapped
+DDInter1115,Magnesium citrate,,,none,unmapped
+DDInter1116,Magnesium gluconate,,,none,unmapped
+DDInter1117,Magnesium glycinate,,,none,unmapped
+DDInter1118,Magnesium hydroxide,,,none,unmapped
+DDInter1119,Magnesium oxide,,,none,unmapped
+DDInter112,Aprepitant,,,none,unmapped
+DDInter1120,Magnesium sulfate,,,none,unmapped
+DDInter1121,Manganese (chloride),,,none,unmapped
+DDInter1122,Manganese (sulfate),,,none,unmapped
+DDInter1123,Mannitol,,,none,unmapped
+DDInter1124,Maprotiline,,,none,unmapped
+DDInter1125,Maraviroc,,,none,unmapped
+DDInter1126,Mazindol,Compound::DB00579,Mazindol,normalized case-insensitive exact generic name,exact_name
+DDInter1127,Measles virus vaccine live attenuated,,,none,unmapped
+DDInter1128,Mebendazole,,,none,unmapped
+DDInter1129,Mebrofenin,,,none,unmapped
+DDInter113,Aprotinin,,,none,unmapped
+DDInter1130,Mecamylamine,Compound::DB00657,Mecamylamine,normalized case-insensitive exact generic name,exact_name
+DDInter1131,Mecasermin,,,none,unmapped
+DDInter1132,Mecasermin rinfabate,,,none,unmapped
+DDInter1133,Mechlorethamine,,,none,unmapped
+DDInter1134,Meclizine,,,none,unmapped
+DDInter1135,Meclofenamic acid,Compound::DB00939,Meclofenamic acid,normalized case-insensitive exact generic name,exact_name
+DDInter1136,Mecobalamin,,,none,unmapped
+DDInter1137,Medroxyprogesterone acetate,Compound::DB00603,Medroxyprogesterone Acetate,normalized case-insensitive exact generic name,exact_name
+DDInter1138,Medrysone (ophthalmic),,,none,unmapped
+DDInter1139,Mefenamic acid,Compound::DB00784,Mefenamic acid,normalized case-insensitive exact generic name,exact_name
+DDInter114,Arbutamine,Compound::DB01102,Arbutamine,normalized case-insensitive exact generic name,exact_name
+DDInter1140,Mefloquine,,,none,unmapped
+DDInter1141,Megestrol acetate,Compound::DB00351,Megestrol acetate,normalized case-insensitive exact generic name,exact_name
+DDInter1142,Melatonin,,,none,unmapped
+DDInter1143,Meloxicam,,,none,unmapped
+DDInter1144,Melphalan,,,none,unmapped
+DDInter1145,Melphalan flufenamide,,,none,unmapped
+DDInter1146,Memantine,,,none,unmapped
+DDInter1147,Meningococcal polysaccharide vaccine group C,,,none,unmapped
+DDInter1148,Menotropins,,,none,unmapped
+DDInter1149,Mepenzolate,,,none,unmapped
+DDInter115,Ardeparin,,,none,unmapped
+DDInter1150,Meperidine,,,none,unmapped
+DDInter1151,Mephentermine,,,none,unmapped
+DDInter1152,Mephenytoin,,,none,unmapped
+DDInter1153,Mepivacaine,,,none,unmapped
+DDInter1154,Meprobamate,,,none,unmapped
+DDInter1155,Mepyramine,Compound::DB06691,Mepyramine,normalized case-insensitive exact generic name,exact_name
+DDInter1156,Mercaptopurine,,,none,unmapped
+DDInter1157,Meropenem,,,none,unmapped
+DDInter1158,Mesalazine,Compound::DB00244,Mesalazine,normalized case-insensitive exact generic name,exact_name
+DDInter1159,Mesoridazine,,,none,unmapped
+DDInter116,Arformoterol,Compound::DB01274,Arformoterol,normalized case-insensitive exact generic name,exact_name
+DDInter1160,Mestranol,,,none,unmapped
+DDInter1161,Metamfetamine,,,none,unmapped
+DDInter1162,Metaraminol,,,none,unmapped
+DDInter1163,Metaxalone,,,none,unmapped
+DDInter1164,Metformin,Compound::DB00331,Metformin,normalized case-insensitive exact generic name,exact_name
+DDInter1165,Methacholine,,,none,unmapped
+DDInter1166,Methadone,,,none,unmapped
+DDInter1167,Methazolamide,,,none,unmapped
+DDInter1168,Methdilazine,,,none,unmapped
+DDInter1169,Methenamine,,,none,unmapped
+DDInter117,Argatroban,,,none,unmapped
+DDInter1170,Methimazole,,,none,unmapped
+DDInter1171,Methionine,,,none,unmapped
+DDInter1172,Methocarbamol,Compound::DB00423,Methocarbamol,normalized case-insensitive exact generic name,exact_name
+DDInter1173,Methohexital,,,none,unmapped
+DDInter1174,Methotrexate,,,none,unmapped
+DDInter1175,Methotrimeprazine,Compound::DB01403,Methotrimeprazine,normalized case-insensitive exact generic name,exact_name
+DDInter1176,Methoxamine,,,none,unmapped
+DDInter1177,Methoxsalen,,,none,unmapped
+DDInter1178,Methoxsalen (topical),,,none,unmapped
+DDInter1179,Methoxyflurane,,,none,unmapped
+DDInter118,Aripiprazole,,,none,unmapped
+DDInter1180,Methscopolamine,,,none,unmapped
+DDInter1181,Methsuximide,,,none,unmapped
+DDInter1182,Methyl aminolevulinate (topical),,,none,unmapped
+DDInter1183,Methyl salicylate (topical),,,none,unmapped
+DDInter1184,Methylcellulose,,,none,unmapped
+DDInter1185,Methyldopa,Compound::DB00968,Methyldopa,normalized case-insensitive exact generic name,exact_name
+DDInter1186,Methylene blue,,,none,unmapped
+DDInter1187,Methylergometrine,Compound::DB00353,Methylergometrine,normalized case-insensitive exact generic name,exact_name
+DDInter1188,Methylnaltrexone,,,none,unmapped
+DDInter1189,Methylphenidate,,,none,unmapped
+DDInter119,Armodafinil,,,none,unmapped
+DDInter1190,Methylphenobarbital,,,none,unmapped
+DDInter1191,Methylprednisolone,,,none,unmapped
+DDInter1192,Methylprednisolone (topical),,,none,unmapped
+DDInter1193,Methyltestosterone,Compound::DB06710,Methyltestosterone,normalized case-insensitive exact generic name,exact_name
+DDInter1194,Methysergide,Compound::DB00247,Methysergide,normalized case-insensitive exact generic name,exact_name
+DDInter1195,Meticillin,,,none,unmapped
+DDInter1196,Metipranolol (ophthalmic),,,none,unmapped
+DDInter1197,Metoclopramide,,,none,unmapped
+DDInter1198,Metocurine,,,none,unmapped
+DDInter1199,Metolazone,Compound::DB00524,Metolazone,normalized case-insensitive exact generic name,exact_name
+DDInter12,Acebutolol,Compound::DB01193,Acebutolol,normalized case-insensitive exact generic name,exact_name
+DDInter120,Arsenic trioxide,,,none,unmapped
+DDInter1200,Metoprolol,Compound::DB00264,Metoprolol,normalized case-insensitive exact generic name,exact_name
+DDInter1201,Metreleptin,,,none,unmapped
+DDInter1202,Metronidazole,,,none,unmapped
+DDInter1203,Metronidazole (topical),,,none,unmapped
+DDInter1204,Metyrapone,Compound::DB01011,Metyrapone,normalized case-insensitive exact generic name,exact_name
+DDInter1205,Metyrosine,Compound::DB00765,Metyrosine,normalized case-insensitive exact generic name,exact_name
+DDInter1206,Mexiletine,,,none,unmapped
+DDInter1207,Mezlocillin,,,none,unmapped
+DDInter1208,Micafungin,,,none,unmapped
+DDInter1209,Miconazole,,,none,unmapped
+DDInter121,Artemether,,,none,unmapped
+DDInter1210,Miconazole (topical),,,none,unmapped
+DDInter1211,Microcrystalline cellulose,,,none,unmapped
+DDInter1212,Midazolam,,,none,unmapped
+DDInter1213,Midodrine,,,none,unmapped
+DDInter1214,Midostaurin,,,none,unmapped
+DDInter1215,Mifepristone,,,none,unmapped
+DDInter1216,Migalastat,,,none,unmapped
+DDInter1217,Miglitol,Compound::DB00491,Miglitol,normalized case-insensitive exact generic name,exact_name
+DDInter1218,Miglustat,Compound::DB00419,Miglustat,normalized case-insensitive exact generic name,exact_name
+DDInter1219,Milk thistle,,,none,unmapped
+DDInter122,Artesunate,,,none,unmapped
+DDInter1220,Milnacipran,,,none,unmapped
+DDInter1221,Milrinone,,,none,unmapped
+DDInter1222,Miltefosine,,,none,unmapped
+DDInter1223,Mineral oil,,,none,unmapped
+DDInter1224,Minocycline,,,none,unmapped
+DDInter1225,Minocycline (topical),,,none,unmapped
+DDInter1226,Minoxidil,Compound::DB00350,Minoxidil,normalized case-insensitive exact generic name,exact_name
+DDInter1227,Minoxidil (topical),,,none,unmapped
+DDInter1228,Mipomersen,,,none,unmapped
+DDInter1229,Mirabegron,Compound::DB08893,Mirabegron,normalized case-insensitive exact generic name,exact_name
+DDInter123,Articaine,,,none,unmapped
+DDInter1230,Mirtazapine,,,none,unmapped
+DDInter1231,Misoprostol,,,none,unmapped
+DDInter1232,Mitomycin,,,none,unmapped
+DDInter1233,Mitotane,,,none,unmapped
+DDInter1234,Mitoxantrone,,,none,unmapped
+DDInter1235,Mivacurium,,,none,unmapped
+DDInter1236,Modafinil,,,none,unmapped
+DDInter1237,Moexipril,Compound::DB00691,Moexipril,normalized case-insensitive exact generic name,exact_name
+DDInter1238,Mogamulizumab,,,none,unmapped
+DDInter1239,Molindone,,,none,unmapped
+DDInter124,Ascorbic acid,,,none,unmapped
+DDInter1240,Monomethyl fumarate,,,none,unmapped
+DDInter1241,Monopotassium phosphate,,,none,unmapped
+DDInter1242,Montelukast,,,none,unmapped
+DDInter1243,Moricizine,,,none,unmapped
+DDInter1244,Morphine,,,none,unmapped
+DDInter1245,Morphine (liposomal),,,none,unmapped
+DDInter1246,Moxetumomab Pasudotox,,,none,unmapped
+DDInter1247,Moxifloxacin,,,none,unmapped
+DDInter1248,Mumps virus strain B level jeryl lynn live antigen,,,none,unmapped
+DDInter1249,Mupirocin,,,none,unmapped
+DDInter125,Asenapine,,,none,unmapped
+DDInter1250,Muromonab,,,none,unmapped
+DDInter1251,Mycophenolate mofetil,,,none,unmapped
+DDInter1252,Mycophenolic acid,,,none,unmapped
+DDInter1253,Nabilone,,,none,unmapped
+DDInter1254,Nabumetone,,,none,unmapped
+DDInter1255,Nadolol,Compound::DB01203,Nadolol,normalized case-insensitive exact generic name,exact_name
+DDInter1256,Nafcillin,,,none,unmapped
+DDInter1257,Nalbuphine,,,none,unmapped
+DDInter1258,Naldemedine,,,none,unmapped
+DDInter1259,Nalidixic acid,,,none,unmapped
+DDInter126,Asparaginase Erwinia chrysanthemi,,,none,unmapped
+DDInter1260,Nalmefene,,,none,unmapped
+DDInter1261,Naloxegol,,,none,unmapped
+DDInter1262,Naloxone,,,none,unmapped
+DDInter1263,Naltrexone,,,none,unmapped
+DDInter1264,Naphazoline (nasal),,,none,unmapped
+DDInter1265,Naphazoline (ophthalmic),,,none,unmapped
+DDInter1266,Naproxen,,,none,unmapped
+DDInter1267,Naratriptan,,,none,unmapped
+DDInter1268,Natalizumab,,,none,unmapped
+DDInter1269,Nateglinide,Compound::DB00731,Nateglinide,normalized case-insensitive exact generic name,exact_name
+DDInter127,Asparaginase Escherichia coli,,,none,unmapped
+DDInter1270,Naxitamab,,,none,unmapped
+DDInter1271,Nebivolol,Compound::DB04861,Nebivolol,normalized case-insensitive exact generic name,exact_name
+DDInter1272,Necitumumab,,,none,unmapped
+DDInter1273,Nedocromil,,,none,unmapped
+DDInter1274,Nefazodone,,,none,unmapped
+DDInter1275,Nelarabine,,,none,unmapped
+DDInter1276,Nelfinavir,,,none,unmapped
+DDInter1277,Neomycin,Compound::DB00994,Neomycin,normalized case-insensitive exact generic name,exact_name
+DDInter1278,Neomycin (topical),,,none,unmapped
+DDInter1279,Neostigmine,,,none,unmapped
+DDInter128,Astemizole,,,none,unmapped
+DDInter1280,Nepafenac (ophthalmic),,,none,unmapped
+DDInter1281,Neratinib,,,none,unmapped
+DDInter1282,Nesiritide,,,none,unmapped
+DDInter1283,Netilmicin,,,none,unmapped
+DDInter1284,Netupitant,,,none,unmapped
+DDInter1285,Nevirapine,,,none,unmapped
+DDInter1286,Niacin,Compound::DB00627,Niacin,normalized case-insensitive exact generic name,exact_name
+DDInter1287,Nicardipine,Compound::DB00622,Nicardipine,normalized case-insensitive exact generic name,exact_name
+DDInter1288,Niclosamide,,,none,unmapped
+DDInter1289,Nicotinamide,,,none,unmapped
+DDInter129,Atazanavir,,,none,unmapped
+DDInter1290,Nicotine,,,none,unmapped
+DDInter1291,Nifedipine,Compound::DB01115,Nifedipine,normalized case-insensitive exact generic name,exact_name
+DDInter1292,Nifurtimox,,,none,unmapped
+DDInter1293,Nilotinib,,,none,unmapped
+DDInter1294,Nilutamide,,,none,unmapped
+DDInter1295,Nimodipine,Compound::DB00393,Nimodipine,normalized case-insensitive exact generic name,exact_name
+DDInter1296,Nintedanib,,,none,unmapped
+DDInter1297,Niraparib,,,none,unmapped
+DDInter1298,Nisoldipine,Compound::DB00401,Nisoldipine,normalized case-insensitive exact generic name,exact_name
+DDInter1299,Nitazoxanide,Compound::DB00507,Nitazoxanide,normalized case-insensitive exact generic name,exact_name
+DDInter13,Acenocoumarol,,,none,unmapped
+DDInter130,Atenolol,Compound::DB00335,Atenolol,normalized case-insensitive exact generic name,exact_name
+DDInter1300,Nitisinone,,,none,unmapped
+DDInter1301,Nitrazepam,,,none,unmapped
+DDInter1302,Nitric Oxide,,,none,unmapped
+DDInter1303,Nitrofurantoin,,,none,unmapped
+DDInter1304,Nitroglycerin,,,none,unmapped
+DDInter1305,Nitroprusside,,,none,unmapped
+DDInter1306,Nitrous acid,,,none,unmapped
+DDInter1307,Nitrous oxide,,,none,unmapped
+DDInter1308,Nivolumab,,,none,unmapped
+DDInter1309,Nizatidine,,,none,unmapped
+DDInter131,Atezolizumab,,,none,unmapped
+DDInter1310,Norelgestromin,,,none,unmapped
+DDInter1311,Norepinephrine,Compound::DB00368,Norepinephrine,normalized case-insensitive exact generic name,exact_name
+DDInter1312,Norethisterone,,,none,unmapped
+DDInter1313,Norfloxacin,,,none,unmapped
+DDInter1314,Norgestimate,,,none,unmapped
+DDInter1315,Norgestrel,,,none,unmapped
+DDInter1316,Nortriptyline,,,none,unmapped
+DDInter1317,Novobiocin,,,none,unmapped
+DDInter1318,Nystatin,,,none,unmapped
+DDInter1319,Obeticholic acid,,,none,unmapped
+DDInter132,Atomoxetine,Compound::DB00289,Atomoxetine,normalized case-insensitive exact generic name,exact_name
+DDInter1320,Obinutuzumab,,,none,unmapped
+DDInter1321,Ocrelizumab,,,none,unmapped
+DDInter1322,Octasulfur (topical),,,none,unmapped
+DDInter1323,Octreotide,,,none,unmapped
+DDInter1324,Ofatumumab,,,none,unmapped
+DDInter1325,Ofloxacin,,,none,unmapped
+DDInter1326,Olanzapine,,,none,unmapped
+DDInter1327,Olaparib,,,none,unmapped
+DDInter1328,Olaratumab,,,none,unmapped
+DDInter1329,Oliceridine,,,none,unmapped
+DDInter133,Atorvastatin,Compound::DB01076,Atorvastatin,normalized case-insensitive exact generic name,exact_name
+DDInter1330,Olmesartan,Compound::DB00275,Olmesartan,normalized case-insensitive exact generic name,exact_name
+DDInter1331,Olodaterol,,,none,unmapped
+DDInter1332,Olopatadine,,,none,unmapped
+DDInter1333,Olopatadine (nasal),,,none,unmapped
+DDInter1334,Olsalazine,,,none,unmapped
+DDInter1335,Omacetaxine mepesuccinate,,,none,unmapped
+DDInter1336,Omadacycline,,,none,unmapped
+DDInter1337,Omalizumab,,,none,unmapped
+DDInter1339,Omega-3 fatty acids,,,none,unmapped
+DDInter134,Atovaquone,,,none,unmapped
+DDInter1340,Omeprazole,,,none,unmapped
+DDInter1341,Onasemnogene abeparvovec,,,none,unmapped
+DDInter1342,Ondansetron,,,none,unmapped
+DDInter1343,Opicapone,,,none,unmapped
+DDInter1344,Opium,,,none,unmapped
+DDInter1345,Oprelvekin,,,none,unmapped
+DDInter1346,Orciprenaline,,,none,unmapped
+DDInter1347,Oritavancin,,,none,unmapped
+DDInter1348,Orlistat,Compound::DB01083,Orlistat,normalized case-insensitive exact generic name,exact_name
+DDInter1349,Orphenadrine,,,none,unmapped
+DDInter135,Atracurium,,,none,unmapped
+DDInter1350,Oseltamivir,,,none,unmapped
+DDInter1351,Osilodrostat,,,none,unmapped
+DDInter1352,Osimertinib,,,none,unmapped
+DDInter1353,Ospemifene,,,none,unmapped
+DDInter1354,Oxacillin,,,none,unmapped
+DDInter1355,Oxaliplatin,,,none,unmapped
+DDInter1356,Oxamniquine,,,none,unmapped
+DDInter1357,Oxandrolone,Compound::DB00621,Oxandrolone,normalized case-insensitive exact generic name,exact_name
+DDInter1358,Oxaprozin,,,none,unmapped
+DDInter1359,Oxazepam,,,none,unmapped
+DDInter136,Atropine,,,none,unmapped
+DDInter1360,Oxcarbazepine,Compound::DB00776,Oxcarbazepine,normalized case-insensitive exact generic name,exact_name
+DDInter1362,Oxitriptan,,,none,unmapped
+DDInter1363,Oxtriphylline,,,none,unmapped
+DDInter1364,Oxybuprocaine (ophthalmic),,,none,unmapped
+DDInter1365,Oxybutynin,,,none,unmapped
+DDInter1366,Oxycodone,,,none,unmapped
+DDInter1367,Oxygen,,,none,unmapped
+DDInter1368,Oxymetazoline (nasal),,,none,unmapped
+DDInter1369,Oxymetazoline (ophthalmic),,,none,unmapped
+DDInter137,Atropine (ophthalmic),,,none,unmapped
+DDInter1370,Oxymetazoline (topical),,,none,unmapped
+DDInter1371,Oxymetholone,,,none,unmapped
+DDInter1372,Oxymorphone,,,none,unmapped
+DDInter1373,Oxyquinoline (topical),,,none,unmapped
+DDInter1374,Oxytetracycline,,,none,unmapped
+DDInter1375,Oxytocin,,,none,unmapped
+DDInter1376,Ozanimod,,,none,unmapped
+DDInter1377,Paclitaxel,,,none,unmapped
+DDInter1378,Paclitaxel (protein-bound),,,none,unmapped
+DDInter1379,Palbociclib,,,none,unmapped
+DDInter138,Attapulgite,,,none,unmapped
+DDInter1380,Palifermin,,,none,unmapped
+DDInter1381,Paliperidone,,,none,unmapped
+DDInter1382,Palonosetron,,,none,unmapped
+DDInter1383,Pamidronic acid,,,none,unmapped
+DDInter1384,Pancrelipase,,,none,unmapped
+DDInter1385,Pancuronium,,,none,unmapped
+DDInter1386,Panitumumab,,,none,unmapped
+DDInter1387,Panobinostat,,,none,unmapped
+DDInter1388,Pantoprazole,,,none,unmapped
+DDInter1389,Papaverine,Compound::DB01113,Papaverine,normalized case-insensitive exact generic name,exact_name
+DDInter139,Auranofin,,,none,unmapped
+DDInter1390,Papaya,,,none,unmapped
+DDInter1391,Paraldehyde,,,none,unmapped
+DDInter1392,Paramethadione,,,none,unmapped
+DDInter1393,Parathyroid hormone,,,none,unmapped
+DDInter1394,Paricalcitol,,,none,unmapped
+DDInter1395,Paritaprevir,,,none,unmapped
+DDInter1396,Paromomycin,Compound::DB01421,Paromomycin,normalized case-insensitive exact generic name,exact_name
+DDInter1397,Paroxetine,,,none,unmapped
+DDInter1398,Pasireotide,,,none,unmapped
+DDInter1399,Patiromer,,,none,unmapped
+DDInter14,Acetaminophen,,,none,unmapped
+DDInter140,Aurothioglucose,,,none,unmapped
+DDInter1400,Pazopanib,,,none,unmapped
+DDInter1401,Pectin,,,none,unmapped
+DDInter1402,Pegademase,,,none,unmapped
+DDInter1403,Pegaptanib (ophthalmic),,,none,unmapped
+DDInter1404,Pegaspargase,,,none,unmapped
+DDInter1405,Pegfilgrastim,,,none,unmapped
+DDInter1406,Peginesatide,,,none,unmapped
+DDInter1407,Peginterferon alfa-2a,,,none,unmapped
+DDInter1408,Peginterferon alfa-2b,,,none,unmapped
+DDInter1409,Peginterferon beta-1a,,,none,unmapped
+DDInter141,Avanafil,,,none,unmapped
+DDInter1410,Pegloticase,,,none,unmapped
+DDInter1411,Pegvaliase,,,none,unmapped
+DDInter1412,Pegvisomant,,,none,unmapped
+DDInter1413,Pembrolizumab,,,none,unmapped
+DDInter1414,Pemetrexed,,,none,unmapped
+DDInter1415,Pemigatinib,,,none,unmapped
+DDInter1416,Pemoline,,,none,unmapped
+DDInter1417,Penbutolol,Compound::DB01359,Penbutolol,normalized case-insensitive exact generic name,exact_name
+DDInter1418,Penciclovir (topical),,,none,unmapped
+DDInter1419,Penicillamine,,,none,unmapped
+DDInter142,Avapritinib,,,none,unmapped
+DDInter1420,Pentamidine,,,none,unmapped
+DDInter1421,Pentazocine,,,none,unmapped
+DDInter1423,Pentobarbital,,,none,unmapped
+DDInter1424,Pentosan polysulfate,,,none,unmapped
+DDInter1425,Pentostatin,,,none,unmapped
+DDInter1426,Pentoxifylline,,,none,unmapped
+DDInter1427,Pentoxyverine,,,none,unmapped
+DDInter1428,Perampanel,,,none,unmapped
+DDInter1429,Perflutren,,,none,unmapped
+DDInter143,Avatrombopag,,,none,unmapped
+DDInter1430,Pergolide,,,none,unmapped
+DDInter1431,Perindopril,Compound::DB00790,Perindopril,normalized case-insensitive exact generic name,exact_name
+DDInter1432,Perphenazine,,,none,unmapped
+DDInter1434,Pertuzumab,,,none,unmapped
+DDInter1435,Pexidartinib,,,none,unmapped
+DDInter1436,Pfizer-BioNTech Covid-19 Vaccine,,,none,unmapped
+DDInter1437,Phenacemide,Compound::DB01121,Phenacemide,normalized case-insensitive exact generic name,exact_name
+DDInter1438,Phenazopyridine,,,none,unmapped
+DDInter1439,Phendimetrazine,,,none,unmapped
+DDInter144,Avelumab,,,none,unmapped
+DDInter1440,Phenelzine,,,none,unmapped
+DDInter1441,Phenindamine,,,none,unmapped
+DDInter1442,Phenobarbital,,,none,unmapped
+DDInter1443,Phenolphthalein,,,none,unmapped
+DDInter1444,Phenoxybenzamine,Compound::DB00925,Phenoxybenzamine,normalized case-insensitive exact generic name,exact_name
+DDInter1445,Phenoxymethylpenicillin,,,none,unmapped
+DDInter1446,Phensuximide,,,none,unmapped
+DDInter1447,Phentermine,,,none,unmapped
+DDInter1448,Phentolamine,,,none,unmapped
+DDInter1449,Phenyl salicylate,,,none,unmapped
+DDInter1451,Phenylbutazone,,,none,unmapped
+DDInter1452,Phenylbutyric acid,,,none,unmapped
+DDInter1453,Phenylephrine,,,none,unmapped
+DDInter1454,Phenylephrine (nasal),,,none,unmapped
+DDInter1455,Phenylephrine (ophthalmic),,,none,unmapped
+DDInter1456,Phenylephrine (otic),,,none,unmapped
+DDInter1457,Phenylephrine (topical),,,none,unmapped
+DDInter1458,Phenylpropanolamine,,,none,unmapped
+DDInter1459,Phenyltoloxamine,,,none,unmapped
+DDInter146,Axicabtagene ciloleucel,,,none,unmapped
+DDInter1460,Phenytoin,,,none,unmapped
+DDInter1461,Phylloquinone,,,none,unmapped
+DDInter1462,Physostigmine,,,none,unmapped
+DDInter1463,Physostigmine (ophthalmic),,,none,unmapped
+DDInter1464,Picosulfuric acid,,,none,unmapped
+DDInter1465,Pilocarpine,,,none,unmapped
+DDInter1466,Pilocarpine (ophthalmic),,,none,unmapped
+DDInter1467,Pimavanserin,,,none,unmapped
+DDInter1468,Pimecrolimus,,,none,unmapped
+DDInter1469,Pimecrolimus (topical),,,none,unmapped
+DDInter147,Axitinib,,,none,unmapped
+DDInter1470,Pimozide,Compound::DB01100,Pimozide,normalized case-insensitive exact generic name,exact_name
+DDInter1471,Pindolol,Compound::DB00960,Pindolol,normalized case-insensitive exact generic name,exact_name
+DDInter1472,Pioglitazone,Compound::DB01132,Pioglitazone,normalized case-insensitive exact generic name,exact_name
+DDInter1473,Pipecuronium,,,none,unmapped
+DDInter1474,Piperacillin,,,none,unmapped
+DDInter1475,Piperazine,,,none,unmapped
+DDInter1476,Pirbuterol,Compound::DB01291,Pirbuterol,normalized case-insensitive exact generic name,exact_name
+DDInter1477,Pirfenidone,,,none,unmapped
+DDInter1478,Piroxicam,,,none,unmapped
+DDInter1479,Pitavastatin,Compound::DB08860,Pitavastatin,normalized case-insensitive exact generic name,exact_name
+DDInter148,Azacitidine,,,none,unmapped
+DDInter1480,Pitolisant,,,none,unmapped
+DDInter1481,Plantago seed,,,none,unmapped
+DDInter1482,Plazomicin,,,none,unmapped
+DDInter1483,Plecanatide,,,none,unmapped
+DDInter1484,Plicamycin,,,none,unmapped
+DDInter1485,Polatuzumab vedotin,,,none,unmapped
+DDInter1486,Poliovirus type 1 antigen (formaldehyde inactivated),,,none,unmapped
+DDInter1487,Polyethylene glycol (3350 with electrolytes),,,none,unmapped
+DDInter1488,Polyethylene glycol (3350),,,none,unmapped
+DDInter1489,Polymyxin B,,,none,unmapped
+DDInter149,Azatadine,,,none,unmapped
+DDInter1490,Polythiazide,Compound::DB01324,Polythiazide,normalized case-insensitive exact generic name,exact_name
+DDInter1491,Pomalidomide,,,none,unmapped
+DDInter1492,Ponatinib,,,none,unmapped
+DDInter1493,Porfimer sodium,,,none,unmapped
+DDInter1494,Posaconazole,,,none,unmapped
+DDInter1495,Potassium acetate,,,none,unmapped
+DDInter1496,Potassium bicarbonate,,,none,unmapped
+DDInter1497,Potassium chloride,,,none,unmapped
+DDInter1498,Potassium citrate,,,none,unmapped
+DDInter1499,Potassium gluconate,,,none,unmapped
+DDInter15,Acetazolamide,,,none,unmapped
+DDInter150,Azathioprine,,,none,unmapped
+DDInter1500,Potassium Iodide,,,none,unmapped
+DDInter1501,Potassium perchlorate,,,none,unmapped
+DDInter1502,Pralatrexate,,,none,unmapped
+DDInter1503,Pralidoxime,,,none,unmapped
+DDInter1504,Pralsetinib,,,none,unmapped
+DDInter1505,Pramipexole,,,none,unmapped
+DDInter1506,Pramlintide,,,none,unmapped
+DDInter1507,Prasterone enantate,,,none,unmapped
+DDInter1508,Prasugrel,Compound::DB06209,Prasugrel,normalized case-insensitive exact generic name,exact_name
+DDInter1509,Pravastatin,Compound::DB00175,Pravastatin,normalized case-insensitive exact generic name,exact_name
+DDInter151,Azelaic acid,,,none,unmapped
+DDInter1510,Praziquantel,,,none,unmapped
+DDInter1511,Prazosin,Compound::DB00457,Prazosin,normalized case-insensitive exact generic name,exact_name
+DDInter1512,Prednicarbate (topical),,,none,unmapped
+DDInter1513,Prednisolone,,,none,unmapped
+DDInter1514,Prednisolone (ophthalmic),,,none,unmapped
+DDInter1515,Prednisone,,,none,unmapped
+DDInter1516,Pregabalin,,,none,unmapped
+DDInter1517,Pretomanid,,,none,unmapped
+DDInter1518,Prilocaine,,,none,unmapped
+DDInter1519,Prilocaine (topiclal),,,none,unmapped
+DDInter152,Azelaic acid (topical),,,none,unmapped
+DDInter1520,Primaquine,,,none,unmapped
+DDInter1521,Primidone,,,none,unmapped
+DDInter1522,Probenecid,Compound::DB01032,Probenecid,normalized case-insensitive exact generic name,exact_name
+DDInter1523,Probucol,,,none,unmapped
+DDInter1524,Procainamide,,,none,unmapped
+DDInter1525,Procaine,,,none,unmapped
+DDInter1526,Procarbazine,,,none,unmapped
+DDInter1527,Prochlorperazine,,,none,unmapped
+DDInter1528,Procyclidine,,,none,unmapped
+DDInter1529,Progesterone,Compound::DB00396,Progesterone,normalized case-insensitive exact generic name,exact_name
+DDInter153,Azelastine,,,none,unmapped
+DDInter1530,Progesterone (topical),,,none,unmapped
+DDInter1531,Proguanil,,,none,unmapped
+DDInter1532,Promazine,Compound::DB00420,Promazine,normalized case-insensitive exact generic name,exact_name
+DDInter1533,Promethazine,Compound::DB01069,Promethazine,normalized case-insensitive exact generic name,exact_name
+DDInter1534,Propafenone,Compound::DB01182,Propafenone,normalized case-insensitive exact generic name,exact_name
+DDInter1535,Propantheline,,,none,unmapped
+DDInter1536,Proparacaine (ophthalmic),,,none,unmapped
+DDInter1537,Propiomazine,Compound::DB00777,Propiomazine,normalized case-insensitive exact generic name,exact_name
+DDInter1538,Propofol,,,none,unmapped
+DDInter1539,Propranolol,Compound::DB00571,Propranolol,normalized case-insensitive exact generic name,exact_name
+DDInter154,Azelastine (nasal),,,none,unmapped
+DDInter1540,Propylhexedrine (nasal),,,none,unmapped
+DDInter1541,Propylthiouracil,,,none,unmapped
+DDInter1542,Protein C,,,none,unmapped
+DDInter1543,Protriptyline,,,none,unmapped
+DDInter1544,Prucalopride,,,none,unmapped
+DDInter1545,Pseudoephedrine,,,none,unmapped
+DDInter1546,Pyrantel,,,none,unmapped
+DDInter1547,Pyrazinamide,,,none,unmapped
+DDInter1548,Pyridostigmine,,,none,unmapped
+DDInter1549,Pyridoxine,,,none,unmapped
+DDInter155,Azelastine (ophthalmic),,,none,unmapped
+DDInter1550,Pyrimethamine,,,none,unmapped
+DDInter1551,Pyrophosphoric acid,,,none,unmapped
+DDInter1552,Quazepam,,,none,unmapped
+DDInter1553,Quetiapine,,,none,unmapped
+DDInter1554,Quinapril,Compound::DB00881,Quinapril,normalized case-insensitive exact generic name,exact_name
+DDInter1555,Quinestrol,,,none,unmapped
+DDInter1556,Quinidine,,,none,unmapped
+DDInter1557,Quinine,,,none,unmapped
+DDInter1558,Quinupristin,,,none,unmapped
+DDInter1559,Rabeprazole,,,none,unmapped
+DDInter156,Azilsartan medoxomil,Compound::DB08822,Azilsartan medoxomil,normalized case-insensitive exact generic name,exact_name
+DDInter1560,Racepinephrine,,,none,unmapped
+DDInter1561,Radium Ra 223 dichloride,,,none,unmapped
+DDInter1562,Raloxifene,,,none,unmapped
+DDInter1563,Raltegravir,,,none,unmapped
+DDInter1564,Ramelteon,,,none,unmapped
+DDInter1565,Ramipril,Compound::DB00178,Ramipril,normalized case-insensitive exact generic name,exact_name
+DDInter1566,Ramucirumab,,,none,unmapped
+DDInter1568,Ranitidine,,,none,unmapped
+DDInter1569,Ranitidine (bismuth citrate),,,none,unmapped
+DDInter157,Azithromycin,,,none,unmapped
+DDInter1570,Ranolazine,Compound::DB00243,Ranolazine,normalized case-insensitive exact generic name,exact_name
+DDInter1571,Rapacuronium,,,none,unmapped
+DDInter1572,Rasagiline,,,none,unmapped
+DDInter1573,Rasburicase,,,none,unmapped
+DDInter1574,Ravulizumab,,,none,unmapped
+DDInter1575,Regadenoson,,,none,unmapped
+DDInter1576,Regorafenib,,,none,unmapped
+DDInter1577,Relugolix,,,none,unmapped
+DDInter1578,Remdesivir,,,none,unmapped
+DDInter1579,Remifentanil,,,none,unmapped
+DDInter158,Aztreonam,,,none,unmapped
+DDInter1580,Remimazolam,,,none,unmapped
+DDInter1581,Repaglinide,Compound::DB00912,Repaglinide,normalized case-insensitive exact generic name,exact_name
+DDInter1582,Reserpine,Compound::DB00206,Reserpine,normalized case-insensitive exact generic name,exact_name
+DDInter1583,Resorcinol (topical),,,none,unmapped
+DDInter1584,Retapamulin (topical),,,none,unmapped
+DDInter1585,Reteplase,,,none,unmapped
+DDInter1586,Revefenacin,,,none,unmapped
+DDInter1587,Ribavirin,,,none,unmapped
+DDInter1588,Ribociclib,,,none,unmapped
+DDInter1589,Rifabutin,,,none,unmapped
+DDInter159,Bacampicillin,,,none,unmapped
+DDInter1590,Rifampicin,,,none,unmapped
+DDInter1591,Rifamycin,,,none,unmapped
+DDInter1592,Rifapentine,,,none,unmapped
+DDInter1593,Rifaximin,,,none,unmapped
+DDInter1594,Rilonacept,,,none,unmapped
+DDInter1595,Rilpivirine,,,none,unmapped
+DDInter1596,Riluzole,,,none,unmapped
+DDInter1597,Rimantadine,,,none,unmapped
+DDInter1598,Rimegepant,,,none,unmapped
+DDInter1599,Rimexolone (ophthalmic),,,none,unmapped
+DDInter16,Acetohexamide,,,none,unmapped
+DDInter160,Bacillus calmette-guerin substrain tice live antigen,,,none,unmapped
+DDInter1600,Riociguat,,,none,unmapped
+DDInter1601,Ripretinib,,,none,unmapped
+DDInter1602,Risankizumab,,,none,unmapped
+DDInter1603,Risdiplam,,,none,unmapped
+DDInter1604,Risedronic acid,,,none,unmapped
+DDInter1605,Risperidone,,,none,unmapped
+DDInter1606,Ritodrine,Compound::DB00867,Ritodrine,normalized case-insensitive exact generic name,exact_name
+DDInter1607,Ritonavir,,,none,unmapped
+DDInter1608,Rituximab,,,none,unmapped
+DDInter1609,Rivaroxaban,,,none,unmapped
+DDInter161,Bacitracin,,,none,unmapped
+DDInter1610,Rivastigmine,,,none,unmapped
+DDInter1611,Rizatriptan,,,none,unmapped
+DDInter1612,Rocuronium,,,none,unmapped
+DDInter1613,Rofecoxib,,,none,unmapped
+DDInter1614,Roflumilast,,,none,unmapped
+DDInter1615,Rolapitant,,,none,unmapped
+DDInter1616,Romidepsin,,,none,unmapped
+DDInter1617,Romiplostim,,,none,unmapped
+DDInter1618,Romosozumab,,,none,unmapped
+DDInter1619,Ropinirole,,,none,unmapped
+DDInter162,Baclofen,Compound::DB00181,Baclofen,normalized case-insensitive exact generic name,exact_name
+DDInter1620,Ropivacaine,,,none,unmapped
+DDInter1621,Rosiglitazone,Compound::DB00412,Rosiglitazone,normalized case-insensitive exact generic name,exact_name
+DDInter1622,Rosuvastatin,Compound::DB01098,Rosuvastatin,normalized case-insensitive exact generic name,exact_name
+DDInter1623,Rotavirus vaccine,,,none,unmapped
+DDInter1624,Rotigotine,,,none,unmapped
+DDInter1625,Rubella virus vaccine,,,none,unmapped
+DDInter1626,Rucaparib,,,none,unmapped
+DDInter1627,Rufinamide,,,none,unmapped
+DDInter1628,Ruxolitinib,,,none,unmapped
+DDInter1629,Sacituzumab govitecan,,,none,unmapped
+DDInter163,Baloxavir marboxil,,,none,unmapped
+DDInter1630,Sacubitril,,,none,unmapped
+DDInter1631,Safinamide,,,none,unmapped
+DDInter1632,Salbutamol,Compound::DB01001,Salbutamol,normalized case-insensitive exact generic name,exact_name
+DDInter1633,Salicylic acid (sodium),,,none,unmapped
+DDInter1634,Salicylic acid (topical),,,none,unmapped
+DDInter1635,Salmeterol,Compound::DB00938,Salmeterol,normalized case-insensitive exact generic name,exact_name
+DDInter1636,Salmon calcitonin,,,none,unmapped
+DDInter1637,Salsalate,Compound::DB01399,Salsalate,normalized case-insensitive exact generic name,exact_name
+DDInter1638,Samarium (153Sm) lexidronam,,,none,unmapped
+DDInter1639,Sapropterin,,,none,unmapped
+DDInter164,Balsalazide,,,none,unmapped
+DDInter1640,Saquinavir,,,none,unmapped
+DDInter1641,Sarecycline,,,none,unmapped
+DDInter1642,Sargramostim,,,none,unmapped
+DDInter1643,Sarilumab,,,none,unmapped
+DDInter1644,Satralizumab,,,none,unmapped
+DDInter1645,Saw palmetto,,,none,unmapped
+DDInter1646,Saxagliptin,,,none,unmapped
+DDInter1647,Scopolamine,,,none,unmapped
+DDInter1648,Scopolamine (ophthalmic),,,none,unmapped
+DDInter1649,Secnidazole,,,none,unmapped
+DDInter165,Baricitinib,,,none,unmapped
+DDInter1650,Secobarbital,,,none,unmapped
+DDInter1651,Secretin human,,,none,unmapped
+DDInter1652,Secukinumab,,,none,unmapped
+DDInter1653,Selegiline,,,none,unmapped
+DDInter1654,Selenium,,,none,unmapped
+DDInter1655,Selenium Sulfide,,,none,unmapped
+DDInter1656,Selexipag,,,none,unmapped
+DDInter1657,Selinexor,,,none,unmapped
+DDInter1658,Selpercatinib,,,none,unmapped
+DDInter1659,Selumetinib,,,none,unmapped
+DDInter166,Basiliximab,,,none,unmapped
+DDInter1660,Semaglutide,,,none,unmapped
+DDInter1661,Sermorelin,,,none,unmapped
+DDInter1662,Sertraline,,,none,unmapped
+DDInter1663,Sevelamer,,,none,unmapped
+DDInter1664,Sevoflurane,,,none,unmapped
+DDInter1665,Sibutramine,,,none,unmapped
+DDInter1666,Sildenafil,,,none,unmapped
+DDInter1667,Silodosin,,,none,unmapped
+DDInter1668,Siltuximab,,,none,unmapped
+DDInter1669,Silver (topical),,,none,unmapped
+DDInter167,Bazedoxifene,,,none,unmapped
+DDInter1670,Silver nitrate (ophthalmic),,,none,unmapped
+DDInter1671,Silver nitrate (topical),,,none,unmapped
+DDInter1672,Silver sulfadiazine (topical),,,none,unmapped
+DDInter1673,Simeprevir,,,none,unmapped
+DDInter1674,Simethicone,,,none,unmapped
+DDInter1675,Simvastatin,Compound::DB00641,Simvastatin,normalized case-insensitive exact generic name,exact_name
+DDInter1676,Siponimod,,,none,unmapped
+DDInter1677,Sipuleucel-T,,,none,unmapped
+DDInter1678,Sirolimus,,,none,unmapped
+DDInter1679,Sitagliptin,Compound::DB01261,Sitagliptin,normalized case-insensitive exact generic name,exact_name
+DDInter168,Beclomethasone dipropionate,,,none,unmapped
+DDInter1680,"Smallpox (Vaccinia) Vaccine, Live",,,none,unmapped
+DDInter1681,Sodium acetate,,,none,unmapped
+DDInter1682,Sodium aurothiomalate,,,none,unmapped
+DDInter1683,Sodium bicarbonate,,,none,unmapped
+DDInter1684,Sodium cellulose phosphate,,,none,unmapped
+DDInter1685,Sodium chloride,,,none,unmapped
+DDInter1686,Sodium citrate,,,none,unmapped
+DDInter1687,Sodium ferric gluconate complex,,,none,unmapped
+DDInter1688,Sodium glycerophosphate,,,none,unmapped
+DDInter1689,Sodium iodide,,,none,unmapped
+DDInter169,Beclomethasone dipropionate (nasal),,,none,unmapped
+DDInter1690,Sodium oxybate,,,none,unmapped
+DDInter1691,"Sodium phosphate, monobasic",,,none,unmapped
+DDInter1692,"Sodium phosphate, monobasic (p32)",,,none,unmapped
+DDInter1693,Sodium sulfate,,,none,unmapped
+DDInter1694,Sodium zirconium cyclosilicate,,,none,unmapped
+DDInter1695,Sofosbuvir,,,none,unmapped
+DDInter1696,Solifenacin,Compound::DB01591,Solifenacin,normalized case-insensitive exact generic name,exact_name
+DDInter1697,Solriamfetol,,,none,unmapped
+DDInter1698,Somapacitan,,,none,unmapped
+DDInter1699,Somatotropin,,,none,unmapped
+DDInter17,Acetohydroxamic acid,,,none,unmapped
+DDInter170,Bedaquiline,,,none,unmapped
+DDInter1700,Somatrem,,,none,unmapped
+DDInter1701,Sonidegib,,,none,unmapped
+DDInter1702,Sorafenib,,,none,unmapped
+DDInter1703,Sorbitol,,,none,unmapped
+DDInter1704,Sotalol,Compound::DB00489,Sotalol,normalized case-insensitive exact generic name,exact_name
+DDInter1705,Sparfloxacin,,,none,unmapped
+DDInter1706,Spectinomycin,,,none,unmapped
+DDInter1707,Spironolactone,Compound::DB00421,Spironolactone,normalized case-insensitive exact generic name,exact_name
+DDInter1708,St. John's Wort,,,none,unmapped
+DDInter1709,Stanozolol,,,none,unmapped
+DDInter171,Belantamab mafodotin,,,none,unmapped
+DDInter1710,Stavudine,,,none,unmapped
+DDInter1711,Stiripentol,,,none,unmapped
+DDInter1712,Streptokinase,,,none,unmapped
+DDInter1713,Streptomycin,,,none,unmapped
+DDInter1714,Streptozocin,,,none,unmapped
+DDInter1715,Strontium chloride Sr-89,,,none,unmapped
+DDInter1716,Succinylcholine,,,none,unmapped
+DDInter1717,Sucralfate,,,none,unmapped
+DDInter1718,Sufentanil,,,none,unmapped
+DDInter1719,Sugammadex,,,none,unmapped
+DDInter172,Belatacept,,,none,unmapped
+DDInter1720,Sulfacetamide (ophthalmic),,,none,unmapped
+DDInter1721,Sulfadiazine,,,none,unmapped
+DDInter1722,Sulfadoxine,,,none,unmapped
+DDInter1723,Sulfamethizole,,,none,unmapped
+DDInter1724,Sulfamethoxazole,,,none,unmapped
+DDInter1725,Sulfasalazine,,,none,unmapped
+DDInter1726,Sulfinpyrazone,,,none,unmapped
+DDInter1727,Sulfisoxazole,,,none,unmapped
+DDInter1729,Sulindac,,,none,unmapped
+DDInter173,Belimumab,,,none,unmapped
+DDInter1730,Sumatriptan,,,none,unmapped
+DDInter1731,Sunitinib,,,none,unmapped
+DDInter1732,Suprofen (ophthalmic),,,none,unmapped
+DDInter1733,Suvorexant,,,none,unmapped
+DDInter1734,Tacrine,,,none,unmapped
+DDInter1735,Tacrolimus,,,none,unmapped
+DDInter1736,Tadalafil,,,none,unmapped
+DDInter1737,Tafamidis,,,none,unmapped
+DDInter1738,Tafasitamab,,,none,unmapped
+DDInter1739,Tafenoquine,,,none,unmapped
+DDInter174,Belinostat,,,none,unmapped
+DDInter1741,Tagraxofusp,,,none,unmapped
+DDInter1742,Talazoparib,,,none,unmapped
+DDInter1743,Talimogene laherparepvec,,,none,unmapped
+DDInter1744,Tamoxifen,,,none,unmapped
+DDInter1745,Tamsulosin,Compound::DB00706,Tamsulosin,normalized case-insensitive exact generic name,exact_name
+DDInter1746,Tapentadol,,,none,unmapped
+DDInter1747,Tasimelteon,,,none,unmapped
+DDInter1748,Tazarotene,,,none,unmapped
+DDInter1749,Tazarotene (topical),,,none,unmapped
+DDInter175,Belladonna,,,none,unmapped
+DDInter1750,Tazemetostat,,,none,unmapped
+DDInter1752,Tedizolid,,,none,unmapped
+DDInter1753,Teduglutide,,,none,unmapped
+DDInter1754,Tegaserod,,,none,unmapped
+DDInter1755,Telaprevir,,,none,unmapped
+DDInter1756,Telavancin,,,none,unmapped
+DDInter1757,Telbivudine,,,none,unmapped
+DDInter1758,Telithromycin,,,none,unmapped
+DDInter1759,Telmisartan,Compound::DB00966,Telmisartan,normalized case-insensitive exact generic name,exact_name
+DDInter176,Bempedoic acid,,,none,unmapped
+DDInter1760,Telotristat ethyl,,,none,unmapped
+DDInter1761,Temazepam,,,none,unmapped
+DDInter1762,Temozolomide,,,none,unmapped
+DDInter1763,Temsirolimus,,,none,unmapped
+DDInter1764,Tenecteplase,,,none,unmapped
+DDInter1765,Teniposide,,,none,unmapped
+DDInter1766,Teprotumumab,,,none,unmapped
+DDInter1767,Terazosin,Compound::DB01162,Terazosin,normalized case-insensitive exact generic name,exact_name
+DDInter1768,Terbinafine,Compound::DB00857,Terbinafine,normalized case-insensitive exact generic name,exact_name
+DDInter1769,Terbutaline,,,none,unmapped
+DDInter177,Benazepril,Compound::DB00542,Benazepril,normalized case-insensitive exact generic name,exact_name
+DDInter1770,Terfenadine,,,none,unmapped
+DDInter1771,Teriflunomide,,,none,unmapped
+DDInter1772,Teriparatide,,,none,unmapped
+DDInter1773,Tesamorelin,,,none,unmapped
+DDInter1774,Testolactone,Compound::DB00894,Testolactone,normalized case-insensitive exact generic name,exact_name
+DDInter1775,Testosterone,Compound::DB00624,Testosterone,normalized case-insensitive exact generic name,exact_name
+DDInter1776,Testosterone (topical),,,none,unmapped
+DDInter1778,Tetrabenazine,,,none,unmapped
+DDInter1779,Tetracaine,,,none,unmapped
+DDInter178,Bendamustine,,,none,unmapped
+DDInter1780,Tetracaine (ophthalmic),,,none,unmapped
+DDInter1781,Tetracaine (topical),,,none,unmapped
+DDInter1782,Tetracosactide,,,none,unmapped
+DDInter1783,Tetracycline,,,none,unmapped
+DDInter1784,Tetracycline (topical),,,none,unmapped
+DDInter1785,Tetraferric tricitrate decahydrate,,,none,unmapped
+DDInter1786,Tetrofosmin,,,none,unmapped
+DDInter1787,Tetryzoline (nasal),,,none,unmapped
+DDInter1788,Tetryzoline (ophthalmic),,,none,unmapped
+DDInter1789,Thalidomide,,,none,unmapped
+DDInter179,Bendroflumethiazide,Compound::DB00436,Bendroflumethiazide,normalized case-insensitive exact generic name,exact_name
+DDInter1790,Thallous Chloride,,,none,unmapped
+DDInter1791,Theophylline,,,none,unmapped
+DDInter1792,Thiabendazole,,,none,unmapped
+DDInter1793,Thiethylperazine,,,none,unmapped
+DDInter1794,Thimerosal (topical),,,none,unmapped
+DDInter1795,Thiopental,,,none,unmapped
+DDInter1796,Thioridazine,,,none,unmapped
+DDInter1797,Thiotepa,,,none,unmapped
+DDInter1798,Thiothixene,,,none,unmapped
+DDInter1799,"Thyroid, porcine",,,none,unmapped
+DDInter18,Acetylcholine,,,none,unmapped
+DDInter180,Benzalkonium (topical),,,none,unmapped
+DDInter1800,Thyrotropin alfa,,,none,unmapped
+DDInter1801,Tiagabine,,,none,unmapped
+DDInter1802,Ticagrelor,Compound::DB08816,Ticagrelor,normalized case-insensitive exact generic name,exact_name
+DDInter1803,Ticarcillin,,,none,unmapped
+DDInter1804,Ticlopidine,Compound::DB00208,Ticlopidine,normalized case-insensitive exact generic name,exact_name
+DDInter1805,Tigecycline,,,none,unmapped
+DDInter1806,Tildrakizumab,,,none,unmapped
+DDInter1807,Tilmanocept,,,none,unmapped
+DDInter1808,Tiludronic acid,,,none,unmapped
+DDInter1809,Timolol,Compound::DB00373,Timolol,normalized case-insensitive exact generic name,exact_name
+DDInter181,Benzatropine,,,none,unmapped
+DDInter1810,Timolol (ophthalmic),,,none,unmapped
+DDInter1811,Tinidazole,,,none,unmapped
+DDInter1812,Tinzaparin,,,none,unmapped
+DDInter1813,Tioconazole,,,none,unmapped
+DDInter1814,Tioguanine,,,none,unmapped
+DDInter1815,Tiotropium,,,none,unmapped
+DDInter1816,Tipiracil,,,none,unmapped
+DDInter1817,Tipranavir,,,none,unmapped
+DDInter1818,Tirofiban,Compound::DB00775,Tirofiban,normalized case-insensitive exact generic name,exact_name
+DDInter1819,Tisagenlecleucel,,,none,unmapped
+DDInter182,Benzhydrocodone,,,none,unmapped
+DDInter1820,Tivozanib,,,none,unmapped
+DDInter1821,Tizanidine,Compound::DB00697,Tizanidine,normalized case-insensitive exact generic name,exact_name
+DDInter1822,Tobramycin,,,none,unmapped
+DDInter1823,Tocainide,,,none,unmapped
+DDInter1824,Tocilizumab,,,none,unmapped
+DDInter1825,Tofacitinib,,,none,unmapped
+DDInter1826,Tolazamide,Compound::DB00839,Tolazamide,normalized case-insensitive exact generic name,exact_name
+DDInter1827,Tolazoline,,,none,unmapped
+DDInter1828,Tolbutamide,Compound::DB01124,Tolbutamide,normalized case-insensitive exact generic name,exact_name
+DDInter1829,Tolcapone,,,none,unmapped
+DDInter183,Benznidazole,,,none,unmapped
+DDInter1830,Tolevamer,,,none,unmapped
+DDInter1831,Tolmetin,,,none,unmapped
+DDInter1832,Tolterodine,Compound::DB01036,Tolterodine,normalized case-insensitive exact generic name,exact_name
+DDInter1833,Tolvaptan,,,none,unmapped
+DDInter1834,Topiramate,,,none,unmapped
+DDInter1835,Topotecan,,,none,unmapped
+DDInter1836,Torasemide,Compound::DB00214,Torasemide,normalized case-insensitive exact generic name,exact_name
+DDInter1837,Toremifene,,,none,unmapped
+DDInter1838,Tositumomab,,,none,unmapped
+DDInter1839,Tositumomab (I-131),,,none,unmapped
+DDInter184,Benzocaine (topical),,,none,unmapped
+DDInter1840,Trabectedin,,,none,unmapped
+DDInter1841,Tramadol,,,none,unmapped
+DDInter1842,Trametinib,,,none,unmapped
+DDInter1843,Trandolapril,Compound::DB00519,Trandolapril,normalized case-insensitive exact generic name,exact_name
+DDInter1844,Tranexamic acid,,,none,unmapped
+DDInter1845,Tranylcypromine,,,none,unmapped
+DDInter1846,Trastuzumab,,,none,unmapped
+DDInter1847,Trastuzumab deruxtecan,,,none,unmapped
+DDInter1848,Trastuzumab emtansine,,,none,unmapped
+DDInter1849,Travoprost,,,none,unmapped
+DDInter185,Benzonatate,,,none,unmapped
+DDInter1851,Trazodone,,,none,unmapped
+DDInter1852,Treprostinil,Compound::DB00374,Treprostinil,normalized case-insensitive exact generic name,exact_name
+DDInter1853,Tretinoin,,,none,unmapped
+DDInter1854,Tretinoin (topical),,,none,unmapped
+DDInter1855,Triamcinolone,,,none,unmapped
+DDInter1856,Triamcinolone (nasal),,,none,unmapped
+DDInter1857,Triamcinolone (ophthalmic),,,none,unmapped
+DDInter1858,Triamcinolone (topical),,,none,unmapped
+DDInter1859,Triamterene,Compound::DB00384,Triamterene,normalized case-insensitive exact generic name,exact_name
+DDInter186,Benzoyl peroxide (topical),,,none,unmapped
+DDInter1860,Triazolam,,,none,unmapped
+DDInter1861,Trichlormethiazide,Compound::DB01021,Trichlormethiazide,normalized case-insensitive exact generic name,exact_name
+DDInter1862,Trichophyton mentagrophytes,,,none,unmapped
+DDInter1863,Triclabendazole,,,none,unmapped
+DDInter1864,Triethylenetetramine,,,none,unmapped
+DDInter1865,Trifarotene (topical),,,none,unmapped
+DDInter1866,Trifluoperazine,,,none,unmapped
+DDInter1867,Triflupromazine,Compound::DB00508,Triflupromazine,normalized case-insensitive exact generic name,exact_name
+DDInter1868,Trifluridine,,,none,unmapped
+DDInter1869,Triheptanoin,,,none,unmapped
+DDInter187,Benzphetamine,Compound::DB00865,Benzphetamine,normalized case-insensitive exact generic name,exact_name
+DDInter1870,Trihexyphenidyl,,,none,unmapped
+DDInter1871,Trimethadione,,,none,unmapped
+DDInter1872,Trimethaphan,Compound::DB01116,Trimethaphan,normalized case-insensitive exact generic name,exact_name
+DDInter1873,Trimethobenzamide,Compound::DB00662,Trimethobenzamide,normalized case-insensitive exact generic name,exact_name
+DDInter1874,Trimethoprim,,,none,unmapped
+DDInter1875,Trimetrexate,,,none,unmapped
+DDInter1876,Trimipramine,Compound::DB00726,Trimipramine,normalized case-insensitive exact generic name,exact_name
+DDInter1877,Trioxsalen,,,none,unmapped
+DDInter1878,Tripelennamine,Compound::DB00792,Tripelennamine,normalized case-insensitive exact generic name,exact_name
+DDInter1879,Triprolidine,,,none,unmapped
+DDInter188,Benzthiazide,Compound::DB00562,Benzthiazide,normalized case-insensitive exact generic name,exact_name
+DDInter1880,Triptorelin,,,none,unmapped
+DDInter1881,Troglitazone,,,none,unmapped
+DDInter1882,Troleandomycin,,,none,unmapped
+DDInter1883,Tromethamine,,,none,unmapped
+DDInter1884,Tropicamide,,,none,unmapped
+DDInter1885,Tropicamide (ophthalmic),,,none,unmapped
+DDInter1886,Trospium,,,none,unmapped
+DDInter1887,Trovafloxacin,,,none,unmapped
+DDInter1888,Tryptophan,,,none,unmapped
+DDInter1889,Tuberculin purified protein derivative,,,none,unmapped
+DDInter189,Benzylpenicillin,,,none,unmapped
+DDInter1890,Tubocurarine,,,none,unmapped
+DDInter1891,Tucatinib,,,none,unmapped
+DDInter1892,Turmeric,,,none,unmapped
+DDInter1893,Typhoid vaccine (inactivated),,,none,unmapped
+DDInter1894,Typhoid vaccine (live),,,none,unmapped
+DDInter1895,Tyropanoic acid,,,none,unmapped
+DDInter1896,Ubrogepant,,,none,unmapped
+DDInter1897,Ulipristal,,,none,unmapped
+DDInter1898,Ulobetasol (topical),,,none,unmapped
+DDInter1899,Umeclidinium,,,none,unmapped
+DDInter19,Acetylcysteine,,,none,unmapped
+DDInter190,Benzylpenicillin (potassium),,,none,unmapped
+DDInter1901,Upadacitinib,,,none,unmapped
+DDInter1902,Uracil mustard,,,none,unmapped
+DDInter1903,Urea,,,none,unmapped
+DDInter1904,Urofollitropin,,,none,unmapped
+DDInter1905,Urokinase,,,none,unmapped
+DDInter1906,Ursodeoxycholic acid,,,none,unmapped
+DDInter1907,Ustekinumab,,,none,unmapped
+DDInter1908,Valaciclovir,,,none,unmapped
+DDInter1909,Valbenazine,,,none,unmapped
+DDInter191,Benzylpenicillin (sodium),,,none,unmapped
+DDInter1910,Valdecoxib,,,none,unmapped
+DDInter1911,Valerian,,,none,unmapped
+DDInter1912,Valganciclovir,,,none,unmapped
+DDInter1913,Valproic acid,,,none,unmapped
+DDInter1914,Valrubicin,,,none,unmapped
+DDInter1915,Valsartan,Compound::DB00177,Valsartan,normalized case-insensitive exact generic name,exact_name
+DDInter1916,Vancomycin,,,none,unmapped
+DDInter1917,Vandetanib,,,none,unmapped
+DDInter1918,Vardenafil,,,none,unmapped
+DDInter1919,Varenicline,,,none,unmapped
+DDInter192,Bepridil,Compound::DB01244,Bepridil,normalized case-insensitive exact generic name,exact_name
+DDInter1920,Varicella Zoster Vaccine (Recombinant),,,none,unmapped
+DDInter1921,Vasopressin,,,none,unmapped
+DDInter1922,Vecuronium,,,none,unmapped
+DDInter1923,Vedolizumab,,,none,unmapped
+DDInter1924,Velpatasvir,,,none,unmapped
+DDInter1925,Vemurafenib,,,none,unmapped
+DDInter1926,Venetoclax,,,none,unmapped
+DDInter1927,Venlafaxine,,,none,unmapped
+DDInter1928,Verapamil,Compound::DB00661,Verapamil,normalized case-insensitive exact generic name,exact_name
+DDInter1929,Verteporfin,,,none,unmapped
+DDInter193,Berotralstat,,,none,unmapped
+DDInter1930,Vibegron,,,none,unmapped
+DDInter1931,Vibrio cholerae CVD 103-HgR strain live antigen,,,none,unmapped
+DDInter1932,Vibrio cholerae CVD 103-HgR strain live antigen (live),,,none,unmapped
+DDInter1933,Vigabatrin,,,none,unmapped
+DDInter1934,Vilanterol,,,none,unmapped
+DDInter1935,Vilazodone,,,none,unmapped
+DDInter1936,Vinblastine,,,none,unmapped
+DDInter1937,Vincristine,,,none,unmapped
+DDInter1938,Vincristine (liposome),,,none,unmapped
+DDInter1939,Vinorelbine,,,none,unmapped
+DDInter194,Beta carotene,,,none,unmapped
+DDInter1940,Vismodegib,,,none,unmapped
+DDInter1941,Vitamin A,,,none,unmapped
+DDInter1942,Vitamin D,,,none,unmapped
+DDInter1943,Vitamin E,,,none,unmapped
+DDInter1944,Von Willebrand Factor Human,,,none,unmapped
+DDInter1945,Vorapaxar,,,none,unmapped
+DDInter1946,Voriconazole,,,none,unmapped
+DDInter1947,Vorinostat,,,none,unmapped
+DDInter1948,Vortioxetine,,,none,unmapped
+DDInter1949,Voxelotor,,,none,unmapped
+DDInter195,Betamethasone,,,none,unmapped
+DDInter1950,Voxilaprevir,,,none,unmapped
+DDInter1951,Warfarin,,,none,unmapped
+DDInter1952,Xylometazoline (nasal),,,none,unmapped
+DDInter1953,Yellow Fever Vaccine,,,none,unmapped
+DDInter1954,Yohimbine,Compound::DB01392,Yohimbine,normalized case-insensitive exact generic name,exact_name
+DDInter1955,Zafirlukast,Compound::DB00549,Zafirlukast,normalized case-insensitive exact generic name,exact_name
+DDInter1956,Zalcitabine,,,none,unmapped
+DDInter1957,Zaleplon,,,none,unmapped
+DDInter1958,Zanamivir,,,none,unmapped
+DDInter1959,Zanubrutinib,,,none,unmapped
+DDInter196,Betamethasone (topical),,,none,unmapped
+DDInter1960,Ziconotide,,,none,unmapped
+DDInter1961,Zidovudine,,,none,unmapped
+DDInter1962,Zileuton,,,none,unmapped
+DDInter1963,Zinc acetate,,,none,unmapped
+DDInter1964,Zinc chloride,,,none,unmapped
+DDInter1965,Zinc gluconate,,,none,unmapped
+DDInter1966,Zinc sulfate,,,none,unmapped
+DDInter1967,Ziprasidone,,,none,unmapped
+DDInter1968,Zoledronic acid,,,none,unmapped
+DDInter1969,Zolmitriptan,,,none,unmapped
+DDInter197,Betaxolol,Compound::DB00195,Betaxolol,normalized case-insensitive exact generic name,exact_name
+DDInter1970,Zolpidem,,,none,unmapped
+DDInter1971,Zonisamide,,,none,unmapped
+DDInter1972,Zopiclone,,,none,unmapped
+DDInter198,Betaxolol (ophthalmic),,,none,unmapped
+DDInter199,Bethanechol,,,none,unmapped
+DDInter2,Abaloparatide,,,none,unmapped
+DDInter20,Acetylsalicylic acid,Compound::DB00945,Acetylsalicylic acid,normalized case-insensitive exact generic name,exact_name
+DDInter200,Betrixaban,,,none,unmapped
+DDInter201,Bevacizumab,,,none,unmapped
+DDInter202,Bexarotene,,,none,unmapped
+DDInter203,Bexarotene (topical),,,none,unmapped
+DDInter204,Bicalutamide,,,none,unmapped
+DDInter205,Bictegravir,,,none,unmapped
+DDInter206,Bifidobacterium longum infantis,,,none,unmapped
+DDInter207,Bimatoprost,,,none,unmapped
+DDInter21,Acitretin,,,none,unmapped
+DDInter210,Binimetinib,,,none,unmapped
+DDInter211,Biperiden,,,none,unmapped
+DDInter212,Bisacodyl,,,none,unmapped
+DDInter213,Bismuth subcitrate potassium,,,none,unmapped
+DDInter214,Bismuth subgallate,,,none,unmapped
+DDInter215,Bismuth subsalicylate,,,none,unmapped
+DDInter216,Bisoprolol,Compound::DB00612,Bisoprolol,normalized case-insensitive exact generic name,exact_name
+DDInter217,Bivalirudin,,,none,unmapped
+DDInter219,Bleomycin,,,none,unmapped
+DDInter22,Aclidinium,,,none,unmapped
+DDInter220,Blinatumomab,,,none,unmapped
+DDInter221,Boceprevir,,,none,unmapped
+DDInter222,Bortezomib,Compound::DB00188,Bortezomib,normalized case-insensitive exact generic name,exact_name
+DDInter223,Bosentan,,,none,unmapped
+DDInter224,Bosutinib,,,none,unmapped
+DDInter225,Botulinum toxin type A,,,none,unmapped
+DDInter226,Botulinum Toxin Type B,,,none,unmapped
+DDInter227,Bremelanotide,,,none,unmapped
+DDInter228,Brentuximab vedotin,,,none,unmapped
+DDInter229,Bretylium,,,none,unmapped
+DDInter23,Acrivastine,,,none,unmapped
+DDInter230,Brexanolone,,,none,unmapped
+DDInter231,Brexpiprazole,,,none,unmapped
+DDInter232,Brexucabtagene autoleucel,,,none,unmapped
+DDInter233,Brigatinib,,,none,unmapped
+DDInter234,Brimonidine,Compound::DB00484,Brimonidine,normalized case-insensitive exact generic name,exact_name
+DDInter235,Brimonidine (ophthalmic),,,none,unmapped
+DDInter236,Brimonidine (topical),,,none,unmapped
+DDInter237,Brinzolamide,,,none,unmapped
+DDInter238,Brinzolamide (ophthalmic),,,none,unmapped
+DDInter239,Brivaracetam,,,none,unmapped
+DDInter24,Activated charcoal,,,none,unmapped
+DDInter240,Brodalumab,,,none,unmapped
+DDInter241,Bromfenac,,,none,unmapped
+DDInter242,Bromfenac (ophthalmic),,,none,unmapped
+DDInter243,Bromocriptine,Compound::DB01200,Bromocriptine,normalized case-insensitive exact generic name,exact_name
+DDInter244,Bromotheophylline,,,none,unmapped
+DDInter245,Brompheniramine,,,none,unmapped
+DDInter246,Budesonide,,,none,unmapped
+DDInter247,Budesonide (nasal),,,none,unmapped
+DDInter248,Bumetanide,Compound::DB00887,Bumetanide,normalized case-insensitive exact generic name,exact_name
+DDInter249,Bupivacaine,,,none,unmapped
+DDInter25,Acyclovir,,,none,unmapped
+DDInter250,Bupivacaine (liposome),,,none,unmapped
+DDInter251,Buprenorphine,,,none,unmapped
+DDInter252,Bupropion,,,none,unmapped
+DDInter253,Burosumab,,,none,unmapped
+DDInter254,Buspirone,,,none,unmapped
+DDInter255,Busulfan,,,none,unmapped
+DDInter256,Butabarbital,,,none,unmapped
+DDInter257,Butalbital,,,none,unmapped
+DDInter258,Butorphanol,,,none,unmapped
+DDInter259,Cabazitaxel,,,none,unmapped
+DDInter26,Acyclovir (topical),,,none,unmapped
+DDInter260,Cabergoline,,,none,unmapped
+DDInter261,Cabotegravir,,,none,unmapped
+DDInter262,Cabozantinib,,,none,unmapped
+DDInter263,Caffeine,,,none,unmapped
+DDInter264,Calaspargase pegol,,,none,unmapped
+DDInter265,Calcifediol,,,none,unmapped
+DDInter266,Calcipotriol,,,none,unmapped
+DDInter267,Calcipotriol (topical),,,none,unmapped
+DDInter268,Calcitriol,,,none,unmapped
+DDInter269,Calcitriol (topical),,,none,unmapped
+DDInter27,Adalimumab,,,none,unmapped
+DDInter270,Calcium acetate,,,none,unmapped
+DDInter271,Calcium carbonate,,,none,unmapped
+DDInter272,Calcium chloride,,,none,unmapped
+DDInter273,Calcium citrate,,,none,unmapped
+DDInter274,Calcium glubionate anhydrous,,,none,unmapped
+DDInter275,Calcium glucoheptonate,,,none,unmapped
+DDInter276,Calcium gluconate,,,none,unmapped
+DDInter277,Calcium glycerophosphate,,,none,unmapped
+DDInter278,Calcium lactate,,,none,unmapped
+DDInter279,Calcium Phosphate,,,none,unmapped
+DDInter28,Adapalene,,,none,unmapped
+DDInter280,Canagliflozin,,,none,unmapped
+DDInter281,Canakinumab,,,none,unmapped
+DDInter282,Candida albicans,,,none,unmapped
+DDInter283,Cangrelor,,,none,unmapped
+DDInter284,Cannabidiol,,,none,unmapped
+DDInter285,Capecitabine,,,none,unmapped
+DDInter286,Caplacizumab,,,none,unmapped
+DDInter287,Capmatinib,,,none,unmapped
+DDInter288,Capreomycin,,,none,unmapped
+DDInter289,Capromab pendetide,,,none,unmapped
+DDInter29,Adapalene (topical),,,none,unmapped
+DDInter291,Capsicum,,,none,unmapped
+DDInter292,Captopril,Compound::DB01197,Captopril,normalized case-insensitive exact generic name,exact_name
+DDInter293,Carbamazepine,,,none,unmapped
+DDInter294,Carbamoylcholine (ophthalmic),,,none,unmapped
+DDInter295,Carbenicillin,,,none,unmapped
+DDInter297,Carbinoxamine,,,none,unmapped
+DDInter298,Carboplatin,,,none,unmapped
+DDInter299,Carfilzomib,,,none,unmapped
+DDInter3,Abametapir (topical),,,none,unmapped
+DDInter30,Adefovir dipivoxil,,,none,unmapped
+DDInter300,Cariprazine,,,none,unmapped
+DDInter301,Carisoprodol,,,none,unmapped
+DDInter302,Carmustine,,,none,unmapped
+DDInter303,Carteolol,Compound::DB00521,Carteolol,normalized case-insensitive exact generic name,exact_name
+DDInter304,Carteolol (ophthalmic),,,none,unmapped
+DDInter305,Carvedilol,Compound::DB01136,Carvedilol,normalized case-insensitive exact generic name,exact_name
+DDInter306,Caspofungin,,,none,unmapped
+DDInter307,Castor oil,,,none,unmapped
+DDInter308,Cedazuridine,,,none,unmapped
+DDInter309,Cefaclor,,,none,unmapped
+DDInter31,Adenosine,,,none,unmapped
+DDInter310,Cefadroxil,,,none,unmapped
+DDInter311,Cefalotin,,,none,unmapped
+DDInter312,Cefamandole,,,none,unmapped
+DDInter313,Cefapirin,,,none,unmapped
+DDInter314,Cefazolin,,,none,unmapped
+DDInter315,Cefdinir,,,none,unmapped
+DDInter316,Cefditoren,,,none,unmapped
+DDInter317,Cefepime,,,none,unmapped
+DDInter318,Cefiderocol,,,none,unmapped
+DDInter319,Cefixime,,,none,unmapped
+DDInter32,Afatinib,,,none,unmapped
+DDInter320,Cefmetazole,,,none,unmapped
+DDInter321,Cefonicid,,,none,unmapped
+DDInter322,Cefoperazone,,,none,unmapped
+DDInter323,Cefotaxime,,,none,unmapped
+DDInter324,Cefotetan,,,none,unmapped
+DDInter325,Cefoxitin,,,none,unmapped
+DDInter326,Cefpodoxime,,,none,unmapped
+DDInter327,Cefprozil,,,none,unmapped
+DDInter328,Cefradine,,,none,unmapped
+DDInter329,Ceftaroline fosamil,,,none,unmapped
+DDInter33,Aflibercept,,,none,unmapped
+DDInter330,Ceftazidime,,,none,unmapped
+DDInter331,Ceftibuten,,,none,unmapped
+DDInter332,Ceftizoxime,,,none,unmapped
+DDInter333,Ceftolozane,,,none,unmapped
+DDInter334,Ceftriaxone,,,none,unmapped
+DDInter335,Cefuroxime,,,none,unmapped
+DDInter336,Celecoxib,,,none,unmapped
+DDInter337,Cemiplimab,,,none,unmapped
+DDInter338,Cenobamate,,,none,unmapped
+DDInter339,Cephalexin,,,none,unmapped
+DDInter34,Agalsidase beta,,,none,unmapped
+DDInter340,Ceritinib,,,none,unmapped
+DDInter341,Cerivastatin,,,none,unmapped
+DDInter342,Certolizumab pegol,,,none,unmapped
+DDInter343,Cetirizine,,,none,unmapped
+DDInter344,Cetuximab,,,none,unmapped
+DDInter345,Cetylpyridinium (topical),,,none,unmapped
+DDInter346,Cevimeline,,,none,unmapped
+DDInter347,Chamomile,,,none,unmapped
+DDInter348,Chenodeoxycholic acid,,,none,unmapped
+DDInter349,Chloral hydrate,,,none,unmapped
+DDInter35,Albendazole,,,none,unmapped
+DDInter350,Chlorambucil,,,none,unmapped
+DDInter351,Chloramphenicol,,,none,unmapped
+DDInter352,Chloramphenicol (ophthalmic),,,none,unmapped
+DDInter353,Chloramphenicol (otic),,,none,unmapped
+DDInter354,Chlorcyclizine,,,none,unmapped
+DDInter355,Chlordiazepoxide,,,none,unmapped
+DDInter356,Chlorhexidine,,,none,unmapped
+DDInter357,Chlormezanone,,,none,unmapped
+DDInter358,Chloroprocaine,,,none,unmapped
+DDInter359,Chloroquine,,,none,unmapped
+DDInter36,Albiglutide,,,none,unmapped
+DDInter360,Chlorothiazide,Compound::DB00880,Chlorothiazide,normalized case-insensitive exact generic name,exact_name
+DDInter361,Chlorphenesin,Compound::DB00856,Chlorphenesin,normalized case-insensitive exact generic name,exact_name
+DDInter362,Chlorpheniramine,,,none,unmapped
+DDInter363,Chlorpromazine,Compound::DB00477,Chlorpromazine,normalized case-insensitive exact generic name,exact_name
+DDInter364,Chlorpropamide,Compound::DB00672,Chlorpropamide,normalized case-insensitive exact generic name,exact_name
+DDInter365,Chlorthalidone,Compound::DB00310,Chlorthalidone,normalized case-insensitive exact generic name,exact_name
+DDInter366,Chlorzoxazone,,,none,unmapped
+DDInter367,Cholecalciferol,,,none,unmapped
+DDInter368,Cholestyramine,,,none,unmapped
+DDInter369,Cholic Acid,,,none,unmapped
+DDInter37,Alclometasone (topical),,,none,unmapped
+DDInter370,Choline salicylate,,,none,unmapped
+DDInter371,Chondroitin sulfate,,,none,unmapped
+DDInter372,Chorionic Gonadotropin (Human),,,none,unmapped
+DDInter373,Chromic chloride,,,none,unmapped
+DDInter374,Chromium picolinate,,,none,unmapped
+DDInter375,Ciclesonide,,,none,unmapped
+DDInter376,Ciclesonide (nasal),,,none,unmapped
+DDInter377,Ciclopirox,,,none,unmapped
+DDInter378,Cidofovir,,,none,unmapped
+DDInter379,Cilostazol,,,none,unmapped
+DDInter38,Aldesleukin,,,none,unmapped
+DDInter380,Cimetidine,,,none,unmapped
+DDInter381,Cinacalcet,Compound::DB01012,Cinacalcet,normalized case-insensitive exact generic name,exact_name
+DDInter382,Cinchocaine (topical),,,none,unmapped
+DDInter383,Cinoxacin,,,none,unmapped
+DDInter384,Ciprofloxacin,,,none,unmapped
+DDInter385,Cisapride,,,none,unmapped
+DDInter386,Cisatracurium,,,none,unmapped
+DDInter387,Cisplatin,,,none,unmapped
+DDInter388,Citalopram,,,none,unmapped
+DDInter39,Alectinib,,,none,unmapped
+DDInter390,Citric acid,,,none,unmapped
+DDInter391,Citrus bioflavonoids,,,none,unmapped
+DDInter392,Cladribine,,,none,unmapped
+DDInter393,Clarithromycin,,,none,unmapped
+DDInter394,Clavulanic acid,,,none,unmapped
+DDInter395,Clemastine,,,none,unmapped
+DDInter396,Clevidipine,Compound::DB04920,Clevidipine,normalized case-insensitive exact generic name,exact_name
+DDInter397,Clidinium,,,none,unmapped
+DDInter398,Clindamycin,,,none,unmapped
+DDInter399,Clindamycin (topical),,,none,unmapped
+DDInter4,Abarelix,,,none,unmapped
+DDInter40,Alefacept,,,none,unmapped
+DDInter400,Clioquinol (topical),,,none,unmapped
+DDInter401,Clobazam,,,none,unmapped
+DDInter402,Clobetasol,,,none,unmapped
+DDInter403,Clobetasol (topical),,,none,unmapped
+DDInter404,Clocortolone (topical),,,none,unmapped
+DDInter405,Clofarabine,,,none,unmapped
+DDInter406,Clofazimine,,,none,unmapped
+DDInter407,Clofedanol,,,none,unmapped
+DDInter408,Clofibrate,Compound::DB00636,Clofibrate,normalized case-insensitive exact generic name,exact_name
+DDInter409,Clomifene,,,none,unmapped
+DDInter41,Alemtuzumab,,,none,unmapped
+DDInter410,Clomipramine,,,none,unmapped
+DDInter411,Clonazepam,Compound::DB01068,Clonazepam,normalized case-insensitive exact generic name,exact_name
+DDInter412,Clonidine,Compound::DB00575,Clonidine,normalized case-insensitive exact generic name,exact_name
+DDInter413,Clopidogrel,Compound::DB00758,Clopidogrel,normalized case-insensitive exact generic name,exact_name
+DDInter414,Clorazepic acid,,,none,unmapped
+DDInter415,Clostridium tetani toxoid antigen (formaldehyde inactivated),,,none,unmapped
+DDInter416,Clotrimazole,,,none,unmapped
+DDInter417,Clove,,,none,unmapped
+DDInter418,Cloxacillin,,,none,unmapped
+DDInter419,Clozapine,,,none,unmapped
+DDInter42,Alendronic acid,,,none,unmapped
+DDInter420,Coagulation Factor IX Human,,,none,unmapped
+DDInter421,Coagulation factor VIIa Recombinant Human,,,none,unmapped
+DDInter422,Coagulation factor X human,,,none,unmapped
+DDInter423,Coal tar (topical),,,none,unmapped
+DDInter424,Cobicistat,,,none,unmapped
+DDInter425,Cobimetinib,,,none,unmapped
+DDInter426,Cocaine (nasal),,,none,unmapped
+DDInter427,Cocaine (topical),,,none,unmapped
+DDInter428,Coccidioides immitis spherule,,,none,unmapped
+DDInter429,Codeine,,,none,unmapped
+DDInter43,Alfentanil,,,none,unmapped
+DDInter430,Coenzyme M,,,none,unmapped
+DDInter431,Colchicine,,,none,unmapped
+DDInter432,Colesevelam,,,none,unmapped
+DDInter433,Colestipol,,,none,unmapped
+DDInter434,Colistimethate,,,none,unmapped
+DDInter435,Collagenase clostridium histolyticum,,,none,unmapped
+DDInter436,Collagenase clostridium histolyticum (topical),,,none,unmapped
+DDInter437,Conestat alfa,,,none,unmapped
+DDInter438,Conivaptan,Compound::DB00872,Conivaptan,normalized case-insensitive exact generic name,exact_name
+DDInter439,Conjugated estrogens,,,none,unmapped
+DDInter44,Alfuzosin,Compound::DB00346,Alfuzosin,normalized case-insensitive exact generic name,exact_name
+DDInter440,Conjugated estrogens (topical),,,none,unmapped
+DDInter441,Copanlisib,,,none,unmapped
+DDInter442,Copper gluconate,,,none,unmapped
+DDInter443,Copper oxodotreotide Cu-64,,,none,unmapped
+DDInter445,Corticotropin,,,none,unmapped
+DDInter446,Cranberry,,,none,unmapped
+DDInter447,Creatine,,,none,unmapped
+DDInter448,Crizotinib,,,none,unmapped
+DDInter449,Cromoglicic acid,,,none,unmapped
+DDInter45,Alimemazine,Compound::DB01246,Alimemazine,normalized case-insensitive exact generic name,exact_name
+DDInter451,Cyanocobalamin,,,none,unmapped
+DDInter452,Cyclandelate,,,none,unmapped
+DDInter453,Cyclizine,Compound::DB01176,Cyclizine,normalized case-insensitive exact generic name,exact_name
+DDInter454,Cyclobenzaprine,,,none,unmapped
+DDInter455,Cyclopentolate (ophthalmic),,,none,unmapped
+DDInter456,Cyclophosphamide,,,none,unmapped
+DDInter457,Cycloserine,,,none,unmapped
+DDInter458,Cyclosporine,,,none,unmapped
+DDInter459,Cyproheptadine,,,none,unmapped
+DDInter46,Aliskiren,,,none,unmapped
+DDInter460,Cytarabine,,,none,unmapped
+DDInter461,Cytarabine (liposomal),,,none,unmapped
+DDInter462,Dabrafenib,,,none,unmapped
+DDInter463,Dacarbazine,,,none,unmapped
+DDInter464,Daclatasvir,,,none,unmapped
+DDInter465,Dacomitinib,,,none,unmapped
+DDInter466,Dactinomycin,,,none,unmapped
+DDInter467,Dalbavancin,,,none,unmapped
+DDInter468,Dalfampridine,,,none,unmapped
+DDInter469,Dalfopristin,,,none,unmapped
+DDInter47,Alitretinoin (topical),,,none,unmapped
+DDInter470,Dalteparin,,,none,unmapped
+DDInter471,Danaparoid,,,none,unmapped
+DDInter472,Danazol,,,none,unmapped
+DDInter473,Dantrolene,,,none,unmapped
+DDInter474,Dapagliflozin,,,none,unmapped
+DDInter475,Dapsone,,,none,unmapped
+DDInter476,Dapsone (topical),,,none,unmapped
+DDInter477,Daptomycin,,,none,unmapped
+DDInter478,Daratumumab,,,none,unmapped
+DDInter479,Darbepoetin alfa,,,none,unmapped
+DDInter48,Allopurinol,,,none,unmapped
+DDInter480,Darifenacin,,,none,unmapped
+DDInter481,Darolutamide,,,none,unmapped
+DDInter482,Darunavir,,,none,unmapped
+DDInter483,Dasabuvir,,,none,unmapped
+DDInter484,Dasatinib,,,none,unmapped
+DDInter485,Daunorubicin,,,none,unmapped
+DDInter486,Daunorubicin (liposomal),,,none,unmapped
+DDInter487,Decitabine,,,none,unmapped
+DDInter488,Deferasirox,Compound::DB01609,Deferasirox,normalized case-insensitive exact generic name,exact_name
+DDInter489,Deferiprone,,,none,unmapped
+DDInter49,Almotriptan,,,none,unmapped
+DDInter490,Deferoxamine,,,none,unmapped
+DDInter491,Defibrotide,,,none,unmapped
+DDInter492,Deflazacort,,,none,unmapped
+DDInter493,Degarelix,,,none,unmapped
+DDInter494,Dehydrocholic acid,,,none,unmapped
+DDInter495,Delafloxacin,,,none,unmapped
+DDInter496,Delavirdine,,,none,unmapped
+DDInter497,Demecarium (ophthalmic),,,none,unmapped
+DDInter498,Demeclocycline,,,none,unmapped
+DDInter499,Denileukin diftitox,,,none,unmapped
+DDInter5,Abatacept,,,none,unmapped
+DDInter50,Aloe Vera Leaf,,,none,unmapped
+DDInter500,Denosumab,,,none,unmapped
+DDInter501,Deoxycholic acid,,,none,unmapped
+DDInter502,Deserpidine,Compound::DB01089,Deserpidine,normalized case-insensitive exact generic name,exact_name
+DDInter503,Desflurane,,,none,unmapped
+DDInter504,Desipramine,Compound::DB01151,Desipramine,normalized case-insensitive exact generic name,exact_name
+DDInter505,Desirudin,,,none,unmapped
+DDInter506,Desloratadine,,,none,unmapped
+DDInter507,Desmopressin,,,none,unmapped
+DDInter508,Desogestrel,,,none,unmapped
+DDInter509,Desonide (topical),,,none,unmapped
+DDInter51,Alogliptin,Compound::DB06203,Alogliptin,normalized case-insensitive exact generic name,exact_name
+DDInter510,Desoximetasone (topical),,,none,unmapped
+DDInter511,Desvenlafaxine,,,none,unmapped
+DDInter512,Deutetrabenazine,,,none,unmapped
+DDInter513,Dexamethasone,,,none,unmapped
+DDInter514,Dexamethasone (nasal),,,none,unmapped
+DDInter515,Dexamethasone (ophthalmic),,,none,unmapped
+DDInter516,Dexamethasone (topical),,,none,unmapped
+DDInter517,Dexbrompheniramine,,,none,unmapped
+DDInter518,Dexfenfluramine,,,none,unmapped
+DDInter519,Dexlansoprazole,,,none,unmapped
+DDInter52,Alosetron,,,none,unmapped
+DDInter520,Dexmedetomidine,,,none,unmapped
+DDInter521,Dexmethylphenidate,,,none,unmapped
+DDInter522,Dexrazoxane,,,none,unmapped
+DDInter523,Dextran (-1),,,none,unmapped
+DDInter524,Dextran (high molecular weight),,,none,unmapped
+DDInter525,Dextran (low molecular weight),,,none,unmapped
+DDInter526,Dextroamphetamine,Compound::DB01576,Dextroamphetamine,normalized case-insensitive exact generic name,exact_name
+DDInter527,Dextromethorphan,,,none,unmapped
+DDInter528,Dextropropoxyphene,Compound::DB00647,Dextropropoxyphene,normalized case-insensitive exact generic name,exact_name
+DDInter529,"Dextrose, unspecified form",,,none,unmapped
+DDInter53,Alpelisib,,,none,unmapped
+DDInter530,Dextrothyroxine,,,none,unmapped
+DDInter531,Dezocine,,,none,unmapped
+DDInter532,Diamorphine,,,none,unmapped
+DDInter533,Diatrizoate,,,none,unmapped
+DDInter534,Diazepam,,,none,unmapped
+DDInter535,Diazoxide,Compound::DB01119,Diazoxide,normalized case-insensitive exact generic name,exact_name
+DDInter536,Dichloralphenazone,,,none,unmapped
+DDInter537,Diclofenac,Compound::DB00586,Diclofenac,normalized case-insensitive exact generic name,exact_name
+DDInter538,Diclofenac (ophthalmic),,,none,unmapped
+DDInter539,Diclofenac (topical),,,none,unmapped
+DDInter54,Alprazolam,,,none,unmapped
+DDInter540,Diclofenamide,Compound::DB01144,Diclofenamide,normalized case-insensitive exact generic name,exact_name
+DDInter541,Dicloxacillin,,,none,unmapped
+DDInter542,Dicoumarol,,,none,unmapped
+DDInter543,Dicyclomine,,,none,unmapped
+DDInter544,Didanosine,,,none,unmapped
+DDInter545,Dienestrol (topical),,,none,unmapped
+DDInter546,Dienogest,,,none,unmapped
+DDInter547,Diethylpropion,,,none,unmapped
+DDInter548,Diethylstilbestrol,,,none,unmapped
+DDInter549,Difenoxin,,,none,unmapped
+DDInter55,Alprostadil,,,none,unmapped
+DDInter550,Diflorasone (topical),,,none,unmapped
+DDInter551,Diflunisal,,,none,unmapped
+DDInter552,Difluprednate (ophthalmic),,,none,unmapped
+DDInter553,Digitoxin,,,none,unmapped
+DDInter554,Digoxin,,,none,unmapped
+DDInter555,Digoxin Immune Fab (Ovine),,,none,unmapped
+DDInter556,Dihydrocodeine,,,none,unmapped
+DDInter557,Dihydroergotamine,Compound::DB00320,Dihydroergotamine,normalized case-insensitive exact generic name,exact_name
+DDInter558,Dihydrotachysterol,,,none,unmapped
+DDInter559,Diiodohydroxyquinoline,,,none,unmapped
+DDInter56,Alteplase,,,none,unmapped
+DDInter561,Diltiazem,Compound::DB00343,Diltiazem,normalized case-insensitive exact generic name,exact_name
+DDInter562,Dimenhydrinate,,,none,unmapped
+DDInter563,Dimercaprol,,,none,unmapped
+DDInter564,Dimethyl fumarate,,,none,unmapped
+DDInter567,Dinoprostone (topical),,,none,unmapped
+DDInter568,Dinutuximab,,,none,unmapped
+DDInter569,Diphenhydramine,Compound::DB01075,Diphenhydramine,normalized case-insensitive exact generic name,exact_name
+DDInter57,Altretamine,,,none,unmapped
+DDInter570,Diphenhydramine (topical),,,none,unmapped
+DDInter571,Diphenoxylate,,,none,unmapped
+DDInter572,Dipivefrin (ophthalmic),,,none,unmapped
+DDInter573,Dipyridamole,,,none,unmapped
+DDInter574,Diroximel fumarate,,,none,unmapped
+DDInter575,Disopyramide,,,none,unmapped
+DDInter576,Disulfiram,,,none,unmapped
+DDInter577,Dobutamine,Compound::DB00841,Dobutamine,normalized case-insensitive exact generic name,exact_name
+DDInter578,Docetaxel,,,none,unmapped
+DDInter579,Docusate,,,none,unmapped
+DDInter58,Aluminum hydroxide,,,none,unmapped
+DDInter580,Dofetilide,Compound::DB00204,Dofetilide,normalized case-insensitive exact generic name,exact_name
+DDInter581,Dolasetron,,,none,unmapped
+DDInter582,Dolutegravir,,,none,unmapped
+DDInter583,Donepezil,Compound::DB00843,Donepezil,normalized case-insensitive exact generic name,exact_name
+DDInter584,Dopamine,Compound::DB00988,Dopamine,normalized case-insensitive exact generic name,exact_name
+DDInter585,Doravirine,,,none,unmapped
+DDInter586,Doripenem,,,none,unmapped
+DDInter587,Dornase alfa,,,none,unmapped
+DDInter588,Dorzolamide (ophthalmic),,,none,unmapped
+DDInter589,Dotatate,,,none,unmapped
+DDInter59,Alvimopan,Compound::DB06274,Alvimopan,normalized case-insensitive exact generic name,exact_name
+DDInter590,Doxacurium,,,none,unmapped
+DDInter591,Doxapram,,,none,unmapped
+DDInter592,Doxazosin,Compound::DB00590,Doxazosin,normalized case-insensitive exact generic name,exact_name
+DDInter593,Doxepin,,,none,unmapped
+DDInter594,Doxepin (topical),,,none,unmapped
+DDInter595,Doxercalciferol,,,none,unmapped
+DDInter596,Doxorubicin,,,none,unmapped
+DDInter597,Doxorubicin (liposomal),,,none,unmapped
+DDInter598,Doxycycline,,,none,unmapped
+DDInter599,Doxycycline (topical),,,none,unmapped
+DDInter6,Abciximab,,,none,unmapped
+DDInter60,Amantadine,,,none,unmapped
+DDInter600,Doxylamine,,,none,unmapped
+DDInter601,Dronabinol,,,none,unmapped
+DDInter602,Dronedarone,,,none,unmapped
+DDInter603,Droperidol,,,none,unmapped
+DDInter604,Drospirenone,Compound::DB01395,Drospirenone,normalized case-insensitive exact generic name,exact_name
+DDInter605,Drotrecogin alfa,,,none,unmapped
+DDInter606,Droxidopa,Compound::DB06262,Droxidopa,normalized case-insensitive exact generic name,exact_name
+DDInter607,Dulaglutide,,,none,unmapped
+DDInter608,Duloxetine,Compound::DB00476,Duloxetine,normalized case-insensitive exact generic name,exact_name
+DDInter609,Dupilumab,,,none,unmapped
+DDInter61,Ambenonium,,,none,unmapped
+DDInter610,Durvalumab,,,none,unmapped
+DDInter611,Dutasteride,,,none,unmapped
+DDInter612,Duvelisib,,,none,unmapped
+DDInter613,Dyphylline,,,none,unmapped
+DDInter614,Echinacea,,,none,unmapped
+DDInter615,Echothiophate (ophthalmic),,,none,unmapped
+DDInter616,Econazole,,,none,unmapped
+DDInter617,Econazole (topical),,,none,unmapped
+DDInter618,Eculizumab,,,none,unmapped
+DDInter619,Edetate calcium disodium anhydrous,,,none,unmapped
+DDInter62,Ambrisentan,,,none,unmapped
+DDInter620,Edetate disodium anhydrous,,,none,unmapped
+DDInter621,Edoxaban,,,none,unmapped
+DDInter622,Edrophonium,,,none,unmapped
+DDInter623,Efalizumab,,,none,unmapped
+DDInter624,Efavirenz,,,none,unmapped
+DDInter625,Elagolix,,,none,unmapped
+DDInter626,Elbasvir,,,none,unmapped
+DDInter627,Eletriptan,,,none,unmapped
+DDInter628,Elexacaftor,,,none,unmapped
+DDInter629,Eliglustat,,,none,unmapped
+DDInter63,Amcinonide,,,none,unmapped
+DDInter630,Elotuzumab,,,none,unmapped
+DDInter631,Eltrombopag,,,none,unmapped
+DDInter632,Eluxadoline,,,none,unmapped
+DDInter633,Elvitegravir,,,none,unmapped
+DDInter634,Emapalumab,,,none,unmapped
+DDInter635,Emicizumab,,,none,unmapped
+DDInter636,Empagliflozin,,,none,unmapped
+DDInter637,Emtricitabine,,,none,unmapped
+DDInter638,Enalapril,Compound::DB00584,Enalapril,normalized case-insensitive exact generic name,exact_name
+DDInter639,Enasidenib,,,none,unmapped
+DDInter64,Amifampridine,,,none,unmapped
+DDInter640,Encorafenib,,,none,unmapped
+DDInter641,Enflurane,,,none,unmapped
+DDInter642,Enfortumab vedotin,,,none,unmapped
+DDInter643,Enfuvirtide,,,none,unmapped
+DDInter644,Enoxacin,,,none,unmapped
+DDInter645,Enoxaparin,,,none,unmapped
+DDInter646,Entacapone,,,none,unmapped
+DDInter647,Entecavir,,,none,unmapped
+DDInter648,Entrectinib,,,none,unmapped
+DDInter649,Enzalutamide,,,none,unmapped
+DDInter65,Amifostine,,,none,unmapped
+DDInter650,Ephedrine,,,none,unmapped
+DDInter651,Ephedrine (nasal),,,none,unmapped
+DDInter652,Epinephrine,Compound::DB00668,Epinephrine,normalized case-insensitive exact generic name,exact_name
+DDInter653,Epinephrine (ophthalmic),,,none,unmapped
+DDInter654,Epinephrine (topical),,,none,unmapped
+DDInter655,Epirubicin,,,none,unmapped
+DDInter656,Eplerenone,Compound::DB00700,Eplerenone,normalized case-insensitive exact generic name,exact_name
+DDInter657,Epoprostenol,,,none,unmapped
+DDInter658,Eprosartan,Compound::DB00876,Eprosartan,normalized case-insensitive exact generic name,exact_name
+DDInter659,Eptifibatide,,,none,unmapped
+DDInter66,Amikacin,Compound::DB00479,Amikacin,normalized case-insensitive exact generic name,exact_name
+DDInter660,Eravacycline,,,none,unmapped
+DDInter661,Erdafitinib,,,none,unmapped
+DDInter662,Ergocalciferol,,,none,unmapped
+DDInter663,Ergoloid mesylate,Compound::DB01049,Ergoloid mesylate,normalized case-insensitive exact generic name,exact_name
+DDInter664,Ergometrine,,,none,unmapped
+DDInter665,Ergotamine,Compound::DB00696,Ergotamine,normalized case-insensitive exact generic name,exact_name
+DDInter666,Eribulin,,,none,unmapped
+DDInter667,Erlotinib,,,none,unmapped
+DDInter668,Ertapenem,,,none,unmapped
+DDInter669,Ertugliflozin,,,none,unmapped
+DDInter67,Amikacin (liposome),,,none,unmapped
+DDInter670,Erythromycin,,,none,unmapped
+DDInter671,Erythropoietin,,,none,unmapped
+DDInter672,Escitalopram,,,none,unmapped
+DDInter673,Esketamine,,,none,unmapped
+DDInter674,Eslicarbazepine,,,none,unmapped
+DDInter675,Esmolol,Compound::DB00187,Esmolol,normalized case-insensitive exact generic name,exact_name
+DDInter676,Esomeprazole,,,none,unmapped
+DDInter677,Estazolam,,,none,unmapped
+DDInter678,Esterified estrogens,,,none,unmapped
+DDInter679,Estradiol,,,none,unmapped
+DDInter68,Amiloride,Compound::DB00594,Amiloride,normalized case-insensitive exact generic name,exact_name
+DDInter680,Estradiol (topical),,,none,unmapped
+DDInter681,Estramustine,,,none,unmapped
+DDInter682,Estrone,,,none,unmapped
+DDInter683,Estrone sulfate,,,none,unmapped
+DDInter684,Estrone sulfate (topical),,,none,unmapped
+DDInter685,Eszopiclone,,,none,unmapped
+DDInter686,Etacrynic acid,,,none,unmapped
+DDInter687,Etanercept,,,none,unmapped
+DDInter688,Etelcalcetide,,,none,unmapped
+DDInter689,Ethambutol,,,none,unmapped
+DDInter69,Aminobenzoic acid,,,none,unmapped
+DDInter690,Ethanol,,,none,unmapped
+DDInter691,Ethchlorvynol,,,none,unmapped
+DDInter692,Ethinylestradiol,,,none,unmapped
+DDInter693,Ethiodized oil,,,none,unmapped
+DDInter694,Ethionamide,,,none,unmapped
+DDInter695,Ethosuximide,,,none,unmapped
+DDInter696,Ethotoin,,,none,unmapped
+DDInter697,Etidocaine,,,none,unmapped
+DDInter698,Etidronic acid,,,none,unmapped
+DDInter699,Etodolac,,,none,unmapped
+DDInter7,Abemaciclib,,,none,unmapped
+DDInter70,Aminocaproic acid,,,none,unmapped
+DDInter700,Etomidate,,,none,unmapped
+DDInter701,Etonogestrel,,,none,unmapped
+DDInter702,Etoposide,,,none,unmapped
+DDInter703,Etravirine,,,none,unmapped
+DDInter704,Everolimus,,,none,unmapped
+DDInter705,Exemestane,,,none,unmapped
+DDInter706,Exenatide,,,none,unmapped
+DDInter707,Ezetimibe,Compound::DB00973,Ezetimibe,normalized case-insensitive exact generic name,exact_name
+DDInter708,Ezogabine,,,none,unmapped
+DDInter709,Factor IX Complex (Human),,,none,unmapped
+DDInter71,Aminoglutethimide,,,none,unmapped
+DDInter710,Factor XIII (human),,,none,unmapped
+DDInter711,Famciclovir,,,none,unmapped
+DDInter712,Famotidine,,,none,unmapped
+DDInter713,Febuxostat,,,none,unmapped
+DDInter714,Fedratinib,,,none,unmapped
+DDInter715,Felbamate,,,none,unmapped
+DDInter716,Felodipine,Compound::DB01023,Felodipine,normalized case-insensitive exact generic name,exact_name
+DDInter717,Fenfluramine,,,none,unmapped
+DDInter718,Fenofibrate,Compound::DB01039,Fenofibrate,normalized case-insensitive exact generic name,exact_name
+DDInter719,Fenofibric acid,,,none,unmapped
+DDInter72,Aminolevulinic acid,,,none,unmapped
+DDInter720,Fenoldopam,Compound::DB00800,Fenoldopam,normalized case-insensitive exact generic name,exact_name
+DDInter721,Fenoprofen,Compound::DB00573,Fenoprofen,normalized case-insensitive exact generic name,exact_name
+DDInter722,Fentanyl,Compound::DB00813,Fentanyl,normalized case-insensitive exact generic name,exact_name
+DDInter723,Ferric carboxymaltose,,,none,unmapped
+DDInter724,Ferric derisomaltose,,,none,unmapped
+DDInter725,Ferrous fumarate,,,none,unmapped
+DDInter726,Ferrous gluconate,,,none,unmapped
+DDInter727,Ferrous sulfate anhydrous,,,none,unmapped
+DDInter728,Ferumoxides,,,none,unmapped
+DDInter729,Ferumoxsil,,,none,unmapped
+DDInter73,Aminolevulinic acid (topical),,,none,unmapped
+DDInter730,Ferumoxytol,,,none,unmapped
+DDInter731,Fesoterodine,,,none,unmapped
+DDInter732,Fexofenadine,,,none,unmapped
+DDInter733,Fibrinogen human,,,none,unmapped
+DDInter734,Fidaxomicin,,,none,unmapped
+DDInter735,Filgrastim,,,none,unmapped
+DDInter736,Finasteride,,,none,unmapped
+DDInter737,Fingolimod,,,none,unmapped
+DDInter738,Flavoxate,,,none,unmapped
+DDInter739,Flax seed,,,none,unmapped
+DDInter74,Aminophylline,,,none,unmapped
+DDInter740,Flecainide,,,none,unmapped
+DDInter741,Flibanserin,,,none,unmapped
+DDInter742,Floxuridine,,,none,unmapped
+DDInter743,Fluconazole,,,none,unmapped
+DDInter744,Flucytosine,,,none,unmapped
+DDInter745,Fludarabine,,,none,unmapped
+DDInter746,Fludeoxyglucose (18F),,,none,unmapped
+DDInter747,Fludrocortisone,Compound::DB00687,Fludrocortisone,normalized case-insensitive exact generic name,exact_name
+DDInter748,Flumazenil,,,none,unmapped
+DDInter749,Flunisolide,,,none,unmapped
+DDInter75,Aminosalicylic acid,Compound::DB00233,Aminosalicylic Acid,normalized case-insensitive exact generic name,exact_name
+DDInter750,Flunisolide (nasal),,,none,unmapped
+DDInter751,Fluocinolone acetonide,,,none,unmapped
+DDInter752,Fluocinonide,,,none,unmapped
+DDInter753,Fluocinonide (topical),,,none,unmapped
+DDInter755,Fluorometholone,,,none,unmapped
+DDInter756,Fluorometholone (ophthalmic),,,none,unmapped
+DDInter757,Fluorouracil,,,none,unmapped
+DDInter758,Fluoxetine,,,none,unmapped
+DDInter759,Fluoxymesterone,Compound::DB01185,Fluoxymesterone,normalized case-insensitive exact generic name,exact_name
+DDInter76,Amiodarone,,,none,unmapped
+DDInter760,Fluphenazine,,,none,unmapped
+DDInter761,Flurandrenolide (topical),,,none,unmapped
+DDInter762,Flurazepam,,,none,unmapped
+DDInter763,Flurbiprofen,Compound::DB00712,Flurbiprofen,normalized case-insensitive exact generic name,exact_name
+DDInter764,Flurbiprofen (ophthalmic),,,none,unmapped
+DDInter765,Flutamide,,,none,unmapped
+DDInter766,Fluticasone,,,none,unmapped
+DDInter767,Fluticasone (nasal),,,none,unmapped
+DDInter768,Fluticasone (topical),,,none,unmapped
+DDInter769,Fluvastatin,Compound::DB01095,Fluvastatin,normalized case-insensitive exact generic name,exact_name
+DDInter77,Amisulpride,,,none,unmapped
+DDInter770,Fluvoxamine,,,none,unmapped
+DDInter771,Folic acid,,,none,unmapped
+DDInter772,Follitropin,,,none,unmapped
+DDInter773,Fomepizole,,,none,unmapped
+DDInter775,Fondaparinux,,,none,unmapped
+DDInter776,Formoterol,Compound::DB00983,Formoterol,normalized case-insensitive exact generic name,exact_name
+DDInter777,Fosamprenavir,,,none,unmapped
+DDInter778,Fosaprepitant,,,none,unmapped
+DDInter779,Foscarnet,,,none,unmapped
+DDInter78,Amitriptyline,,,none,unmapped
+DDInter780,Fosfomycin,,,none,unmapped
+DDInter781,Fosinopril,Compound::DB00492,Fosinopril,normalized case-insensitive exact generic name,exact_name
+DDInter782,Fosnetupitant,,,none,unmapped
+DDInter783,Fosphenytoin,,,none,unmapped
+DDInter784,Fospropofol,,,none,unmapped
+DDInter785,Fostamatinib,,,none,unmapped
+DDInter786,Fostemsavir,,,none,unmapped
+DDInter787,Frangula purshiana bark,,,none,unmapped
+DDInter788,Frovatriptan,,,none,unmapped
+DDInter789,Fulvestrant,,,none,unmapped
+DDInter79,Amlodipine,Compound::DB00381,Amlodipine,normalized case-insensitive exact generic name,exact_name
+DDInter790,Furosemide,Compound::DB00695,Furosemide,normalized case-insensitive exact generic name,exact_name
+DDInter791,Gabapentin,,,none,unmapped
+DDInter792,Gadobenic acid,,,none,unmapped
+DDInter793,Gadobutrol,,,none,unmapped
+DDInter794,Gadodiamide,,,none,unmapped
+DDInter795,Gadofosveset trisodium,,,none,unmapped
+DDInter796,Gadopentetic acid,,,none,unmapped
+DDInter797,Gadoteric acid,,,none,unmapped
+DDInter798,Gadoteridol,,,none,unmapped
+DDInter799,Gadoversetamide,,,none,unmapped
+DDInter8,Abiraterone,,,none,unmapped
+DDInter80,Ammonium chloride,,,none,unmapped
+DDInter800,Gadoxetic acid,,,none,unmapped
+DDInter801,Galactose,,,none,unmapped
+DDInter802,Galantamine,,,none,unmapped
+DDInter803,Gallium chloride Ga-67,,,none,unmapped
+DDInter804,Gallium nitrate,,,none,unmapped
+DDInter805,gamma-Aminobutyric acid,,,none,unmapped
+DDInter806,Ganciclovir,,,none,unmapped
+DDInter807,Ganirelix,,,none,unmapped
+DDInter808,Garlic,,,none,unmapped
+DDInter809,Gatifloxacin,,,none,unmapped
+DDInter81,Amobarbital,,,none,unmapped
+DDInter810,Gefitinib,,,none,unmapped
+DDInter811,Gemcitabine,,,none,unmapped
+DDInter812,Gemfibrozil,Compound::DB01241,Gemfibrozil,normalized case-insensitive exact generic name,exact_name
+DDInter813,Gemifloxacin,,,none,unmapped
+DDInter814,Gemtuzumab ozogamicin,,,none,unmapped
+DDInter815,Gentamicin,,,none,unmapped
+DDInter816,Gentamicin (topical),,,none,unmapped
+DDInter817,Gilteritinib,,,none,unmapped
+DDInter818,Ginger,,,none,unmapped
+DDInter819,Ginkgo biloba,,,none,unmapped
+DDInter82,Amoxapine,,,none,unmapped
+DDInter820,Ginseng,,,none,unmapped
+DDInter821,Givosiran,,,none,unmapped
+DDInter822,Glasdegib,,,none,unmapped
+DDInter823,Glatiramer,,,none,unmapped
+DDInter824,Glecaprevir,,,none,unmapped
+DDInter825,Glimepiride,Compound::DB00222,Glimepiride,normalized case-insensitive exact generic name,exact_name
+DDInter826,Glipizide,Compound::DB01067,Glipizide,normalized case-insensitive exact generic name,exact_name
+DDInter827,Glucagon,,,none,unmapped
+DDInter828,Glucarpidase,,,none,unmapped
+DDInter829,Glucosamine,,,none,unmapped
+DDInter83,Amoxicillin,,,none,unmapped
+DDInter830,Glutamic acid,,,none,unmapped
+DDInter831,Glyburide,Compound::DB01016,Glyburide,normalized case-insensitive exact generic name,exact_name
+DDInter832,Glycerin,,,none,unmapped
+DDInter833,Glycerol phenylbutyrate,,,none,unmapped
+DDInter834,Glycopyrronium,,,none,unmapped
+DDInter835,Glycopyrronium (topical),,,none,unmapped
+DDInter836,Goldenseal,,,none,unmapped
+DDInter837,Golimumab,,,none,unmapped
+DDInter838,Gonadorelin,,,none,unmapped
+DDInter839,Goserelin,,,none,unmapped
+DDInter84,Amphetamine,Compound::DB00182,Amphetamine,normalized case-insensitive exact generic name,exact_name
+DDInter840,Granisetron,,,none,unmapped
+DDInter841,Grazoprevir,,,none,unmapped
+DDInter842,Grepafloxacin,,,none,unmapped
+DDInter843,Griseofulvin,,,none,unmapped
+DDInter844,Guanabenz,Compound::DB00629,Guanabenz,normalized case-insensitive exact generic name,exact_name
+DDInter845,Guanadrel,Compound::DB00226,Guanadrel,normalized case-insensitive exact generic name,exact_name
+DDInter846,Guanethidine,Compound::DB01170,Guanethidine,normalized case-insensitive exact generic name,exact_name
+DDInter847,Guanfacine,Compound::DB01018,Guanfacine,normalized case-insensitive exact generic name,exact_name
+DDInter848,Guanidine,,,none,unmapped
+DDInter849,Guselkumab,,,none,unmapped
+DDInter85,Amphotericin B,,,none,unmapped
+DDInter850,Halazepam,,,none,unmapped
+DDInter851,Halcinonide (topical),,,none,unmapped
+DDInter852,Halofantrine,,,none,unmapped
+DDInter853,Haloperidol,,,none,unmapped
+DDInter854,Halothane,,,none,unmapped
+DDInter855,Hemin,,,none,unmapped
+DDInter856,Heparin,,,none,unmapped
+DDInter857,Heparin (flush),,,none,unmapped
+DDInter858,Hepatitis A Vaccine,,,none,unmapped
+DDInter86,Amphotericin B (cholesteryl sulfate),,,none,unmapped
+DDInter860,Hepatitis B Vaccine (Recombinant),,,none,unmapped
+DDInter861,Hexachlorophene (topical),,,none,unmapped
+DDInter862,Hexaminolevulinate,,,none,unmapped
+DDInter863,Histamine,,,none,unmapped
+DDInter864,Histrelin,,,none,unmapped
+DDInter865,Homatropine,,,none,unmapped
+DDInter866,Homatropine (ophthalmic),,,none,unmapped
+DDInter867,Human adenovirus e serotype 4 strain cl-68578 antigen,,,none,unmapped
+DDInter868,Human botulinum neurotoxin A/B immune globulin,,,none,unmapped
+DDInter869,Human C1-esterase inhibitor,,,none,unmapped
+DDInter87,Amphotericin B (lipid complex),,,none,unmapped
+DDInter870,Human cytomegalovirus immune globulin,,,none,unmapped
+DDInter871,Human immunoglobulin G (intramuscular),,,none,unmapped
+DDInter872,Human immunoglobulin G (intravenous and subcutaneous),,,none,unmapped
+DDInter873,Human immunoglobulin G (intravenous),,,none,unmapped
+DDInter874,Human immunoglobulin G (subcutaneous),,,none,unmapped
+DDInter875,Human papillomavirus type 11 L1 capsid protein antigen,,,none,unmapped
+DDInter877,Human Rho(D) immune globulin,,,none,unmapped
+DDInter88,Amphotericin B (liposomal),,,none,unmapped
+DDInter880,Hyaluronic acid,,,none,unmapped
+DDInter881,Hyaluronidase,,,none,unmapped
+DDInter882,Hydralazine,Compound::DB01275,Hydralazine,normalized case-insensitive exact generic name,exact_name
+DDInter883,Hydrochlorothiazide,Compound::DB00999,Hydrochlorothiazide,normalized case-insensitive exact generic name,exact_name
+DDInter884,Hydrocodone,,,none,unmapped
+DDInter885,Hydrocortisone,Compound::DB00741,Hydrocortisone,normalized case-insensitive exact generic name,exact_name
+DDInter886,Hydrocortisone (ophthalmic),,,none,unmapped
+DDInter887,Hydrocortisone (topical),,,none,unmapped
+DDInter888,Hydrocortisone butyrate,,,none,unmapped
+DDInter889,Hydroflumethiazide,Compound::DB00774,Hydroflumethiazide,normalized case-insensitive exact generic name,exact_name
+DDInter89,Ampicillin,,,none,unmapped
+DDInter890,Hydromorphone,,,none,unmapped
+DDInter891,Hydroxocobalamin,,,none,unmapped
+DDInter892,Hydroxyamphetamine (ophthalmic),,,none,unmapped
+DDInter893,Hydroxychloroquine,,,none,unmapped
+DDInter894,Hydroxyurea,,,none,unmapped
+DDInter895,Hydroxyzine,,,none,unmapped
+DDInter896,Hyoscyamine,,,none,unmapped
+DDInter897,Ibandronate,,,none,unmapped
+DDInter898,Ibritumomab tiuxetan,,,none,unmapped
+DDInter899,Ibrutinib,,,none,unmapped
+DDInter9,Acalabrutinib,,,none,unmapped
+DDInter90,Amprenavir,,,none,unmapped
+DDInter900,Ibuprofen,Compound::DB01050,Ibuprofen,normalized case-insensitive exact generic name,exact_name
+DDInter901,Ibutilide,,,none,unmapped
+DDInter902,Icatibant,,,none,unmapped
+DDInter903,Icosapent,,,none,unmapped
+DDInter904,Idarubicin,,,none,unmapped
+DDInter905,Idelalisib,,,none,unmapped
+DDInter906,Ifosfamide,,,none,unmapped
+DDInter907,Iloperidone,,,none,unmapped
+DDInter908,Iloprost,,,none,unmapped
+DDInter909,Imatinib,,,none,unmapped
+DDInter91,Amrinone,,,none,unmapped
+DDInter910,Imiglucerase,,,none,unmapped
+DDInter911,Imipenem,,,none,unmapped
+DDInter912,Imipramine,Compound::DB00458,Imipramine,normalized case-insensitive exact generic name,exact_name
+DDInter913,Imiquimod,,,none,unmapped
+DDInter914,Imiquimod (topical),,,none,unmapped
+DDInter915,Indacaterol,,,none,unmapped
+DDInter916,Indapamide,Compound::DB00808,Indapamide,normalized case-insensitive exact generic name,exact_name
+DDInter917,Indinavir,,,none,unmapped
+DDInter918,Indium In-111 oxyquinoline,,,none,unmapped
+DDInter919,Indium In-111 pentetate,,,none,unmapped
+DDInter92,Amyl Nitrite,,,none,unmapped
+DDInter920,Indium In-111 pentetreotide,,,none,unmapped
+DDInter921,Indomethacin,Compound::DB00328,Indomethacin,normalized case-insensitive exact generic name,exact_name
+DDInter922,Inebilizumab,,,none,unmapped
+DDInter923,Infliximab,,,none,unmapped
+DDInter924,Influenza A virus A/California/7/2009 (H1N1)-like antigen (propiolactone inactivated),,,none,unmapped
+DDInter925,Influenza A virus A/Vietnam/1194/2004 (H5N1) antigen (formaldehyde inactivated),,,none,unmapped
+DDInter926,Inotersen,,,none,unmapped
+DDInter927,Inotuzumab ozogamicin,,,none,unmapped
+DDInter928,Insulin aspart (aspart protamine),,,none,unmapped
+DDInter929,Insulin aspart (aspart),,,none,unmapped
+DDInter93,Anagrelide,,,none,unmapped
+DDInter930,Insulin degludec,,,none,unmapped
+DDInter931,Insulin detemir,,,none,unmapped
+DDInter932,Insulin glargine,,,none,unmapped
+DDInter933,Insulin glulisine,,,none,unmapped
+DDInter934,Insulin human,,,none,unmapped
+DDInter935,"Insulin human (inhalation, rapid acting)",,,none,unmapped
+DDInter936,Insulin human (isophane),,,none,unmapped
+DDInter937,Insulin human (regular),,,none,unmapped
+DDInter938,Insulin human (zinc extended),,,none,unmapped
+DDInter939,Insulin human (zinc),,,none,unmapped
+DDInter94,Anakinra,,,none,unmapped
+DDInter940,Insulin lispro,,,none,unmapped
+DDInter941,Insulin lispro (protamine),,,none,unmapped
+DDInter942,"Interferon alfa-2a, Recombinant",,,none,unmapped
+DDInter943,Interferon alfa-2b,,,none,unmapped
+DDInter944,Interferon alfa-n1,,,none,unmapped
+DDInter945,Interferon alfa-n3,,,none,unmapped
+DDInter946,Interferon alfacon-1,,,none,unmapped
+DDInter947,Interferon beta-1a,,,none,unmapped
+DDInter948,Interferon beta-1b,,,none,unmapped
+DDInter949,Interferon gamma-1b,,,none,unmapped
+DDInter95,Anastrozole,,,none,unmapped
+DDInter950,Inulin,,,none,unmapped
+DDInter951,Iobenguane (I-123),,,none,unmapped
+DDInter952,Iobenguane (I-131),,,none,unmapped
+DDInter953,Iodide I-123,,,none,unmapped
+DDInter954,Iodide I-131,,,none,unmapped
+DDInter955,Iodine,,,none,unmapped
+DDInter956,Iodine (topical),,,none,unmapped
+DDInter957,Iodipamide,,,none,unmapped
+DDInter958,Iodixanol,,,none,unmapped
+DDInter959,Ioflupane I-123,,,none,unmapped
+DDInter960,Iohexol,,,none,unmapped
+DDInter961,Iopamidol,,,none,unmapped
+DDInter962,Iopanoic acid,,,none,unmapped
+DDInter963,Iopodic acid,,,none,unmapped
+DDInter964,Iopromide,,,none,unmapped
+DDInter965,Iothalamic acid,,,none,unmapped
+DDInter966,Ioversol,,,none,unmapped
+DDInter967,Ioxilan,,,none,unmapped
+DDInter968,Ipecac,,,none,unmapped
+DDInter969,Ipilimumab,,,none,unmapped
+DDInter97,Anidulafungin,,,none,unmapped
+DDInter970,Ipratropium,,,none,unmapped
+DDInter971,Ipratropium (nasal),,,none,unmapped
+DDInter972,Irbesartan,Compound::DB01029,Irbesartan,normalized case-insensitive exact generic name,exact_name
+DDInter973,Irinotecan,,,none,unmapped
+DDInter974,Irinotecan (liposomal),,,none,unmapped
+DDInter975,Iron,,,none,unmapped
+DDInter976,Iron Dextran,,,none,unmapped
+DDInter977,Iron protein succinylate,,,none,unmapped
+DDInter978,Iron sucrose,,,none,unmapped
+DDInter979,Isatuximab,,,none,unmapped
+DDInter98,Anisindione,Compound::DB01125,Anisindione,normalized case-insensitive exact generic name,exact_name
+DDInter980,Isavuconazonium,,,none,unmapped
+DDInter981,Isocarboxazid,,,none,unmapped
+DDInter982,Isoetharine,,,none,unmapped
+DDInter983,Isoflurane,,,none,unmapped
+DDInter984,Isoflurophate (ophthalmic),,,none,unmapped
+DDInter985,Isometheptene,,,none,unmapped
+DDInter986,Isoniazid,,,none,unmapped
+DDInter987,Isoprenaline,Compound::DB01064,Isoprenaline,normalized case-insensitive exact generic name,exact_name
+DDInter988,Isosorbide,,,none,unmapped
+DDInter989,Isosorbide dinitrate,,,none,unmapped
+DDInter99,Anistreplase,,,none,unmapped
+DDInter990,Isosorbide mononitrate,,,none,unmapped
+DDInter991,Isotretinoin,,,none,unmapped
+DDInter992,Isoxsuprine,Compound::DB08941,Isoxsuprine,normalized case-insensitive exact generic name,exact_name
+DDInter993,Isradipine,Compound::DB00270,Isradipine,normalized case-insensitive exact generic name,exact_name
+DDInter994,Istradefylline,,,none,unmapped
+DDInter995,Itraconazole,,,none,unmapped
+DDInter996,Ivabradine,,,none,unmapped
+DDInter997,Ivacaftor,,,none,unmapped
+DDInter998,Ivermectin,,,none,unmapped
+DDInter999,Ivermectin (topical),,,none,unmapped

@@ -1,83 +1,56 @@
-# Sprint 3 ML Data Foundation
+# Sprint 3 DDInter ML Data Foundation
 
-## Dataset Decision
+## Dataset Contract
 
-The preferred DDI task is blocked for Sprint 3 because the repository contains no
-legitimate DDI label dataset such as TWOSIDES, OFFSIDES-derived DDI labels, or
-DrugBank interaction labels with approved redistribution/access. Hetionet `CrC`
-is chemical resemblance only and is not used as a DDI label.
+- Task: classify severity for a known curated DDInter drug pair.
+- Unit: one unique canonical unordered pair, keyed by stable DDInter IDs.
+- Target: `ddi_severity` from DDInter 2.0.
+- Classes: Major, Moderate, Minor.
+- Excluded label: Unknown, retained in an interim audit file.
+- Graph feature source: the checked-in Hetionet fragment.
+- Molecular descriptors: not applied because the official downloads provide no
+  verified SMILES, InChI, or InChIKey.
 
-Implemented fallback:
+There are no generated non-interactions or synthetic negatives. Missing DDInter
+records are never interpreted as safe. Hetionet `CrC` contributes resemblance
+context only and is never a label or severity proxy.
 
-```text
-Compound + Disease -> traditional tabular graph-count features -> ctd_label
-```
+## Reproducibility and Provenance
 
-This is represented CtD relationship classification, not clinical efficacy
-classification.
+The tracked source manifest records the official DDInter 2.0 download and terms
+pages, CC BY-NC-SA 4.0 license, retrieval date, source filenames, and SHA-256
+checksums. Raw CSVs are ignored. `scripts/acquire_ddinter.py` retrieves and
+verifies them before `scripts/build_sprint3_dataset.py` runs.
 
-## Outputs
+The builder validates the observed five-column schema, preserves source file and
+ATC category provenance, excludes malformed rows, canonicalizes by DDInter IDs,
+deduplicates cross-category records, and quarantines any pair with conflicting
+known labels. It never applies a highest-severity rule.
 
-- Full dataset: `data/processed/sprint3/ml_dataset.csv`
-- Training split: `data/processed/sprint3/train.csv`
-- Test split: `data/processed/sprint3/test.csv`
-- Profile: `data/interim/sprint3/dataset_profile.json`
-- EDA findings: `docs/sprint3-eda-findings.md`
-- EDA figures: `docs/figures/sprint3/*.svg`
-- Data dictionary: `docs/data-dictionary.md`
+## Mapping and Features
 
-## Current Dataset Summary
+DDInter names map to Hetionet compounds only when a normalized exact name has one
+unambiguous candidate. Mapping statuses are `exact_name`, `ambiguous`, or
+`unmapped`; ambiguous candidates are not accepted. All DDInter rows remain in
+the primary dataset because requiring both mappings would retain only 3,292 of
+130,422 pairs.
 
-- Rows: 426
-- Positives: 142 represented `CtD` rows
-- Non-positives: 284 deterministic sampled rows without represented `CtD`
-- Split: 80/20 stratified row split
-- Train rows: 340
-- Test rows: 86
-- Random state: 42
+The 29 traditional graph features include per-drug relationship counts and
+degree plus pairwise shared-entity counts and Jaccard similarities. Missing
+features represent unavailable graph coverage, not zero biological activity.
 
-## Feature Engineering
+## Split and Preprocessing
 
-Features are traditional numeric tabular features from represented graph
-relationships: drug gene counts, side-effect counts, pharmacologic-class counts,
-chemical-resemblance neighbor counts, graph-degree counts, disease graph-degree
-counts, and exact `CpD` pair evidence. No graph embeddings, neural networks,
-TransE, RotatE, PyTorch, or GNN features are used.
+The checked-in primary split is 80/20, stratified by severity, with random state
+42. Canonical pairs cannot cross splits. The same drug can appear in both; the
+profile records 98.937% test-drug overlap, so the split primarily evaluates new
+pairs among familiar drugs rather than cold-start drugs.
 
-CtD count features are row-leakage-safe: for a positive row, the current
-Compound-Disease CtD edge is subtracted from the compound and disease CtD counts.
+`ml_engine/app/data/preprocessing.py` returns `X`, `y`, and a scikit-learn
+`ColumnTransformer`. Target and metadata fields are excluded. Imputation,
+scaling, and encoding must be fitted on training data or CV folds only.
 
-RDKit descriptors are not used in Sprint 3 because the checked-in fragment does
-not contain molecular structures such as SMILES with a verified mapping.
-
-## Preprocessing Contract
-
-Sprint 4 should use:
-
-- `ml_engine/app/data/preprocessing.py`
-- `split_features_target(train_df)`
-- `build_preprocessing_pipeline(train_df)`
-
-The preprocessor is a scikit-learn `ColumnTransformer` intended to be fitted on
-training data only. It excludes `ctd_label` and row metadata from feature inputs.
-
-Sprint 4 model comparison should train exactly:
-
-- `LogisticRegression`
-- `RandomForestClassifier`
-- `GradientBoostingClassifier`
-
-All three should consume the same train/test split, preprocessing helper, target
-definition, feature definitions, and primary metric.
-
-## Leakage and Limitations
-
-- The default split is course-compatible 80/20 stratified row splitting.
-- The same compounds and diseases may appear in both train and test. This is a
-  known leakage risk for graph-derived drug-disease rows.
-- A future group-aware split by compound or disease would be scientifically
-  stronger for generalization analysis, but it should be documented separately
-  from the course-compatible default.
-- The non-positive class means "not represented in this fragment after
-  deterministic sampling"; absence of known relation is not evidence of clinical
-  non-treatment or safety.
+Sprint 4 can compare Logistic Regression, Random Forest, and Gradient Boosting
+using the same split and preprocessing contract. Macro F1 is recommended due to
+the small Minor class. No predictive model has been trained in Sprint 3, and
+application responses remain `mlStatus: "not_applied"`.

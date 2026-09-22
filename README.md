@@ -52,13 +52,15 @@ MySQL and Prisma are used for application/system data foundations. Neo4j remains
 ## Current ML Status
 
 No predictive ML model is applied in current graph-backed candidate responses.
-Sprint 3 adds a traditional supervised-learning data foundation, but does not
-train or serve a model.
+Sprint 3 adds a DDInter 2.0 three-class DDI severity data foundation, but does
+not train or serve a model.
 
 - Graph-backed responses use `dataStatus: "real_graph"`.
 - Predictive model status is `mlStatus: "not_applied"`.
 - `interactionRisk` and `synergyScore` are `null`/not applied for real graph-backed candidates.
-- DDI prediction remains blocked until a legitimate DDI label dataset is added.
+- The supervised target is curated DDInter severity: Major, Moderate, or Minor.
+- Unknown severity is audited but excluded; no synthetic negatives or
+  no-interaction class are created.
 - Sprint 4 should compare traditional `LogisticRegression`,
   `RandomForestClassifier`, and `GradientBoostingClassifier` on the Sprint 3
   data outputs.
@@ -79,7 +81,8 @@ Fallback responses must not be interpreted as real graph evidence or real ML pre
 - `/api/drugs/:id` and `/api/drugs/:id/interactions` still provide reference/demo backend responses and are not the primary graph-backed candidate-search flow.
 - Explainability is limited and does not yet provide advanced graph visualization or model explanation.
 - Hetionet `CrC` means compound resemblance and is not a DDI label.
-- DDI prediction requires a dedicated interaction dataset in future work.
+- DDI severity prediction requires Sprint 4 model training and validation on the
+  documented DDInter dataset before any integration.
 - Synergy prediction is future work.
 - Clinical recommendations, dosage decisions, and autonomous prescribing are outside project scope.
 
@@ -89,8 +92,9 @@ Fallback responses must not be interpreted as real graph evidence or real ML pre
 - `ml_engine/`: FastAPI ML/Graph service, Neo4j graph service, candidate generation, safety filtering, greedy set-cover baseline.
 - `frontend/`: static research dashboard.
 - `data/processed/`: filtered Hetionet fragment used for local development.
-- `data/processed/sprint3/`: supervised fallback ML dataset and train/test split.
-- `data/interim/sprint3/`: generated Sprint 3 dataset profile.
+- `data/original/ddinter/`: tracked manifest; license-controlled raw CSVs are ignored.
+- `data/processed/sprint3/`: DDInter severity dataset and train/test split.
+- `data/interim/sprint3/`: profile, mapping, conflict, malformed, and Unknown audits.
 - `docs/`: graph schema and API documentation.
 - `scripts/`: graph fragment generation/loading and repository management helpers.
 - `docker/`: MySQL init scripts.
@@ -182,6 +186,7 @@ python -m pytest -q
 Sprint 3 data outputs:
 
 ```bash
+python3 scripts/acquire_ddinter.py
 python3 scripts/build_sprint3_dataset.py
 python3 scripts/run_sprint3_eda.py
 ```
@@ -195,8 +200,9 @@ See `docs/api.md` for the current API contract.
 - Hetionet is the current biomedical graph source.
 - Hetionet does not directly provide DDI labels.
 - `CrC` is compound resemblance, not interaction risk.
-- Sprint 3 fallback labels describe represented `CtD` relationships in the
-  selected dataset, not clinical truth.
+- DDInter is the severity-label source; Hetionet supplies optional graph
+  features. The legacy CtD prototype is not the primary task.
+- Absence from DDInter is not evidence of safety.
 - Graph coverage is knowledge-graph treatment coverage, not clinical efficacy.
 - Safety rules are deterministic guardrails, not a clinical safety guarantee.
 - Future DDI/synergy predictions must be clearly separated from graph evidence.

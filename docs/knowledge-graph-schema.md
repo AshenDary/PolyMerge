@@ -114,6 +114,9 @@ LIMIT $limit
 ## Current Retrieval Semantics
 
 - Treatment coverage is computed only from represented `CtD` edges.
+- Sprint 3 uses DDInter, not Hetionet, as the DDI severity target source.
+- Graph relationships become optional tabular features after explicit drug
+  mapping. `CrC` remains resemblance context only.
 - Coverage means knowledge-graph treatment coverage for the selected disease set.
 - Predictive ML, DDI, synergy, and clinical validation are not applied in this phase.
 - Side effects and gene relationships are returned as evidence/provenance context, not as safety predictions.
