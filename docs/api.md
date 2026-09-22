@@ -17,10 +17,12 @@ Candidate-set fallback responses use:
 - `upstreamStatus: "fallback"`
 - `candidateSets: []`
 
-No trained DDI, synergy, graph embedding, or GNN model is applied to current
-candidate sets. Graph-backed candidate sets therefore retain
-`mlStatus: "not_applied"`, and
-`interactionRisk` / `synergyScore` remain `null`.
+No trained traditional supervised ML model is applied to current candidate
+sets. Graph-backed candidate sets therefore retain `mlStatus: "not_applied"`,
+and `interactionRisk` / `synergyScore` remain `null`. Neural-network,
+deep-learning, graph-embedding, GNN, transformer, large-language-model,
+foundation-model, and AutoML models are not part of the planned academic ML
+solution.
 
 The legacy `POST /api/combinations/search` compatibility endpoint retains its
 Sprint 1 demo fallback (`dataStatus: "demo"`, `mlStatus: "demo"`).
@@ -296,7 +298,9 @@ primary graph-backed candidate-search flow.
 
 ### `GET /api/drugs/:id/interactions`
 
-Returns current backend reference/demo interaction metadata. This is not a trained DDI prediction endpoint.
+Returns current backend reference/demo interaction metadata. This is not a
+trained traditional drug-pair interaction classification endpoint, and absence
+of an interaction record must not be interpreted as proof of safety.
 
 ## ML/Graph Service Endpoints
 
@@ -332,4 +336,6 @@ diseases, retrieves `CtD` compound candidates, attaches graph
 evidence/provenance, generates candidate sets, runs deterministic safety checks,
 ranks candidates, and runs the greedy candidate-set optimization baseline.
 
-No trained predictive model is run for current graph-backed responses.
+No trained predictive model is run for current graph-backed responses. Future
+model fields should represent traditional supervised ML predictions and remain
+separate from known graph evidence and deterministic rule outcomes.

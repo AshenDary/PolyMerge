@@ -2,13 +2,13 @@
 
 ## Tasks
 
-- [ ] Define evaluation outputs
-- [ ] Compare graph baseline vs embedding baseline
-- [ ] Prepare experiment reporting
-- [ ] Identify explainability fields needed by frontend
+- [ ] Define EDA and evaluation outputs
+- [ ] Prepare experiment reporting templates
+- [ ] Identify explainability fields needed by frontend or Streamlit
+- [ ] Define how graph evidence, deterministic rules, and future model scores appear separately
 
 ## Definition of Done
 
 - [ ] Evaluation output structure is documented
-- [ ] Baseline comparison is available for review
+- [ ] EDA and reporting expectations are available for review
 - [ ] Results avoid clinical safety or efficacy claims

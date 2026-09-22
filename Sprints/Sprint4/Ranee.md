@@ -2,13 +2,13 @@
 
 ## Tasks
 
-- [ ] Add model version and experiment metadata storage
-- [ ] Add API response fields for DDI model outputs
-- [ ] Integrate DDI inference endpoint with backend
+- [ ] Add model version and experiment metadata storage plan
+- [ ] Add API response fields for future traditional model outputs
+- [ ] Prepare backend integration path for the selected model
 - [ ] Handle unavailable model states
 
 ## Definition of Done
 
-- [ ] Backend can return DDI prediction metadata
-- [ ] API clearly labels predictions as model outputs
-- [ ] Tests cover model unavailable and success paths
+- [ ] Backend contract can return traditional model metadata when implemented
+- [ ] API clearly labels future predictions as model outputs
+- [ ] Tests cover model unavailable paths before active inference is added

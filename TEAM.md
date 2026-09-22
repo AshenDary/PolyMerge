@@ -1,4 +1,4 @@
-# PolyMerge Team & Sprint 1 Status
+# PolyMerge Team & Current Responsibilities
 
 ## Jared — Knowledge Graph / Biomedical Data Engineer
 
@@ -17,9 +17,13 @@
 
 ### Current Status
 
-Sprint 1 graph foundation is implemented and ready for review. Future work includes graph integrity checks against larger datasets, DDI dataset preparation, and RDKit/molecular feature preparation.
+Sprint 1 graph foundation is implemented and ready for review. Sprint 2
+candidate-set foundations preserve graph-derived coverage and provenance.
+Future work includes graph integrity checks against larger datasets, supervised
+dataset preparation, data dictionaries, graph-derived tabular features, and
+optional RDKit descriptor preparation.
 
-## Ranee — Backend / ML Integration
+## Ranee — Backend / Traditional ML Integration
 
 ### Current Sprint 1 Work
 
@@ -31,29 +35,33 @@ Sprint 1 graph foundation is implemented and ready for review. Future work inclu
 - Dependency health checks.
 - Python environment compatibility for ML tests.
 - Backend and integration tests.
+- Traditional model serving contract after model selection.
+- Model metadata and unavailable-model handling.
 
 ### Current Status
 
-Backend and ML/Graph integration is implemented for Sprint 1. Real graph-backed responses are labeled with `dataStatus: "real_graph"` and `mlStatus: "not_applied"`. Demo fallback remains available only as clearly labeled fallback output.
+Backend and ML/Graph integration is implemented for Sprint 1. Real graph-backed responses are labeled with `dataStatus: "real_graph"` and `mlStatus: "not_applied"`. Demo fallback remains available only as clearly labeled fallback output. Future model integration should serve a selected traditional ML model, not a neural-network model.
 
 ## Pamela — Optimization / Explainability
 
-### Current Sprint 1 Work
+### Current Sprint 1 / 2 Work
 
 - Greedy set-cover baseline.
 - Candidate ranking foundation.
 - Optimization tests.
 - Safety and optimization verification.
-- Sprint 2 multi-drug optimization planning.
+- Sprint 2 multi-drug candidate-set generation, comparison, rejection reasons, and optimization planning.
+- Academic evaluation outputs and Streamlit deployment planning.
 
 ### Current Status
 
-The Sprint 1 optimizer consumes graph-derived coverage and produces baseline selected compounds. Future work is multi-drug candidate-set generation, richer constraints, comparison, rejection explanations, and frontend visualization.
+The optimizer consumes graph-derived candidate-set coverage and produces baseline selected candidates. Future work is richer constraints, comparison views, rejection explanation presentation, academic evaluation reporting, and Streamlit/frontend visualization.
 
 ## Handoff Expectations
 
-- Graph evidence must remain separate from future ML predictions.
+- Graph evidence must remain separate from future traditional ML predictions.
 - Hard safety rules must remain deterministic and independent of model scores.
 - `CrC` must not be treated as a DDI label.
 - Coverage means knowledge-graph treatment coverage, not clinical efficacy.
 - Any future model or dataset integration must include provenance and model/version metadata.
+- The planned academic comparison is Logistic Regression, Random Forest, and Gradient Boosting using the same split, preprocessing, cross-validation strategy, and primary metric.

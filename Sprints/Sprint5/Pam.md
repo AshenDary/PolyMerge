@@ -6,7 +6,7 @@
 - [ ] Implement rejection reasons
 - [ ] Design evidence path presentation
 - [ ] Add graph visualization plan
-- [ ] Prepare GNN explainability outputs
+- [ ] Prepare traditional-model explanation and reporting outputs
 
 ## Definition of Done
 

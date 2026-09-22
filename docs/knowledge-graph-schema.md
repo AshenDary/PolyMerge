@@ -11,7 +11,10 @@ This document describes the currently loaded Neo4j development graph inspected o
   - `data/processed/fragment_edges.csv`
 - Loader script: `scripts/load_fragment.py`
 
-The fragment is a research knowledge graph for candidate discovery. It is not a DDI-label dataset and does not contain clinical safety guarantees.
+The fragment is a research knowledge graph for candidate discovery. It supplies
+evidence, provenance, candidate coverage, and possible engineered features. It
+is not a DDI-label dataset, not the final ML algorithm, and does not contain
+clinical safety guarantees.
 
 ## Entity Labels
 
@@ -115,8 +118,10 @@ LIMIT $limit
 
 - Treatment coverage is computed only from represented `CtD` edges.
 - Coverage means knowledge-graph treatment coverage for the selected disease set.
-- Predictive ML, DDI, synergy, and clinical validation are not applied in this phase.
+- Predictive ML and clinical validation are not applied in this phase.
 - Side effects and gene relationships are returned as evidence/provenance context, not as safety predictions.
+- Graph relationships may later be transformed into leakage-safe tabular
+  features for traditional supervised ML.
 
 ## Baseline Research Optimization
 
@@ -140,5 +145,14 @@ clinical efficacy, prescribing suitability, or validated safety.
 
 Hard safety filtering happens before optimization. Candidate sets marked as
 rejected are excluded from optimizer selection. The current optimizer remains a
-greedy set-cover baseline; learned DDI, synergy, graph embedding, and GNN
-inference are not applied.
+greedy set-cover baseline; traditional supervised ML inference is not yet
+applied.
+
+## Role In Traditional ML
+
+The graph can support feature engineering for the planned traditional ML
+workflow, including relationship counts, gene-target overlap, side-effect
+overlap, pharmacologic-class features, and treatment-coverage features. These
+features must be derived reproducibly and kept separate from the supervised
+target variable. `CrC` remains compound resemblance and must not be used as DDI
+evidence or as a substitute DDI label.

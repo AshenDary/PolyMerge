@@ -17,7 +17,7 @@
 - Backend `/api/diseases` uses the ML/Graph service rather than a hard-coded disease catalog.
 - Backend validates selected diseases against the graph-backed catalog before candidate search.
 - Candidate generation returns graph-derived single-compound candidates with stable IDs, treatment evidence, and provenance.
-- `dataStatus` and `mlStatus` distinguish real graph data from future ML prediction.
+- `dataStatus` and `mlStatus` distinguish real graph data from future traditional ML prediction.
 - Deterministic hard safety rules remain independent of model outputs.
 - Greedy set-cover baseline consumes graph-derived coverage.
 - Backend and ML test suites cover Sprint 1 graph, API, validation, fallback, and optimization behavior.
@@ -44,49 +44,68 @@
 - Implemented: rejected candidate sets include pre-optimization hard-safety reasons.
 - Remaining: broaden graph/integration coverage against live Neo4j fixtures where available.
 - Remaining: refine frontend support for reviewing multi-drug candidate-set comparisons and rejection details.
-- Remaining: continue optimization work beyond the greedy baseline without treating future DDI, synergy, or GNN models as active.
+- Remaining: continue optimization work beyond the greedy baseline without treating traditional ML prediction as active before training and integration.
 
-## Sprint 3 — Graph Embedding Baseline
-
-### Status: Planned
-
-- Prepare graph data for embedding.
-- Validate entity and relation mappings.
-- Implement a first knowledge graph embedding baseline such as TransE.
-- Return model version metadata.
-- Report graph embedding outputs separately from deterministic graph evidence.
-
-## Sprint 4 — DDI Graph ML
+## Sprint 3 — Dataset, EDA & Traditional Feature Engineering
 
 ### Status: Planned
 
-- Select an appropriate public DDI dataset.
-- Prepare drug identifiers and dataset provenance.
-- Build a PyTorch Geometric representation.
-- Implement a baseline DDI model.
-- Evaluate AUROC, AUPRC, and F1.
-- Store model version and experiment metadata.
+- Finalize the supervised ML problem, with drug-pair interaction classification as the preferred task.
+- Finalize the dataset, target variable, and negative-label strategy.
+- Document dataset source, license, inclusion criteria, and known limitations.
+- Build a data dictionary for raw fields, engineered features, and target labels.
+- Inspect missing values, duplicate rows, target/class distribution, and outliers.
+- Create at least five meaningful EDA visualizations for the academic workflow.
+- Create leakage-safe preprocessing shared by all models.
+- Derive traditional tabular features from compound identity encodings, graph relationship counts, gene-target overlap, side-effect overlap, pharmacologic-class features, treatment coverage features, and optional reproducible RDKit descriptors.
+- Prepare reproducible train/test data.
+- If a suitable DDI classification dataset cannot be finalized, document a fallback supervised drug-disease treatment classification task derived from Hetionet.
+
+## Sprint 4 — Three Traditional ML Model Comparison
+
+### Status: Planned
+
+- Compare exactly three permitted traditional ML algorithms: Logistic Regression, Random Forest, and Gradient Boosting.
+- Use the same train/test split for all models.
+- Use the same preprocessing logic for all models.
+- Use the same cross-validation strategy and folds for all models.
+- Use the same primary metric for all model selection decisions.
+- Tune only on training data.
+- Report validation mean and variability for the primary metric.
+- Compare supporting metrics appropriate to the selected target.
+- Select the final model using documented evidence.
+- Store experiment metadata and model-version information.
 
 Important: Hetionet `CrC` is compound resemblance and must not be treated as a DDI label.
 
-## Sprint 5 — Synergy & Explainability
+## Sprint 5 — Final Evaluation & PolyMerge Integration
 
 ### Status: Planned
 
-- Implement a synergy prediction baseline.
-- Add candidate comparison views.
-- Add structured rejection reasons.
-- Add evidence path outputs.
-- Add graph visualization.
-- Prepare GNN explainability outputs when an actual GNN exists.
+- Evaluate the selected model exactly once on the untouched test set.
+- Save the leakage-safe preprocessing pipeline.
+- Save the selected model.
+- Expose model metadata and training-data provenance.
+- Integrate traditional ML predictions with PolyMerge candidate scoring where appropriate.
+- Keep deterministic safety rules independent from model scores.
+- Preserve graph evidence/provenance separately from ML prediction output.
+- Do not claim clinical safety, efficacy, or prescribing suitability.
+- Continue candidate comparison, rejection reasons, evidence paths, and graph visualization work as research explainability aids.
 
-## Sprint 6 — Integration & Evaluation
+## Sprint 6 — Deployment, Documentation & Academic Submission
 
 ### Status: Planned
 
-- Integrate graph retrieval, safety rules, optimization, future ML prediction, ranking, and explainability.
-- Compare rule-based baseline, greedy KG baseline, graph embedding baseline, and GNN baseline.
-- Track knowledge-graph treatment coverage, number of drugs, predicted interaction risk, evidence strength, uncertainty, AUROC, AUPRC, F1, and reproducibility.
+- Deploy with Streamlit unless the instructor approves the existing frontend as the deployment target.
+- Finalize README and setup instructions.
+- Package the dataset artifacts allowed for submission.
+- Finalize the data dictionary.
+- Finalize `requirements.txt`.
+- Capture screenshots for the deployed workflow.
+- Prepare the IMRaD paper.
+- Add IEEE references.
+- Document model limitations, graph limitations, safety boundaries, and reproducibility steps.
+- Verify reproducibility from a clean setup.
 
 ## Scope Boundaries
 

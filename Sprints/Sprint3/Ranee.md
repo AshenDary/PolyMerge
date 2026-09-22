@@ -2,14 +2,14 @@
 
 ## Tasks
 
-- [ ] Integrate ML model API
-- [ ] Add model version metadata
-- [ ] Add model loading pipeline
-- [ ] Add inference pipeline
-- [ ] Preserve response fields distinguishing KG evidence from ML predictions
+- [ ] Define future traditional model API contract without claiming active inference
+- [ ] Add planned model metadata fields to documentation
+- [ ] Prepare unavailable-model handling plan
+- [ ] Confirm current responses keep `mlStatus: "not_applied"`
+- [ ] Preserve response fields distinguishing KG evidence from future traditional ML predictions
 
 ## Definition of Done
 
-- [ ] API can serve graph embedding predictions
-- [ ] Model version appears in responses
-- [ ] Failure modes are handled cleanly
+- [ ] API documentation is ready for later traditional model serving
+- [ ] Failure modes are documented cleanly
+- [ ] No current endpoint claims trained ML output

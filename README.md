@@ -1,6 +1,11 @@
 # PolyMerge
 
-PolyMerge is a research decision-support platform for exploring multi-drug candidate combinations using biomedical knowledge-graph data and future machine-learning models. It is not an autonomous prescribing system and does not provide medical advice, dosage recommendations, clinical safety guarantees, or final formulation decisions.
+PolyMerge is a biomedical research decision-support platform for exploring
+multi-drug candidate combinations. It combines biomedical knowledge-graph
+evidence, traditional machine learning, deterministic safety rules,
+multi-drug candidate generation, and combinatorial optimization. It is not an
+autonomous prescribing system and does not provide medical advice, dosage
+recommendations, clinical safety guarantees, or final formulation decisions.
 
 ## Current Architecture
 
@@ -56,7 +61,16 @@ No predictive ML model is applied in current graph-backed candidate responses.
 - Graph-backed responses use `dataStatus: "real_graph"`.
 - Predictive model status is `mlStatus: "not_applied"`.
 - `interactionRisk` and `synergyScore` are `null`/not applied for real graph-backed candidates.
-- TransE, graph embeddings, GNN/DDI prediction, and synergy prediction are future work.
+- The final academic ML solution is planned as traditional supervised ML, not
+  neural networks, deep learning, graph neural networks, transformers, or
+  large language models, pretrained foundation models, or AutoML-generated
+  solutions.
+- The planned comparison algorithms are Logistic Regression, Random Forest, and
+  Gradient Boosting.
+- The preferred academic deployment target is Streamlit unless another
+  framework is instructor-approved.
+- Neo4j remains the biomedical evidence source for graph retrieval, provenance,
+  coverage, and feature engineering.
 
 If the ML/Graph service is unavailable or violates the response contract, the backend returns an explicitly labeled fallback:
 
@@ -74,8 +88,10 @@ Fallback responses must not be interpreted as real graph evidence or real ML pre
 - `/api/drugs/:id` and `/api/drugs/:id/interactions` still provide reference/demo backend responses and are not the primary graph-backed candidate-search flow.
 - Explainability is limited and does not yet provide advanced graph visualization or model explanation.
 - Hetionet `CrC` means compound resemblance and is not a DDI label.
-- DDI prediction requires a dedicated interaction dataset in future work.
-- Synergy prediction is future work.
+- Traditional drug-pair interaction classification requires a legitimate
+  supervised DDI dataset and a documented target variable before training.
+- Absence of a known DDI label must not be interpreted as proof that a drug pair
+  is safe.
 - Clinical recommendations, dosage decisions, and autonomous prescribing are outside project scope.
 
 ## Repository Structure
@@ -183,4 +199,5 @@ See `docs/api.md` for the current API contract.
 - `CrC` is compound resemblance, not interaction risk.
 - Graph coverage is knowledge-graph treatment coverage, not clinical efficacy.
 - Safety rules are deterministic guardrails, not a clinical safety guarantee.
-- Future DDI/synergy predictions must be clearly separated from graph evidence.
+- Future traditional ML predictions must be clearly separated from known graph
+  evidence and deterministic rule outcomes.
