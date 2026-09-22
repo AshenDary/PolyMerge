@@ -52,11 +52,16 @@ MySQL and Prisma are used for application/system data foundations. Neo4j remains
 ## Current ML Status
 
 No predictive ML model is applied in current graph-backed candidate responses.
+Sprint 3 adds a traditional supervised-learning data foundation, but does not
+train or serve a model.
 
 - Graph-backed responses use `dataStatus: "real_graph"`.
 - Predictive model status is `mlStatus: "not_applied"`.
 - `interactionRisk` and `synergyScore` are `null`/not applied for real graph-backed candidates.
-- TransE, graph embeddings, GNN/DDI prediction, and synergy prediction are future work.
+- DDI prediction remains blocked until a legitimate DDI label dataset is added.
+- Sprint 4 should compare traditional `LogisticRegression`,
+  `RandomForestClassifier`, and `GradientBoostingClassifier` on the Sprint 3
+  data outputs.
 
 If the ML/Graph service is unavailable or violates the response contract, the backend returns an explicitly labeled fallback:
 
@@ -84,6 +89,8 @@ Fallback responses must not be interpreted as real graph evidence or real ML pre
 - `ml_engine/`: FastAPI ML/Graph service, Neo4j graph service, candidate generation, safety filtering, greedy set-cover baseline.
 - `frontend/`: static research dashboard.
 - `data/processed/`: filtered Hetionet fragment used for local development.
+- `data/processed/sprint3/`: supervised fallback ML dataset and train/test split.
+- `data/interim/sprint3/`: generated Sprint 3 dataset profile.
 - `docs/`: graph schema and API documentation.
 - `scripts/`: graph fragment generation/loading and repository management helpers.
 - `docker/`: MySQL init scripts.
@@ -172,6 +179,13 @@ source .venv/bin/activate
 python -m pytest -q
 ```
 
+Sprint 3 data outputs:
+
+```bash
+python3 scripts/build_sprint3_dataset.py
+python3 scripts/run_sprint3_eda.py
+```
+
 ## API Overview
 
 See `docs/api.md` for the current API contract.
@@ -181,6 +195,8 @@ See `docs/api.md` for the current API contract.
 - Hetionet is the current biomedical graph source.
 - Hetionet does not directly provide DDI labels.
 - `CrC` is compound resemblance, not interaction risk.
+- Sprint 3 fallback labels describe represented `CtD` relationships in the
+  selected dataset, not clinical truth.
 - Graph coverage is knowledge-graph treatment coverage, not clinical efficacy.
 - Safety rules are deterministic guardrails, not a clinical safety guarantee.
 - Future DDI/synergy predictions must be clearly separated from graph evidence.

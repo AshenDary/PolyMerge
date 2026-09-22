@@ -17,8 +17,8 @@ Candidate-set fallback responses use:
 - `upstreamStatus: "fallback"`
 - `candidateSets: []`
 
-No trained DDI, synergy, graph embedding, or GNN model is applied to current
-candidate sets. Graph-backed candidate sets therefore retain
+No trained DDI, synergy, or traditional supervised ML model is applied to
+current candidate sets. Graph-backed candidate sets therefore retain
 `mlStatus: "not_applied"`, and
 `interactionRisk` / `synergyScore` remain `null`.
 

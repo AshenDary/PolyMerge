@@ -2,13 +2,13 @@
 
 ## Tasks
 
-- [ ] Define evaluation outputs
-- [ ] Compare graph baseline vs embedding baseline
-- [ ] Prepare experiment reporting
-- [ ] Identify explainability fields needed by frontend
+- [x] Define EDA outputs for the Sprint 3 dataset
+- [x] Generate reproducible EDA figures and written findings
+- [x] Prepare Sprint 4 evaluation handoff expectations
+- [x] Preserve no-clinical-claims language
 
 ## Definition of Done
 
-- [ ] Evaluation output structure is documented
-- [ ] Baseline comparison is available for review
-- [ ] Results avoid clinical safety or efficacy claims
+- [x] EDA output structure is documented
+- [x] Dataset findings are available for review
+- [x] Results avoid clinical safety or efficacy claims

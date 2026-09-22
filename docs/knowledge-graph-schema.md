@@ -140,5 +140,5 @@ clinical efficacy, prescribing suitability, or validated safety.
 
 Hard safety filtering happens before optimization. Candidate sets marked as
 rejected are excluded from optimizer selection. The current optimizer remains a
-greedy set-cover baseline; learned DDI, synergy, graph embedding, and GNN
-inference are not applied.
+greedy set-cover baseline; learned DDI, synergy, and traditional supervised
+model inference are not applied.

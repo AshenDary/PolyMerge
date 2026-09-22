@@ -17,6 +17,8 @@ PolyMerge's current multi-drug candidate generation and optimization is a resear
 - Hard safety rules are deterministic and incomplete. Passing the hard filter is not a clinical safety guarantee.
 - No learned DDI model is implemented in this baseline.
 - No learned synergy model is implemented in this baseline.
+- Sprint 3 supervised labels describe represented `CtD` rows in the selected
+  dataset and sampled lack of represented `CtD`; they are not clinical truth.
 - Evidence preservation is provenance-oriented and should not be interpreted as regulatory or prescribing evidence.
 - Greedy set-cover can miss globally better combinations because it makes local choices.
 - Combination enumeration is bounded by configuration and may omit larger sets.

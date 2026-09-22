@@ -2,14 +2,13 @@
 
 ## Tasks
 
-- [ ] Integrate ML model API
-- [ ] Add model version metadata
-- [ ] Add model loading pipeline
-- [ ] Add inference pipeline
-- [ ] Preserve response fields distinguishing KG evidence from ML predictions
+- [x] Preserve current API behavior with no Sprint 3 model inference
+- [x] Keep response fields distinguishing KG evidence from future ML predictions
+- [x] Avoid adding model loading or serving before Sprint 4
+- [x] Confirm Sprint 3 outputs are file-based handoff artifacts
 
 ## Definition of Done
 
-- [ ] API can serve graph embedding predictions
-- [ ] Model version appears in responses
-- [ ] Failure modes are handled cleanly
+- [x] API does not claim predictions before a trained model exists
+- [x] Existing failure modes remain covered by tests
+- [x] Sprint 4 has a clear data/preprocessing handoff

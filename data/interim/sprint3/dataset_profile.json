@@ -1,0 +1,57 @@
+{
+  "dataset_rows": 426,
+  "feature_columns": [
+    "compound_other_ctd_disease_count",
+    "compound_cpD_disease_count",
+    "compound_bound_gene_count",
+    "compound_upregulated_gene_count",
+    "compound_downregulated_gene_count",
+    "compound_side_effect_count",
+    "compound_pharmacologic_class_count",
+    "compound_resemblance_neighbor_count",
+    "compound_graph_degree",
+    "disease_other_ctd_compound_count",
+    "disease_cpD_compound_count",
+    "disease_graph_degree",
+    "has_compound_palliates_disease_edge"
+  ],
+  "metadata_columns": [
+    "row_id",
+    "compound_id",
+    "compound_name",
+    "disease_id",
+    "disease_name",
+    "label_source",
+    "label_semantics"
+  ],
+  "negative_label": "0 means the sampled pair lacks represented CtD in this fragment; it is not clinical evidence of no treatment relationship",
+  "negative_ratio": 2,
+  "positive_label": "1 means the Hetionet fragment contains a represented Compound-[:CtD]->Disease edge",
+  "random_state": 42,
+  "target_column": "ctd_label",
+  "target_distribution": {
+    "0": 284,
+    "1": 142
+  },
+  "task": "fallback_drug_disease_ctd_relationship_classification",
+  "test_rows": 86,
+  "test_size": 0.2,
+  "test_target_distribution": {
+    "0": 57,
+    "1": 29
+  },
+  "train_rows": 340,
+  "train_target_distribution": {
+    "0": 227,
+    "1": 113
+  },
+  "unit_of_analysis": "one row = one Compound x Disease pair",
+  "validation": {
+    "duplicate_edge_rows_removed": 0,
+    "duplicate_node_rows_removed": 0,
+    "edge_rows": 16230,
+    "malformed_edge_rows": 0,
+    "malformed_node_rows": 0,
+    "node_rows": 3415
+  }
+}

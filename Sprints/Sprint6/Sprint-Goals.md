@@ -12,8 +12,9 @@ Researcher -> Disease Selection -> Neo4j -> Candidate Generation -> Hard Safety 
 
 - [ ] Rule-based baseline
 - [ ] Greedy KG baseline
-- [ ] Graph embedding baseline
-- [ ] GNN baseline
+- [ ] Logistic Regression baseline
+- [ ] Random Forest baseline
+- [ ] Gradient Boosting baseline
 
 ## Metrics to Track
 

@@ -11,7 +11,7 @@ Add predicted synergy and explainable candidate selection.
 - [ ] Add rejection reasons
 - [ ] Add evidence paths
 - [ ] Add graph visualization
-- [ ] Prepare GNN explainability
+- [ ] Prepare traditional model explainability
 - [ ] Connect explainability results to frontend
 
 ## Definition of Done

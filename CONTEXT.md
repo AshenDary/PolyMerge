@@ -49,12 +49,11 @@ MySQL is used as the application/system data foundation. The biomedical knowledg
 
 ### Planned Next
 
-- Real multi-drug candidate-set generation.
-- Candidate-set ranking and comparison.
-- Enhanced rejection reasons and explainability.
+- Sprint 4 traditional supervised ML comparison using the Sprint 3 split and
+  preprocessing contract.
 - Graph visualization.
-- Real ML/graph embedding baseline such as TransE.
-- Real DDI prediction using a dedicated dataset such as TWOSIDES if available and appropriate.
+- Real DDI prediction only if a legitimate dedicated DDI dataset is added and
+  documented.
 - Synergy prediction.
 
 ## Data Reality and Current Limitations
@@ -63,6 +62,8 @@ MySQL is used as the application/system data foundation. The biomedical knowledg
 - Hetionet does not directly provide drug-drug interaction labels.
 - `CrC` means compound resemblance and must not be treated as DDI.
 - DDI prediction is planned future work and requires a dedicated interaction dataset.
+- Sprint 3 fallback supervised labels describe represented `CtD` relationships
+  in the fragment and should not be interpreted as clinical truth.
 - Current graph-backed candidates use `mlStatus: "not_applied"`.
 - Current candidate generation is not yet the final multi-drug optimization pipeline.
 - The optimizer is a greedy baseline, not a production-grade optimizer.

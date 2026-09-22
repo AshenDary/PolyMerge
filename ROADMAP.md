@@ -44,28 +44,36 @@
 - Implemented: rejected candidate sets include pre-optimization hard-safety reasons.
 - Remaining: broaden graph/integration coverage against live Neo4j fixtures where available.
 - Remaining: refine frontend support for reviewing multi-drug candidate-set comparisons and rejection details.
-- Remaining: continue optimization work beyond the greedy baseline without treating future DDI, synergy, or GNN models as active.
+- Remaining: continue optimization work beyond the greedy baseline without
+  treating future DDI, synergy, or supervised model scores as active.
 
-## Sprint 3 — Graph Embedding Baseline
+## Sprint 3 — Dataset, EDA & Traditional Feature Engineering
+
+### Status: Implemented / Ready For Review
+
+- Implemented: DDI dataset decision gate documented; no legitimate DDI label
+  dataset is present in the repository.
+- Implemented: fallback represented `CtD` relationship classification dataset.
+- Implemented: data dictionary, dataset profile, EDA script/findings, and six
+  reproducible figures.
+- Implemented: leakage-safe scikit-learn preprocessing helper for Sprint 4.
+- Implemented: deterministic 80/20 stratified train/test split.
+- Implemented: Sprint 3 tests for dataset validity, features, preprocessing,
+  and split behavior.
+- Not implemented: model training, GNNs, graph embeddings, neural networks, or
+  DDI prediction.
+
+## Sprint 4 — Traditional Supervised ML Model Comparison
 
 ### Status: Planned
 
-- Prepare graph data for embedding.
-- Validate entity and relation mappings.
-- Implement a first knowledge graph embedding baseline such as TransE.
-- Return model version metadata.
-- Report graph embedding outputs separately from deterministic graph evidence.
-
-## Sprint 4 — DDI Graph ML
-
-### Status: Planned
-
-- Select an appropriate public DDI dataset.
-- Prepare drug identifiers and dataset provenance.
-- Build a PyTorch Geometric representation.
-- Implement a baseline DDI model.
-- Evaluate AUROC, AUPRC, and F1.
-- Store model version and experiment metadata.
+- Train and compare exactly Logistic Regression, Random Forest, and Gradient
+  Boosting.
+- Use the Sprint 3 train/test split, preprocessing helper, target definition,
+  feature definitions, and primary metric.
+- Fit preprocessing only on training data.
+- Report class-sensitive classification metrics and document the row-split
+  leakage risk.
 
 Important: Hetionet `CrC` is compound resemblance and must not be treated as a DDI label.
 
@@ -78,14 +86,16 @@ Important: Hetionet `CrC` is compound resemblance and must not be treated as a D
 - Add structured rejection reasons.
 - Add evidence path outputs.
 - Add graph visualization.
-- Prepare GNN explainability outputs when an actual GNN exists.
+- Prepare explainability outputs for traditional model scores when a model is
+  integrated.
 
 ## Sprint 6 — Integration & Evaluation
 
 ### Status: Planned
 
 - Integrate graph retrieval, safety rules, optimization, future ML prediction, ranking, and explainability.
-- Compare rule-based baseline, greedy KG baseline, graph embedding baseline, and GNN baseline.
+- Compare rule-based baseline, greedy KG baseline, and the Sprint 4 traditional
+  supervised ML models.
 - Track knowledge-graph treatment coverage, number of drugs, predicted interaction risk, evidence strength, uncertainty, AUROC, AUPRC, F1, and reproducibility.
 
 ## Scope Boundaries

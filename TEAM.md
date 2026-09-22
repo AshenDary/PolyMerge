@@ -17,7 +17,9 @@
 
 ### Current Status
 
-Sprint 1 graph foundation is implemented and ready for review. Future work includes graph integrity checks against larger datasets, DDI dataset preparation, and RDKit/molecular feature preparation.
+Sprint 1 graph foundation is implemented and ready for review. Sprint 3 adds a
+traditional supervised data foundation using the available Hetionet fragment.
+Future DDI work still requires a legitimate dedicated DDI dataset.
 
 ## Ranee — Backend / ML Integration
 
@@ -55,5 +57,7 @@ The Sprint 1 optimizer consumes graph-derived coverage and produces baseline sel
 - Graph evidence must remain separate from future ML predictions.
 - Hard safety rules must remain deterministic and independent of model scores.
 - `CrC` must not be treated as a DDI label.
+- Sprint 3 fallback `CtD` labels describe represented graph relationships, not
+  clinical truth.
 - Coverage means knowledge-graph treatment coverage, not clinical efficacy.
 - Any future model or dataset integration must include provenance and model/version metadata.

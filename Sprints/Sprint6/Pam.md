@@ -4,8 +4,9 @@
 
 - [ ] Compare rule-based baseline
 - [ ] Compare greedy KG baseline
-- [ ] Compare graph embedding baseline
-- [ ] Compare GNN baseline
+- [ ] Compare Logistic Regression baseline
+- [ ] Compare Random Forest baseline
+- [ ] Compare Gradient Boosting baseline
 - [ ] Prepare final evaluation report structure
 - [ ] Verify explainability output in final results
 
