@@ -2,13 +2,15 @@
 
 ## Tasks
 
-- [x] Preserve current API behavior with no Sprint 3 model inference
-- [x] Keep response fields distinguishing KG evidence from future ML predictions
-- [x] Avoid adding model loading or serving before Sprint 4
-- [x] Confirm Sprint 3 outputs are file-based handoff artifacts
+- [ ] Define future traditional model API contract without claiming active inference
+- [ ] Add planned model metadata fields to documentation
+- [ ] Prepare unavailable-model handling plan
+- [ ] Confirm current responses keep `mlStatus: "not_applied"`
+- [ ] Preserve response fields distinguishing KG evidence from future traditional ML predictions
+- [ ] Align the future contract with the finalized DDInter severity target
 
 ## Definition of Done
 
-- [x] API does not claim predictions before a trained model exists
-- [x] Existing failure modes remain covered by tests
-- [x] Sprint 4 has a clear data/preprocessing handoff
+- [ ] API documentation is ready for later traditional model serving
+- [ ] Failure modes are documented cleanly
+- [ ] No current endpoint claims trained ML output

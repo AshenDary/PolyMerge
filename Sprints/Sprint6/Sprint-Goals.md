@@ -1,20 +1,25 @@
-# Sprint 6 - Integration & Evaluation
+# Sprint 6 - Deployment, Documentation & Academic Submission
 
 ## Goal
 
-Integrate the complete research pipeline.
+Package the traditional ML workflow, deployment, documentation, and academic submission materials.
 
 ## Pipeline
 
-Researcher -> Disease Selection -> Neo4j -> Candidate Generation -> Hard Safety Rules -> Optimization -> ML Prediction -> Ranking -> Explainability -> Research Results
+Researcher -> Disease Selection -> Neo4j Evidence -> Candidate Generation -> Hard Safety Rules -> Optimization -> Traditional ML Prediction -> Ranking -> Explainability -> Research Results
 
-## Evaluation Baselines
+## Submission Tasks
 
-- [ ] Rule-based baseline
-- [ ] Greedy KG baseline
-- [ ] Logistic Regression baseline
-- [ ] Random Forest baseline
-- [ ] Histogram Gradient Boosting baseline (`GradientBoostingClassifier` fallback if required)
+- [ ] Streamlit deployment unless instructor approves the existing frontend
+- [ ] Final README/setup instructions
+- [ ] Dataset package
+- [ ] Data dictionary
+- [ ] requirements.txt
+- [ ] Screenshots
+- [ ] IMRaD paper
+- [ ] IEEE references
+- [ ] Model limitations
+- [ ] Reproducibility verification
 
 ## Metrics to Track
 
@@ -25,7 +30,7 @@ Researcher -> Disease Selection -> Neo4j -> Candidate Generation -> Hard Safety 
 - [ ] Uncertainty
 - [ ] AUROC
 - [ ] AUPRC
-- [ ] F1
+- [ ] Macro F1 as the primary model metric
 - [ ] Reproducibility
 
 ## Constraint

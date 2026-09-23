@@ -45,14 +45,15 @@
 - Remaining: broaden graph/integration coverage against live Neo4j fixtures where available.
 - Remaining: refine frontend support for reviewing multi-drug candidate-set comparisons and rejection details.
 - Remaining: continue optimization work beyond the greedy baseline without
-  treating future DDI, synergy, or supervised model scores as active.
+  treating future supervised model scores as active.
 
 ## Sprint 3 — Dataset, EDA & Traditional Feature Engineering
 
 ### Status: DDInter Migration Implemented / Ready For Review
 
 - Implemented: official DDInter 2.0 acquisition, checksums, license, and provenance.
-- Implemented: canonical Major/Moderate/Minor severity dataset; Unknown is audited.
+- Implemented: 130,422 canonical Major/Moderate/Minor severity pairs; Unknown is
+  audited and excluded, with no synthetic negative labels.
 - Implemented: duplicate, reverse-pair, malformed, and label-conflict audits.
 - Implemented: conservative PubChem structure mapping for 1,315 drugs and six RDKit descriptors.
 - Implemented: symmetric pair features with explicit graph/structure availability indicators.
@@ -61,6 +62,7 @@
 - Implemented: data dictionary, profile, EDA findings, and seven figures.
 - Implemented: leakage-safe scikit-learn preprocessing helper for Sprint 4.
 - Implemented: deterministic 80/20 stratified train/test split.
+- Implemented: 104,337 training rows and 26,085 test rows in the primary split.
 - Implemented: Sprint 3 tests for dataset validity, features, preprocessing,
   and split behavior.
 - Preserved: old CtD data only as a clearly named legacy prototype.
@@ -70,8 +72,9 @@
 
 ### Status: Planned
 
-- Train and compare exactly Logistic Regression, Random Forest, and Histogram
-  Gradient Boosting. Fall back to literal `GradientBoostingClassifier` if required.
+- Train and compare exactly `LogisticRegression`, `RandomForestClassifier`, and
+  `HistGradientBoostingClassifier`. Use `GradientBoostingClassifier` only as a
+  course-compatibility fallback.
 - Use the Sprint 3 train/test split, preprocessing helper, target definition,
   feature definitions, and primary metric.
 - Fit preprocessing only on training data.
@@ -80,26 +83,29 @@
 
 Important: Hetionet `CrC` is compound resemblance and must not be treated as a DDI label.
 
-## Sprint 5 — Synergy & Explainability
+## Sprint 5 — Final Evaluation & Integration
 
 ### Status: Planned
 
-- Implement a synergy prediction baseline.
-- Add candidate comparison views.
-- Add structured rejection reasons.
-- Add evidence path outputs.
-- Add graph visualization.
-- Prepare explainability outputs for traditional model scores when a model is
-  integrated.
+- Evaluate the selected model exactly once on the untouched test set.
+- Save the leakage-safe preprocessing pipeline and selected model.
+- Expose model metadata and training-data provenance.
+- Integrate traditional ML predictions with candidate scoring where appropriate.
+- Keep deterministic safety rules independent from model scores.
+- Preserve graph evidence/provenance separately from ML prediction output.
+- Continue candidate comparison, rejection reasons, evidence paths, and graph
+  visualization as research explainability aids.
 
-## Sprint 6 — Integration & Evaluation
+## Sprint 6 — Deployment, Documentation & Academic Submission
 
 ### Status: Planned
 
-- Integrate graph retrieval, safety rules, optimization, future ML prediction, ranking, and explainability.
-- Compare rule-based baseline, greedy KG baseline, and the Sprint 4 traditional
-  supervised ML models.
-- Track knowledge-graph treatment coverage, number of drugs, predicted interaction risk, evidence strength, uncertainty, AUROC, AUPRC, F1, and reproducibility.
+- Deploy with Streamlit unless the instructor approves the existing frontend.
+- Finalize README, setup instructions, data dictionary, and requirements.
+- Package submission-eligible dataset and model artifacts.
+- Capture workflow screenshots and prepare the IMRaD paper with IEEE references.
+- Document model and graph limitations, safety boundaries, and reproducibility.
+- Verify the complete workflow from a clean setup.
 
 ## Scope Boundaries
 

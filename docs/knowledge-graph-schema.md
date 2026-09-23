@@ -118,7 +118,7 @@ LIMIT $limit
 - Graph relationships become optional tabular features after explicit drug
   mapping. `CrC` remains resemblance context only.
 - Coverage means knowledge-graph treatment coverage for the selected disease set.
-- Predictive ML, DDI, synergy, and clinical validation are not applied in this phase.
+- Predictive ML and clinical validation are not applied in this phase.
 - Side effects and gene relationships are returned as evidence/provenance context, not as safety predictions.
 
 ## Baseline Research Optimization
@@ -143,5 +143,13 @@ clinical efficacy, prescribing suitability, or validated safety.
 
 Hard safety filtering happens before optimization. Candidate sets marked as
 rejected are excluded from optimizer selection. The current optimizer remains a
-greedy set-cover baseline; learned DDI, synergy, and traditional supervised
-model inference are not applied.
+greedy set-cover baseline; traditional supervised model inference is not applied.
+
+## Role In Traditional ML
+
+DDInter 2.0 is the Sprint 3 supervised DDI severity-label source. Neo4j and
+Hetionet remain evidence and optional feature sources, including reproducible
+relationship counts, gene-target overlap, side-effect overlap, pharmacologic
+class features, and treatment-coverage features. PubChem and RDKit provide the
+molecular descriptor features. These inputs must stay separate from the target.
+`CrC` is compound resemblance, not DDI evidence and not a substitute DDI label.

@@ -2,13 +2,13 @@
 
 ## Tasks
 
-- [ ] Add model version and experiment metadata storage
+- [ ] Add model version and experiment metadata storage plan
 - [ ] Add API response fields for future traditional model outputs
-- [ ] Integrate trained Sprint 4 inference endpoint with backend only after model training
+- [ ] Prepare backend integration path for the selected model
 - [ ] Handle unavailable model states
 
 ## Definition of Done
 
-- [ ] Backend can return model prediction metadata when a model exists
-- [ ] API clearly labels predictions as model outputs
-- [ ] Tests cover model unavailable and success paths
+- [ ] Backend contract can return traditional model metadata when implemented
+- [ ] API clearly labels future predictions as model outputs
+- [ ] Tests cover model unavailable paths before active inference is added

@@ -1,6 +1,11 @@
 # PolyMerge
 
-PolyMerge is a research decision-support platform for exploring multi-drug candidate combinations using biomedical knowledge-graph data and future machine-learning models. It is not an autonomous prescribing system and does not provide medical advice, dosage recommendations, clinical safety guarantees, or final formulation decisions.
+PolyMerge is a research decision-support platform that combines biomedical
+knowledge-graph evidence, traditional supervised ML, deterministic hard safety
+rules, multi-drug candidate generation, optimization, and explainability. It is
+not an autonomous prescribing system and does not provide medical advice,
+dosage recommendations, clinical safety guarantees, or final formulation
+decisions.
 
 ## Current Architecture
 
@@ -59,6 +64,10 @@ Feature enrichment uses cached, conservatively accepted PubChem structures,
 traditional RDKit descriptors, and symmetric Hetionet graph summaries. Missing
 coverage remains distinct from known zero relationships.
 
+The finalized Sprint 3 dataset contains 130,422 canonical labeled drug pairs
+and 55 features. PubChem enrichment uses the official PUG REST API, with 1,315
+validated mappings and 67.818% structure coverage across distinct drugs.
+
 - Graph-backed responses use `dataStatus: "real_graph"`.
 - Predictive model status is `mlStatus: "not_applied"`.
 - `interactionRisk` and `synergyScore` are `null`/not applied for real graph-backed candidates.
@@ -68,6 +77,13 @@ coverage remains distinct from known zero relationships.
 - Sprint 4 should compare `LogisticRegression`, `RandomForestClassifier`, and
   `HistGradientBoostingClassifier` on the same data/CV contract. Use the literal
   `GradientBoostingClassifier` only if required by the course interpretation.
+- The academic ML solution is restricted to traditional supervised learning;
+  neural networks, deep learning, GNNs, transformers, foundation models, and
+  AutoML-generated models are out of scope.
+- Neo4j remains the evidence source for graph retrieval, provenance, coverage,
+  and graph-derived feature engineering.
+- Streamlit is the preferred academic deployment unless another framework is
+  instructor-approved.
 
 If the ML/Graph service is unavailable or violates the response contract, the backend returns an explicitly labeled fallback:
 
@@ -87,7 +103,7 @@ Fallback responses must not be interpreted as real graph evidence or real ML pre
 - Hetionet `CrC` means compound resemblance and is not a DDI label.
 - DDI severity prediction requires Sprint 4 model training and validation on the
   documented DDInter dataset before any integration.
-- Synergy prediction is future work.
+- Absence of a DDInter label is not evidence that a drug pair is safe.
 - Clinical recommendations, dosage decisions, and autonomous prescribing are outside project scope.
 
 ## Repository Structure
@@ -210,4 +226,5 @@ See `docs/api.md` for the current API contract.
 - Absence from DDInter is not evidence of safety.
 - Graph coverage is knowledge-graph treatment coverage, not clinical efficacy.
 - Safety rules are deterministic guardrails, not a clinical safety guarantee.
-- Future DDI/synergy predictions must be clearly separated from graph evidence.
+- Future traditional ML predictions must be clearly separated from graph
+  evidence and deterministic rule outcomes.

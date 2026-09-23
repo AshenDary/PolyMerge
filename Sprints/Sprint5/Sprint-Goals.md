@@ -1,18 +1,20 @@
-# Sprint 5 - Synergy & Explainability
+# Sprint 5 - Final Evaluation & PolyMerge Integration
 
 ## Goal
 
-Add predicted synergy and explainable candidate selection.
+Evaluate the selected traditional model once on the untouched test set and integrate outputs with PolyMerge without mixing predictions with graph evidence.
 
 ## Shared Tasks
 
-- [ ] Implement synergy prediction baseline
-- [ ] Add candidate comparison
-- [ ] Add rejection reasons
-- [ ] Add evidence paths
-- [ ] Add graph visualization
-- [ ] Prepare traditional model explainability
-- [ ] Connect explainability results to frontend
+- [ ] Evaluate selected model exactly once on untouched test data
+- [ ] Save preprocessing pipeline
+- [ ] Save selected model
+- [ ] Expose model metadata
+- [ ] Integrate predictions with PolyMerge candidate scoring where appropriate
+- [ ] Keep deterministic safety rules independent
+- [ ] Preserve graph evidence/provenance separately from ML prediction
+- [ ] Add candidate comparison and rejection reason presentation
+- [ ] Add evidence paths and graph visualization where useful
 
 ## Definition of Done
 

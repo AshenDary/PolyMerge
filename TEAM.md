@@ -1,4 +1,4 @@
-# PolyMerge Team & Sprint 1 Status
+# PolyMerge Team & Current Responsibilities
 
 ## Jared — Knowledge Graph / Biomedical Data Engineer
 
@@ -17,12 +17,13 @@
 
 ### Current Status
 
-Sprint 1 graph foundation is implemented and ready for review. Sprint 3 adds a
-DDInter 2.0 severity data foundation and optional mapped Hetionet graph features.
-PubChem/RDKit enrichment supplies symmetric molecular features where identity is
-verified. No predictive model has been trained or integrated.
+Sprint 1 graph foundation is implemented and ready for review. Sprint 2
+candidate-set foundations preserve graph-derived coverage and provenance.
+Sprint 3 adds Jared's completed DDInter 2.0 severity dataset, PubChem PUG REST
+enrichment, RDKit descriptors, graph-derived tabular features, EDA, and
+leakage-safe preprocessing. No predictive model has been trained or integrated.
 
-## Ranee — Backend / ML Integration
+## Ranee — Backend / Traditional ML Integration
 
 ### Current Sprint 1 Work
 
@@ -34,32 +35,40 @@ verified. No predictive model has been trained or integrated.
 - Dependency health checks.
 - Python environment compatibility for ML tests.
 - Backend and integration tests.
+- Traditional model serving contract after model selection.
+- Model metadata and unavailable-model handling.
 
 ### Current Status
 
-Backend and ML/Graph integration is implemented for Sprint 1. Real graph-backed responses are labeled with `dataStatus: "real_graph"` and `mlStatus: "not_applied"`. Demo fallback remains available only as clearly labeled fallback output.
+Backend and ML/Graph integration is implemented for Sprint 1. Real graph-backed responses are labeled with `dataStatus: "real_graph"` and `mlStatus: "not_applied"`. Demo fallback remains available only as clearly labeled fallback output. Future model integration should serve a selected traditional ML model, not a neural-network model.
 
 ## Pamela — Optimization / Explainability
 
-### Current Sprint 1 Work
+### Current Sprint 1 / 2 Work
 
 - Greedy set-cover baseline.
 - Candidate ranking foundation.
 - Optimization tests.
 - Safety and optimization verification.
-- Sprint 2 multi-drug optimization planning.
+- Sprint 2 multi-drug candidate-set generation, comparison, rejection reasons, and optimization planning.
+- Academic evaluation outputs and Streamlit deployment planning.
 
 ### Current Status
 
-The Sprint 1 optimizer consumes graph-derived coverage and produces baseline selected compounds. Sprint 3 now supplies a DDInter 2.0 severity dataset for future traditional ML; no model is trained yet.
+The optimizer consumes graph-derived candidate-set coverage and produces baseline selected candidates. Future work is richer constraints, comparison views, rejection explanation presentation, academic evaluation reporting, and Streamlit/frontend visualization.
 
 ## Handoff Expectations
 
-- Graph evidence must remain separate from future ML predictions.
+- Graph evidence must remain separate from future traditional ML predictions.
 - Hard safety rules must remain deterministic and independent of model scores.
 - `CrC` must not be treated as a DDI label.
-- Sprint 3 labels come only from curated DDInter severity. Unknown is excluded,
-  and absent interactions are never treated as safe negatives.
-- Hetionet features have limited exact-name coverage and do not define the target.
+- DDInter is the Sprint 3 severity-label source. Unknown is excluded from
+  supervised training, and absent interactions are not treated as safe negatives.
+- PubChem/RDKit provide molecular features; Hetionet provides graph evidence
+  and optional graph features rather than the supervised target.
 - Coverage means knowledge-graph treatment coverage, not clinical efficacy.
 - Any future model or dataset integration must include provenance and model/version metadata.
+- The planned academic comparison is `LogisticRegression`,
+  `RandomForestClassifier`, and `HistGradientBoostingClassifier` using the same
+  split, preprocessing, cross-validation strategy, and macro F1 primary metric.
+  `GradientBoostingClassifier` is only a course-compatibility fallback.

@@ -2,15 +2,14 @@
 
 ## Tasks
 
-- [x] Define EDA outputs for the Sprint 3 dataset
-- [x] Generate reproducible EDA figures and written findings
-- [x] Audit class imbalance, mapping coverage, graph missingness, and drug overlap
-- [x] Audit PubChem/RDKit coverage, descriptor distributions, and feature variance
-- [x] Prepare Sprint 4 evaluation handoff expectations
-- [x] Preserve no-clinical-claims language
+- [ ] Review the completed DDInter severity EDA and evaluation outputs
+- [ ] Prepare experiment reporting templates
+- [ ] Identify explainability fields needed by frontend or Streamlit
+- [ ] Define how DDInter model outputs, graph evidence, and deterministic rules
+  appear separately
 
 ## Definition of Done
 
-- [x] Seven DDInter EDA figures have data-grounded interpretations
-- [x] Dataset findings are available for review
-- [x] Results avoid clinical safety or efficacy claims
+- [ ] Evaluation output structure is documented
+- [ ] Reporting expectations align with the finalized Major/Moderate/Minor target
+- [ ] Results avoid clinical safety or efficacy claims

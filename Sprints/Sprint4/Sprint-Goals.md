@@ -7,9 +7,9 @@ Sprint 3 dataset, split, preprocessing helper, and target definition.
 
 ## Shared Tasks
 
-- [ ] Train Logistic Regression
-- [ ] Train Random Forest
-- [ ] Train Histogram Gradient Boosting (`GradientBoostingClassifier` fallback if required)
+- [ ] Train `LogisticRegression`
+- [ ] Train `RandomForestClassifier`
+- [ ] Train `HistGradientBoostingClassifier`
 - [ ] Use `data/processed/sprint3/train.csv`
 - [ ] Use `data/processed/sprint3/test.csv`
 - [ ] Use `ml_engine/app/data/preprocessing.py`
@@ -24,3 +24,4 @@ Sprint 3 dataset, split, preprocessing helper, and target definition.
 
 DDInter 2.0 is the label source. Hetionet `CrC` is resemblance context only.
 Unknown is not a supervised class, and no missing pair is a safe negative.
+`GradientBoostingClassifier` is only a course-compatibility fallback.

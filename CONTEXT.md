@@ -6,7 +6,7 @@ PolyMerge is a research decision-support platform for candidate discovery in a b
 
 PolyMerge is not an autonomous prescribing system and does not produce clinically validated safety guarantees, dosage recommendations, or clinical treatment decisions.
 
-## Current Sprint 1 Architecture
+## Current Architecture And Direction
 
 ```text
 Frontend
@@ -49,11 +49,14 @@ MySQL is used as the application/system data foundation. The biomedical knowledg
 
 ### Planned Next
 
-- Sprint 4 traditional supervised ML comparison using the Sprint 3 split and
-  preprocessing contract.
+- Sprint 4 comparison of `LogisticRegression`, `RandomForestClassifier`, and
+  `HistGradientBoostingClassifier` using the Sprint 3 split and preprocessing
+  contract. `GradientBoostingClassifier` is only a course-compatibility fallback.
+- Use macro F1 as the primary model-selection metric and evaluate the selected
+  model once on the untouched test set.
+- Save the selected preprocessing pipeline, model, and experiment metadata only
+  after training and validation are complete.
 - Graph visualization.
-- Traditional DDI severity modeling from the documented DDInter 2.0 handoff.
-- Synergy prediction.
 
 ## Data Reality and Current Limitations
 
@@ -62,11 +65,16 @@ MySQL is used as the application/system data foundation. The biomedical knowledg
 - `CrC` means compound resemblance and must not be treated as DDI.
 - Sprint 3 uses DDInter 2.0 severity labels (Major, Moderate, Minor). Unknown is
   excluded from supervised data, with no synthetic no-interaction examples.
+- The completed dataset has 130,422 canonical labeled pairs, an 80/20 stratified
+  split, and 55 final features.
 - Hetionet supplies optional graph features; `CrC` is resemblance only.
 - PubChem supplies conservatively verified structures, and RDKit supplies
-  deterministic interpretable descriptors. Missing coverage is explicit.
+  deterministic interpretable descriptors. Official PUG REST enrichment produced
+  1,315 validated mappings and 67.818% distinct-drug structure coverage; missing
+  coverage is explicit.
 - Current graph-backed candidates use `mlStatus: "not_applied"`.
-- Current candidate generation is not yet the final multi-drug optimization pipeline.
+- Current predictive ML output is inactive until a traditional model is trained,
+  validated, and integrated.
 - The optimizer is a greedy baseline, not a production-grade optimizer.
 
 ## Scope Boundaries
@@ -86,4 +94,4 @@ MySQL is used as the application/system data foundation. The biomedical knowledg
 - Dosage recommendations.
 - Clinical validation or regulatory approval.
 - Chemical stability/formulation guarantees.
-- Real DDI/synergy predictions until a real model and dataset are integrated.
+- Predictive DDI severity output until a trained model is validated and integrated.
