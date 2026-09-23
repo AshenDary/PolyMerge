@@ -2,13 +2,17 @@
 
 ## Tasks
 
-- [ ] Evaluate candidate supervised DDI datasets
-- [ ] Map dataset drug identifiers to graph compounds
-- [ ] Document dataset provenance
-- [ ] Prepare graph/data joins for traditional feature engineering
+- [ ] Load Sprint 3 train/test CSVs
+- [ ] Verify feature and target columns against the data dictionary
+- [ ] Preserve dataset provenance in model reports
+- [ ] Use `ddi_severity` with Major, Moderate, and Minor classes
+- [ ] Keep Unknown, metadata, and source severity out of model inputs
 
 ## Definition of Done
 
-- [ ] Supervised dataset choice is documented
-- [ ] Identifier mapping strategy is documented
+- [ ] Sprint 3 dataset contract is used without redesign
+- [ ] Feature/target definitions are documented in the model report
 - [ ] Hetionet `CrC` is not used as a DDI label
+- [ ] Pairwise split and drug-overlap limitations are reported
+- [ ] Use symmetric features and the shared train-fitted preprocessing contract
+- [ ] Keep PubChem, DDInter, Hetionet, and RDKit provenance out of X

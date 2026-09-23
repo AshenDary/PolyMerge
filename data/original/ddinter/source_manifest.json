@@ -1,0 +1,20 @@
+{
+  "dataset": "DDInter 2.0",
+  "dataset_url": "https://ddinter2.scbdd.com/",
+  "download_page": "https://ddinter2.scbdd.com/download/",
+  "license": "CC BY-NC-SA 4.0",
+  "license_url": "https://ddinter2.scbdd.com/terms/",
+  "release_reference": "DDInter 2.0 (Nucleic Acids Research 2025, DOI: 10.1093/nar/gkae726)",
+  "retrieved_at": "2026-09-22",
+  "redistribution": "Raw CSV files are ignored. Re-download for non-commercial scholarly use under the source license.",
+  "files": {
+    "ddinter_downloads_code_A.csv": "a22ca451d2b755ca2331886f7e00540c86f555f9f55704a59a19c691251f52e0",
+    "ddinter_downloads_code_B.csv": "22cee82ccfc60266f3dbf6a5db12f9390c3390c025e8dc945c2c85f00ca4fa58",
+    "ddinter_downloads_code_D.csv": "c0627ec39965dbe27829e4934cd20d71eb079f4e373287678737bba9423a306a",
+    "ddinter_downloads_code_H.csv": "f0f925f0ba1ee68c4668d3e7a6732719b34623b22a0f5d017f9090e59f63c88e",
+    "ddinter_downloads_code_L.csv": "f54f4486cc00344f8c86508c31c2ca3fad6d1d37ec3af5bcf609b4bbda5507ef",
+    "ddinter_downloads_code_P.csv": "83f8c0edb20d09ef29b8500b48f9623e208379525688ade9e70a7df2d8749d55",
+    "ddinter_downloads_code_R.csv": "1c39c3d4a6e41659b7a988538d7f363867592abc6f41a815de8746f6e2150574",
+    "ddinter_downloads_code_V.csv": "353973fb300453946aea95733e8fb52338e4b59426d2ce6ca318363d4f84f10a"
+  }
+}

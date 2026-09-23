@@ -1,0 +1,13 @@
+{
+  "source": "PubChem",
+  "provider": "National Center for Biotechnology Information (NCBI)",
+  "api": "PubChem PUG REST",
+  "api_base_url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug",
+  "documentation_url": "https://pubchem.ncbi.nlm.nih.gov/docs/pug-rest",
+  "retrieved_at": "2026-09-22",
+  "request_policy": "Request starts spaced by at least 0.22 seconds, below the documented five requests per second limit.",
+  "query": "compound/name/{DDInter name}/property/Title,ConnectivitySMILES,SMILES,InChI,InChIKey/JSON",
+  "acceptance_policy": "Accept only one returned compound whose normalized PubChem title exactly matches the normalized DDInter name and whose SMILES parses with RDKit.",
+  "cache": "data/interim/sprint3/pubchem_query_cache.jsonl",
+  "mapping_audit": "data/interim/sprint3/ddinter_pubchem_mapping.csv"
+}

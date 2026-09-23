@@ -1,11 +1,11 @@
 # PolyMerge
 
-PolyMerge is a biomedical research decision-support platform for exploring
-multi-drug candidate combinations. It combines biomedical knowledge-graph
-evidence, traditional machine learning, deterministic safety rules,
-multi-drug candidate generation, and combinatorial optimization. It is not an
-autonomous prescribing system and does not provide medical advice, dosage
-recommendations, clinical safety guarantees, or final formulation decisions.
+PolyMerge is a research decision-support platform that combines biomedical
+knowledge-graph evidence, traditional supervised ML, deterministic hard safety
+rules, multi-drug candidate generation, optimization, and explainability. It is
+not an autonomous prescribing system and does not provide medical advice,
+dosage recommendations, clinical safety guarantees, or final formulation
+decisions.
 
 ## Current Architecture
 
@@ -57,20 +57,33 @@ MySQL and Prisma are used for application/system data foundations. Neo4j remains
 ## Current ML Status
 
 No predictive ML model is applied in current graph-backed candidate responses.
+Sprint 3 adds a DDInter 2.0 three-class DDI severity data foundation, but does
+not train or serve a model.
+
+Feature enrichment uses cached, conservatively accepted PubChem structures,
+traditional RDKit descriptors, and symmetric Hetionet graph summaries. Missing
+coverage remains distinct from known zero relationships.
+
+The finalized Sprint 3 dataset contains 130,422 canonical labeled drug pairs
+and 55 features. PubChem enrichment uses the official PUG REST API, with 1,315
+validated mappings and 67.818% structure coverage across distinct drugs.
 
 - Graph-backed responses use `dataStatus: "real_graph"`.
 - Predictive model status is `mlStatus: "not_applied"`.
 - `interactionRisk` and `synergyScore` are `null`/not applied for real graph-backed candidates.
-- The final academic ML solution is planned as traditional supervised ML, not
-  neural networks, deep learning, graph neural networks, transformers, or
-  large language models, pretrained foundation models, or AutoML-generated
-  solutions.
-- The planned comparison algorithms are Logistic Regression, Random Forest, and
-  Gradient Boosting.
-- The preferred academic deployment target is Streamlit unless another
-  framework is instructor-approved.
-- Neo4j remains the biomedical evidence source for graph retrieval, provenance,
-  coverage, and feature engineering.
+- The supervised target is curated DDInter severity: Major, Moderate, or Minor.
+- Unknown severity is audited but excluded; no synthetic negatives or
+  no-interaction class are created.
+- Sprint 4 should compare `LogisticRegression`, `RandomForestClassifier`, and
+  `HistGradientBoostingClassifier` on the same data/CV contract. Use the literal
+  `GradientBoostingClassifier` only if required by the course interpretation.
+- The academic ML solution is restricted to traditional supervised learning;
+  neural networks, deep learning, GNNs, transformers, foundation models, and
+  AutoML-generated models are out of scope.
+- Neo4j remains the evidence source for graph retrieval, provenance, coverage,
+  and graph-derived feature engineering.
+- Streamlit is the preferred academic deployment unless another framework is
+  instructor-approved.
 
 If the ML/Graph service is unavailable or violates the response contract, the backend returns an explicitly labeled fallback:
 
@@ -88,10 +101,9 @@ Fallback responses must not be interpreted as real graph evidence or real ML pre
 - `/api/drugs/:id` and `/api/drugs/:id/interactions` still provide reference/demo backend responses and are not the primary graph-backed candidate-search flow.
 - Explainability is limited and does not yet provide advanced graph visualization or model explanation.
 - Hetionet `CrC` means compound resemblance and is not a DDI label.
-- Traditional drug-pair interaction classification requires a legitimate
-  supervised DDI dataset and a documented target variable before training.
-- Absence of a known DDI label must not be interpreted as proof that a drug pair
-  is safe.
+- DDI severity prediction requires Sprint 4 model training and validation on the
+  documented DDInter dataset before any integration.
+- Absence of a DDInter label is not evidence that a drug pair is safe.
 - Clinical recommendations, dosage decisions, and autonomous prescribing are outside project scope.
 
 ## Repository Structure
@@ -100,6 +112,9 @@ Fallback responses must not be interpreted as real graph evidence or real ML pre
 - `ml_engine/`: FastAPI ML/Graph service, Neo4j graph service, candidate generation, safety filtering, greedy set-cover baseline.
 - `frontend/`: static research dashboard.
 - `data/processed/`: filtered Hetionet fragment used for local development.
+- `data/original/ddinter/`: tracked manifest; license-controlled raw CSVs are ignored.
+- `data/processed/sprint3/`: DDInter severity dataset and train/test split.
+- `data/interim/sprint3/`: profile, mapping, conflict, malformed, and Unknown audits.
 - `docs/`: graph schema and API documentation.
 - `scripts/`: graph fragment generation/loading and repository management helpers.
 - `docker/`: MySQL init scripts.
@@ -188,6 +203,15 @@ source .venv/bin/activate
 python -m pytest -q
 ```
 
+Sprint 3 data outputs:
+
+```bash
+python3 scripts/acquire_ddinter.py
+python3 scripts/enrich_pubchem.py
+python3 scripts/build_sprint3_dataset.py
+python3 scripts/run_sprint3_eda.py
+```
+
 ## API Overview
 
 See `docs/api.md` for the current API contract.
@@ -197,7 +221,10 @@ See `docs/api.md` for the current API contract.
 - Hetionet is the current biomedical graph source.
 - Hetionet does not directly provide DDI labels.
 - `CrC` is compound resemblance, not interaction risk.
+- DDInter is the severity-label source; Hetionet supplies optional graph
+  features. The legacy CtD prototype is not the primary task.
+- Absence from DDInter is not evidence of safety.
 - Graph coverage is knowledge-graph treatment coverage, not clinical efficacy.
 - Safety rules are deterministic guardrails, not a clinical safety guarantee.
-- Future traditional ML predictions must be clearly separated from known graph
+- Future traditional ML predictions must be clearly separated from graph
   evidence and deterministic rule outcomes.

@@ -7,14 +7,15 @@ the whole project re-explained every session.
 
 ## Member A - ML Data Engineer (Knowledge Graph & Feature Engineering)
 
-**Core skills:** Neo4j + Cypher, RDKit, Python (pandas), Hetionet/DrugBank
-data wrangling, data dictionaries, leakage-safe feature engineering, and
-reproducible train/test dataset preparation.
+**Core skills:** Neo4j + Cypher, PubChem PUG REST, RDKit, Python (pandas),
+Hetionet and DDInter data wrangling, data dictionaries, leakage-safe feature
+engineering, and reproducible train/test dataset preparation.
 
 **Owns:** `ml_engine/app/utils/neo4j_client.py`,
 `scripts/filter_hetionet_fragment.py`, `scripts/load_fragment.py`,
-`data/processed/`, and future feature-generation scripts or services added for
-the traditional ML workflow.
+`data/original/ddinter/source_manifest.json`, `data/processed/`,
+`ml_engine/app/data/`, and the Sprint 3 DDInter acquisition, build, enrichment,
+and EDA scripts.
 
 **"Done" looks like:** any claim about graph state is backed by an actual
 Cypher query result (`MATCH (n) RETURN count(n)`-style sanity checks), not
@@ -54,9 +55,10 @@ until a trained traditional model is integrated.
 - Do not add neural-network, deep-learning, graph-neural-network, transformer,
   pretrained foundation-model, or AutoML-generated solutions for the academic
   ML model.
-- The planned comparison algorithms are Logistic Regression, Random Forest, and
-  Gradient Boosting. They must use the same split, preprocessing,
-  cross-validation strategy, and primary metric.
+- The planned comparison algorithms are `LogisticRegression`,
+  `RandomForestClassifier`, and `HistGradientBoostingClassifier`. They must use
+  the same split, preprocessing, cross-validation strategy, and macro F1
+  primary metric. `GradientBoostingClassifier` is only a course fallback.
 - Local MySQL migrations need the shadow database
   (`docker/mysql/init/01-shadow-database.sql`). Do not remove it or switch to
   the root user to "simplify" this.
@@ -96,8 +98,8 @@ guessing an owner.
 | Task mentions... | Owner | Stack | Key files | Watch out for |
 | --- | --- | --- | --- | --- |
 | Neo4j, Cypher, Hetionet, knowledge graph, nodes/edges | Member A | Python, `neo4j` driver, pandas | `ml_engine/app/utils/neo4j_client.py`, `scripts/` | Confirm Docker daemon is actually running before touching Neo4j; verify row counts after any load |
-| supervised dataset, EDA, feature engineering, data dictionary | Members A+B | pandas, RDKit, scikit-learn | future `ml_engine/` data prep modules, `data/` | Define the target variable and negative-label strategy before training |
-| Logistic Regression, Random Forest, Gradient Boosting | Members A+B | scikit-learn | future `ml_engine/app/models/` or training scripts | Same split, preprocessing, CV folds, and primary metric for all models |
+| DDInter dataset, PubChem, RDKit, EDA, feature engineering, data dictionary | Member A | pandas, RDKit, scikit-learn | `ml_engine/app/data/`, `scripts/`, `data/` | Preserve the finalized target and explicit missingness semantics |
+| Logistic Regression, Random Forest, Histogram Gradient Boosting | Members A+B | scikit-learn | future `ml_engine/app/models/` or training scripts | Same split, preprocessing, CV folds, and macro F1 metric for all models |
 | Fastify route, API endpoint, backend server | Member B | Fastify, Node | `backend/src/server.js` | Must call deterministic safety checks before returning any drug set to a client |
 | Prisma, MySQL, schema, migration | Member B | Prisma CLI | `backend/prisma/schema.prisma` | Shadow DB is required for `migrate dev` locally; do not bypass it |
 | set-cover, combinatorial search, optimization | Member C (w/ B) | Python | `ml_engine/app/services/combination_search.py` | Operates on graph coverage, rules, and future traditional model scores without treating any as clinical truth |

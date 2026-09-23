@@ -2,11 +2,7 @@
 
 ## Purpose
 
-PolyMerge is a research decision-support platform for candidate discovery in a
-biomedical knowledge-graph setting. It helps researchers and pharmacists
-explore disease clusters, retrieve graph relationships, apply deterministic
-safety rules, run a greedy set-cover baseline, inspect evidence/provenance, and
-prepare traditional supervised ML features for research candidates.
+PolyMerge is a research decision-support platform for candidate discovery in a biomedical knowledge-graph setting. It helps researchers and pharmacists explore disease clusters, retrieve graph relationships, apply deterministic safety rules, run a greedy set-cover baseline, and inspect evidence/provenance for research candidates.
 
 PolyMerge is not an autonomous prescribing system and does not produce clinically validated safety guarantees, dosage recommendations, or clinical treatment decisions.
 
@@ -22,25 +18,17 @@ FastAPI ML/Graph service
 Neo4j biomedical knowledge graph
   ↓
 Graph-backed candidate generation / safety filtering / greedy set-cover baseline
-  ↓
-Future traditional supervised ML scoring after dataset selection and training
 ```
 
-MySQL is used as the application/system data foundation. The biomedical
-knowledge graph is not duplicated into MySQL. Neo4j remains the biomedical
-evidence source; future traditional ML uses derived tabular features rather
-than replacing the graph evidence layer.
+MySQL is used as the application/system data foundation. The biomedical knowledge graph is not duplicated into MySQL.
 
 ## Core Design Principles
 
 - Decision-support only: outputs are research candidates for expert review.
 - Deterministic safety rules remain independent from model scores.
 - Coverage is a knowledge-graph metric, not a clinical efficacy claim.
-- Evidence/provenance must be explicit for known graph relationships, rule outcomes, and future traditional model outputs.
-- Future traditional model scores must be labeled clearly as predictions and separated from graph evidence.
-- No neural-network, deep-learning, GNN, transformer, large language model,
-  pretrained foundation model, or AutoML-generated model is planned for the
-  final academic ML solution.
+- Evidence/provenance must be explicit for known graph relationships, rule outcomes, and future model outputs.
+- Future model scores must be labeled clearly as predictions and separated from graph evidence.
 
 ## Current Implementation Status
 
@@ -53,26 +41,21 @@ than replacing the graph evidence layer.
 - Disease to compound retrieval uses represented `CtD` treatment relationships.
 - Compound-gene evidence uses `CbG`, `CuG`, and `CdG`.
 - Side-effect evidence uses `CcSE`.
-- Graph-backed candidate generation returns single-drug candidates with evidence/provenance.
-- Disease x drug coverage is derived from represented `CtD` edges.
-- Multi-drug candidate-set generation preserves stable IDs, graph evidence, and provenance.
+- Graph-backed candidate generation returns individual compound candidates with evidence/provenance.
 - Hard contraindication rules are preserved and exposed with structured reason payloads.
-- Greedy set-cover baseline consumes graph-derived candidate-set coverage.
-- Candidate ranking, comparison fields, and rejection reasons are present as a Sprint 2 foundation.
+- Greedy set-cover baseline consumes graph-derived coverage.
 - Backend fallback behavior is explicitly labeled as demo fallback when the ML/Graph service is unavailable.
 - Research-only terminology is used in API and UI text.
 
 ### Planned Next
 
-- Finalize the supervised ML problem, preferred as drug-pair interaction classification.
-- Select a legitimate dataset, target variable, and negative-label strategy.
-- Run required EDA, including missing values, duplicates, class distribution, outliers, and at least five meaningful visualizations.
-- Build leakage-safe preprocessing and traditional tabular features.
-- Compare exactly three traditional ML algorithms: Logistic Regression, Random Forest, and Gradient Boosting.
-- Use the same train/test split, preprocessing logic, cross-validation strategy, and primary metric for all models.
-- Evaluate the selected model exactly once on an untouched test set.
-- Save the preprocessing pipeline and selected model for deployment.
-- Deploy with Streamlit unless another framework is instructor-approved.
+- Sprint 4 comparison of `LogisticRegression`, `RandomForestClassifier`, and
+  `HistGradientBoostingClassifier` using the Sprint 3 split and preprocessing
+  contract. `GradientBoostingClassifier` is only a course-compatibility fallback.
+- Use macro F1 as the primary model-selection metric and evaluate the selected
+  model once on the untouched test set.
+- Save the selected preprocessing pipeline, model, and experiment metadata only
+  after training and validation are complete.
 - Graph visualization.
 
 ## Data Reality and Current Limitations
@@ -80,11 +63,18 @@ than replacing the graph evidence layer.
 - Hetionet is currently the available knowledge-graph source.
 - Hetionet does not directly provide drug-drug interaction labels.
 - `CrC` means compound resemblance and must not be treated as DDI.
-- Drug-pair interaction classification requires a dedicated supervised dataset
-  and a documented target variable.
-- Absence of a known DDI label is not proof that a drug pair is safe.
+- Sprint 3 uses DDInter 2.0 severity labels (Major, Moderate, Minor). Unknown is
+  excluded from supervised data, with no synthetic no-interaction examples.
+- The completed dataset has 130,422 canonical labeled pairs, an 80/20 stratified
+  split, and 55 final features.
+- Hetionet supplies optional graph features; `CrC` is resemblance only.
+- PubChem supplies conservatively verified structures, and RDKit supplies
+  deterministic interpretable descriptors. Official PUG REST enrichment produced
+  1,315 validated mappings and 67.818% distinct-drug structure coverage; missing
+  coverage is explicit.
 - Current graph-backed candidates use `mlStatus: "not_applied"`.
-- Current predictive ML output is not active until the traditional model is trained and integrated.
+- Current predictive ML output is inactive until a traditional model is trained,
+  validated, and integrated.
 - The optimizer is a greedy baseline, not a production-grade optimizer.
 
 ## Scope Boundaries
@@ -96,7 +86,6 @@ than replacing the graph evidence layer.
 - Hard safety rules.
 - Greedy set-cover baseline.
 - Candidate ranking foundation.
-- Traditional ML dataset preparation, EDA, feature engineering, model comparison, and deployment.
 - Evidence/provenance structures.
 
 ### Out of Scope
@@ -105,4 +94,4 @@ than replacing the graph evidence layer.
 - Dosage recommendations.
 - Clinical validation or regulatory approval.
 - Chemical stability/formulation guarantees.
-- Active ML predictions until a real traditional model and dataset are integrated.
+- Predictive DDI severity output until a trained model is validated and integrated.

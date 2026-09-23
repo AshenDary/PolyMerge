@@ -7,6 +7,7 @@
 - [ ] Prepare unavailable-model handling plan
 - [ ] Confirm current responses keep `mlStatus: "not_applied"`
 - [ ] Preserve response fields distinguishing KG evidence from future traditional ML predictions
+- [ ] Align the future contract with the finalized DDInter severity target
 
 ## Definition of Done
 

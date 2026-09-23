@@ -19,9 +19,9 @@
 
 Sprint 1 graph foundation is implemented and ready for review. Sprint 2
 candidate-set foundations preserve graph-derived coverage and provenance.
-Future work includes graph integrity checks against larger datasets, supervised
-dataset preparation, data dictionaries, graph-derived tabular features, and
-optional RDKit descriptor preparation.
+Sprint 3 adds Jared's completed DDInter 2.0 severity dataset, PubChem PUG REST
+enrichment, RDKit descriptors, graph-derived tabular features, EDA, and
+leakage-safe preprocessing. No predictive model has been trained or integrated.
 
 ## Ranee — Backend / Traditional ML Integration
 
@@ -62,6 +62,13 @@ The optimizer consumes graph-derived candidate-set coverage and produces baselin
 - Graph evidence must remain separate from future traditional ML predictions.
 - Hard safety rules must remain deterministic and independent of model scores.
 - `CrC` must not be treated as a DDI label.
+- DDInter is the Sprint 3 severity-label source. Unknown is excluded from
+  supervised training, and absent interactions are not treated as safe negatives.
+- PubChem/RDKit provide molecular features; Hetionet provides graph evidence
+  and optional graph features rather than the supervised target.
 - Coverage means knowledge-graph treatment coverage, not clinical efficacy.
 - Any future model or dataset integration must include provenance and model/version metadata.
-- The planned academic comparison is Logistic Regression, Random Forest, and Gradient Boosting using the same split, preprocessing, cross-validation strategy, and primary metric.
+- The planned academic comparison is `LogisticRegression`,
+  `RandomForestClassifier`, and `HistGradientBoostingClassifier` using the same
+  split, preprocessing, cross-validation strategy, and macro F1 primary metric.
+  `GradientBoostingClassifier` is only a course-compatibility fallback.
