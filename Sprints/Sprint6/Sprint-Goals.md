@@ -30,7 +30,7 @@ Researcher -> Disease Selection -> Neo4j Evidence -> Candidate Generation -> Har
 - [ ] Uncertainty
 - [ ] AUROC
 - [ ] AUPRC
-- [ ] F1
+- [ ] Macro F1 as the primary model metric
 - [ ] Reproducibility
 
 ## Constraint

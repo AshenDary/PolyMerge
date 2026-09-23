@@ -4,7 +4,8 @@
 
 - [ ] Compare rule-based baseline
 - [ ] Compare greedy KG baseline
-- [ ] Compare Logistic Regression, Random Forest, and Gradient Boosting results
+- [ ] Compare `LogisticRegression`, `RandomForestClassifier`, and
+  `HistGradientBoostingClassifier` results
 - [ ] Prepare Streamlit/frontend screenshots
 - [ ] Prepare final evaluation report structure
 - [ ] Verify explainability output in final results

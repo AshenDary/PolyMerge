@@ -17,7 +17,7 @@
 - Backend `/api/diseases` uses the ML/Graph service rather than a hard-coded disease catalog.
 - Backend validates selected diseases against the graph-backed catalog before candidate search.
 - Candidate generation returns graph-derived single-compound candidates with stable IDs, treatment evidence, and provenance.
-- `dataStatus` and `mlStatus` distinguish real graph data from future traditional ML prediction.
+- `dataStatus` and `mlStatus` distinguish real graph data from future ML prediction.
 - Deterministic hard safety rules remain independent of model outputs.
 - Greedy set-cover baseline consumes graph-derived coverage.
 - Backend and ML test suites cover Sprint 1 graph, API, validation, fallback, and optimization behavior.
@@ -44,68 +44,68 @@
 - Implemented: rejected candidate sets include pre-optimization hard-safety reasons.
 - Remaining: broaden graph/integration coverage against live Neo4j fixtures where available.
 - Remaining: refine frontend support for reviewing multi-drug candidate-set comparisons and rejection details.
-- Remaining: continue optimization work beyond the greedy baseline without treating traditional ML prediction as active before training and integration.
+- Remaining: continue optimization work beyond the greedy baseline without
+  treating future supervised model scores as active.
 
 ## Sprint 3 — Dataset, EDA & Traditional Feature Engineering
 
+### Status: DDInter Migration Implemented / Ready For Review
+
+- Implemented: official DDInter 2.0 acquisition, checksums, license, and provenance.
+- Implemented: 130,422 canonical Major/Moderate/Minor severity pairs; Unknown is
+  audited and excluded, with no synthetic negative labels.
+- Implemented: duplicate, reverse-pair, malformed, and label-conflict audits.
+- Implemented: conservative PubChem structure mapping for 1,315 drugs and six RDKit descriptors.
+- Implemented: symmetric pair features with explicit graph/structure availability indicators.
+- Implemented: 55-feature matrix and per-feature coverage/distribution audit.
+- Implemented: secondary one-or-more-unseen-drug cold-start split for research analysis.
+- Implemented: data dictionary, profile, EDA findings, and seven figures.
+- Implemented: leakage-safe scikit-learn preprocessing helper for Sprint 4.
+- Implemented: deterministic 80/20 stratified train/test split.
+- Implemented: 104,337 training rows and 26,085 test rows in the primary split.
+- Implemented: Sprint 3 tests for dataset validity, features, preprocessing,
+  and split behavior.
+- Preserved: old CtD data only as a clearly named legacy prototype.
+- Not implemented: model training, GNNs, graph embeddings, neural networks, or transformers.
+
+## Sprint 4 — Traditional Supervised ML Model Comparison
+
 ### Status: Planned
 
-- Finalize the supervised ML problem, with drug-pair interaction classification as the preferred task.
-- Finalize the dataset, target variable, and negative-label strategy.
-- Document dataset source, license, inclusion criteria, and known limitations.
-- Build a data dictionary for raw fields, engineered features, and target labels.
-- Inspect missing values, duplicate rows, target/class distribution, and outliers.
-- Create at least five meaningful EDA visualizations for the academic workflow.
-- Create leakage-safe preprocessing shared by all models.
-- Derive traditional tabular features from compound identity encodings, graph relationship counts, gene-target overlap, side-effect overlap, pharmacologic-class features, treatment coverage features, and optional reproducible RDKit descriptors.
-- Prepare reproducible train/test data.
-- If a suitable DDI classification dataset cannot be finalized, document a fallback supervised drug-disease treatment classification task derived from Hetionet.
-
-## Sprint 4 — Three Traditional ML Model Comparison
-
-### Status: Planned
-
-- Compare exactly three permitted traditional ML algorithms: Logistic Regression, Random Forest, and Gradient Boosting.
-- Use the same train/test split for all models.
-- Use the same preprocessing logic for all models.
-- Use the same cross-validation strategy and folds for all models.
-- Use the same primary metric for all model selection decisions.
-- Tune only on training data.
-- Report validation mean and variability for the primary metric.
-- Compare supporting metrics appropriate to the selected target.
-- Select the final model using documented evidence.
-- Store experiment metadata and model-version information.
+- Train and compare exactly `LogisticRegression`, `RandomForestClassifier`, and
+  `HistGradientBoostingClassifier`. Use `GradientBoostingClassifier` only as a
+  course-compatibility fallback.
+- Use the Sprint 3 train/test split, preprocessing helper, target definition,
+  feature definitions, and primary metric.
+- Fit preprocessing only on training data.
+- Use macro F1 as primary metric and document pair-split drug overlap.
+- Use a most-frequent predictor only as a non-competing context baseline.
 
 Important: Hetionet `CrC` is compound resemblance and must not be treated as a DDI label.
 
-## Sprint 5 — Final Evaluation & PolyMerge Integration
+## Sprint 5 — Final Evaluation & Integration
 
 ### Status: Planned
 
 - Evaluate the selected model exactly once on the untouched test set.
-- Save the leakage-safe preprocessing pipeline.
-- Save the selected model.
+- Save the leakage-safe preprocessing pipeline and selected model.
 - Expose model metadata and training-data provenance.
-- Integrate traditional ML predictions with PolyMerge candidate scoring where appropriate.
+- Integrate traditional ML predictions with candidate scoring where appropriate.
 - Keep deterministic safety rules independent from model scores.
 - Preserve graph evidence/provenance separately from ML prediction output.
-- Do not claim clinical safety, efficacy, or prescribing suitability.
-- Continue candidate comparison, rejection reasons, evidence paths, and graph visualization work as research explainability aids.
+- Continue candidate comparison, rejection reasons, evidence paths, and graph
+  visualization as research explainability aids.
 
 ## Sprint 6 — Deployment, Documentation & Academic Submission
 
 ### Status: Planned
 
-- Deploy with Streamlit unless the instructor approves the existing frontend as the deployment target.
-- Finalize README and setup instructions.
-- Package the dataset artifacts allowed for submission.
-- Finalize the data dictionary.
-- Finalize `requirements.txt`.
-- Capture screenshots for the deployed workflow.
-- Prepare the IMRaD paper.
-- Add IEEE references.
-- Document model limitations, graph limitations, safety boundaries, and reproducibility steps.
-- Verify reproducibility from a clean setup.
+- Deploy with Streamlit unless the instructor approves the existing frontend.
+- Finalize README, setup instructions, data dictionary, and requirements.
+- Package submission-eligible dataset and model artifacts.
+- Capture workflow screenshots and prepare the IMRaD paper with IEEE references.
+- Document model and graph limitations, safety boundaries, and reproducibility.
+- Verify the complete workflow from a clean setup.
 
 ## Scope Boundaries
 

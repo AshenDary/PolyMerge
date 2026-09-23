@@ -2,28 +2,33 @@
 
 ## Goal
 
-Prepare a supervised traditional ML dataset while keeping deterministic KG retrieval clearly separate from predictions.
+Build the reproducible supervised-data foundation for Sprint 4 traditional
+machine-learning comparison while keeping graph evidence separate from future
+model predictions.
 
-## Planned Supervised Task
+## Implemented Dataset Decision
 
-- Preferred: drug-pair interaction classification using a legitimate DDI dataset.
-- Fallback: drug-disease treatment relationship classification from a documented Hetionet-derived dataset.
-
-## Shared Tasks
-
-- [ ] Finalize supervised problem, dataset, target variable, and negative-label strategy
-- [ ] Document dataset source, license, and limitations
-- [ ] Build data dictionary
-- [ ] Inspect missing values, duplicates, target/class distribution, and outliers
-- [ ] Create at least five meaningful EDA visualizations
-- [ ] Create leakage-safe preprocessing
-- [ ] Derive traditional tabular features from graph and compound data
-- [ ] Prepare reproducible train/test data
+- Primary source: official DDInter 2.0 downloads under CC BY-NC-SA 4.0.
+- Target: `ddi_severity`, with Major, Moderate, and Minor classes.
+- Unknown remains auditable but is excluded from supervised data.
+- Hetionet supplies optional graph features; `CrC` is never a DDI label.
+- PubChem and RDKit supply verified structures and deterministic descriptors.
+- The old CtD task is retained only as a legacy prototype.
 
 ## Definition of Done
 
-- [ ] Dataset and target choice are documented
-- [ ] EDA outputs are reproducible
-- [ ] Train/test split is saved or reproducibly generated
-- [ ] Graph evidence remains separate from future traditional ML predictions
-- [ ] No neural-network or graph-embedding model is introduced
+- [x] DDInter source provenance, license, hashes, and target are documented
+- [x] No synthetic negatives or no-interaction class are created
+- [x] Pair canonicalization, duplicate, conflict, and Unknown audits exist
+- [x] DDInter-to-Hetionet mapping coverage is explicit
+- [x] PubChem cache, mapping audit, RDKit validation, and coverage are explicit
+- [x] Pair features are symmetric and missing coverage differs from known zero
+- [x] Primary and secondary cold-start evaluation splits are documented
+- [x] Per-feature coverage and distribution audit exists
+- [x] Data dictionary exists
+- [x] Dataset loading, validation, feature generation, and split code are reusable
+- [x] EDA script, written findings, and at least five figures exist
+- [x] Leakage-safe preprocessing helper exists for Sprint 4
+- [x] Train/test split is deterministic and stratified
+- [x] Tests pass
+- [x] No model training, GNN, graph embedding, neural network, transformer, or TransE is added

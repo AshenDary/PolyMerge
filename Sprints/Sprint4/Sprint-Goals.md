@@ -1,24 +1,27 @@
-# Sprint 4 - Three Traditional ML Model Comparison
+# Sprint 4 - Traditional Supervised ML Model Comparison
 
 ## Goal
 
-Compare exactly three permitted traditional ML algorithms on the finalized supervised task.
+Train and compare the course-required traditional supervised models using the
+Sprint 3 dataset, split, preprocessing helper, and target definition.
 
 ## Shared Tasks
 
-- [ ] Train Logistic Regression
-- [ ] Train Random Forest
-- [ ] Train Gradient Boosting
-- [ ] Use the same train/test split for all models
-- [ ] Use the same preprocessing logic for all models
-- [ ] Use the same cross-validation folds for all models
-- [ ] Use the same primary metric for all models
-- [ ] Tune only on training data
-- [ ] Report validation mean and variability
-- [ ] Compare supporting metrics
-- [ ] Select final model using documented evidence
-- [ ] Store model version and experiment metadata
+- [ ] Train `LogisticRegression`
+- [ ] Train `RandomForestClassifier`
+- [ ] Train `HistGradientBoostingClassifier`
+- [ ] Use `data/processed/sprint3/train.csv`
+- [ ] Use `data/processed/sprint3/test.csv`
+- [ ] Use `ml_engine/app/data/preprocessing.py`
+- [ ] Fit preprocessing on train only
+- [ ] Use macro F1 as the same primary metric for all three models
+- [ ] Document pair-split drug overlap and cold-start limitations
+- [ ] Keep the test split out of feature selection and tuning
+- [ ] Report a most-frequent baseline for context only
+- [ ] Apply weighting/resampling only inside training CV folds if justified
 
 ## Important Constraint
 
-Hetionet `CrC` must not be treated as a DDI dataset. Drug-pair interaction classification must use a dedicated supervised dataset with a documented target and negative-label strategy.
+DDInter 2.0 is the label source. Hetionet `CrC` is resemblance context only.
+Unknown is not a supervised class, and no missing pair is a safe negative.
+`GradientBoostingClassifier` is only a course-compatibility fallback.

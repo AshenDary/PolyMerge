@@ -1,0 +1,249 @@
+{
+  "ambiguous_mapping_count": 0,
+  "canonical_unique_pairs": 160235,
+  "conflicting_label_pair_count": 0,
+  "constant_or_near_constant_features": [
+    "pharmacologic_class_intersection_count",
+    "pharmacologic_class_jaccard"
+  ],
+  "distinct_ddinter_drugs": 1939,
+  "duplicate_pair_rows": 62428,
+  "exact_duplicate_rows": 62428,
+  "exact_id_mapping_count": 0,
+  "exact_name_mapping_count": 227,
+  "excluded_conflicting_pairs": 0,
+  "excluded_unknown_rows": 29813,
+  "feature_columns": [
+    "hetionet_available_count",
+    "both_hetionet_available",
+    "graph_ctd_disease_count_mean",
+    "graph_ctd_disease_count_abs_difference",
+    "graph_cpd_disease_count_mean",
+    "graph_cpd_disease_count_abs_difference",
+    "graph_bound_gene_count_mean",
+    "graph_bound_gene_count_abs_difference",
+    "graph_upregulated_gene_count_mean",
+    "graph_upregulated_gene_count_abs_difference",
+    "graph_downregulated_gene_count_mean",
+    "graph_downregulated_gene_count_abs_difference",
+    "graph_side_effect_count_mean",
+    "graph_side_effect_count_abs_difference",
+    "graph_pharmacologic_class_count_mean",
+    "graph_pharmacologic_class_count_abs_difference",
+    "graph_resemblance_neighbor_count_mean",
+    "graph_resemblance_neighbor_count_abs_difference",
+    "graph_graph_degree_mean",
+    "graph_graph_degree_abs_difference",
+    "gene_intersection_count",
+    "gene_union_count",
+    "gene_jaccard",
+    "bound_gene_intersection_count",
+    "bound_gene_union_count",
+    "bound_gene_jaccard",
+    "upregulated_gene_intersection_count",
+    "upregulated_gene_union_count",
+    "upregulated_gene_jaccard",
+    "downregulated_gene_intersection_count",
+    "downregulated_gene_union_count",
+    "downregulated_gene_jaccard",
+    "side_effect_intersection_count",
+    "side_effect_union_count",
+    "side_effect_jaccard",
+    "treated_disease_intersection_count",
+    "treated_disease_union_count",
+    "treated_disease_jaccard",
+    "pharmacologic_class_intersection_count",
+    "pharmacologic_class_union_count",
+    "pharmacologic_class_jaccard",
+    "structure_available_count",
+    "both_structures_available",
+    "molecular_weight_mean",
+    "molecular_weight_abs_difference",
+    "logp_mean",
+    "logp_abs_difference",
+    "tpsa_mean",
+    "tpsa_abs_difference",
+    "hbd_mean",
+    "hbd_abs_difference",
+    "hba_mean",
+    "hba_abs_difference",
+    "rotatable_bonds_mean",
+    "rotatable_bonds_abs_difference"
+  ],
+  "final_feature_count": 55,
+  "final_supervised_rows": 130422,
+  "fully_novel_test_drugs": 19,
+  "graph_feature_count": 41,
+  "malformed_rows": 1,
+  "mapping_percentage": 11.707,
+  "mapping_status_counts": {
+    "exact_name": 227,
+    "unmapped": 1712
+  },
+  "metadata_columns": [
+    "pair_id",
+    "drug_a_ddinter_id",
+    "drug_a_name",
+    "drug_b_ddinter_id",
+    "drug_b_name",
+    "source_severity",
+    "source_file",
+    "atc_category",
+    "source_dataset",
+    "dataset_version",
+    "drug_a_hetionet_id",
+    "drug_b_hetionet_id",
+    "drug_a_mapping_status",
+    "drug_b_mapping_status",
+    "pair_mapping_coverage",
+    "drug_a_pubchem_cid",
+    "drug_b_pubchem_cid",
+    "drug_a_pubchem_status",
+    "drug_b_pubchem_status",
+    "pair_structure_coverage"
+  ],
+  "missing_values": {
+    "DDInterID_A": 0,
+    "DDInterID_B": 1,
+    "Drug_A": 0,
+    "Drug_B": 1,
+    "Level": 1,
+    "atc_category": 0,
+    "source_file": 0
+  },
+  "molecular_feature_count": 14,
+  "pair_mapping_coverage": {
+    "both_mapped": 3292,
+    "neither_mapped": 95712,
+    "only_drug_a_mapped": 16663,
+    "only_drug_b_mapped": 14755
+  },
+  "pair_structure_coverage": {
+    "both_structured": 77764,
+    "neither_structured": 8907,
+    "one_structured": 43751
+  },
+  "pubchem_mapping_percentage": 67.818,
+  "pubchem_mapping_status_counts": {
+    "ambiguous": 159,
+    "exact_unique": 1315,
+    "unmapped": 465
+  },
+  "pubchem_unique_mapping_count": 1315,
+  "random_state": 42,
+  "raw_rows": 222664,
+  "raw_severity_distribution": {
+    "Major": 33896,
+    "Minor": 10938,
+    "Moderate": 130367,
+    "Unknown": 47462
+  },
+  "rdkit_descriptor_names": [
+    "molecular_weight",
+    "logp",
+    "tpsa",
+    "hbd",
+    "hba",
+    "rotatable_bonds"
+  ],
+  "rdkit_note": "Accepted exact-title PubChem structures parsed successfully with RDKit; unresolved structures remain missing.",
+  "rdkit_structure_coverage": 1315,
+  "rdkit_structure_coverage_percentage": 67.818,
+  "reverse_duplicate_pair_count": 0,
+  "secondary_split": {
+    "all_test_drug_overlap_count": 1526,
+    "design": "10% deterministic drug holdout; every test pair contains at least one held-out drug",
+    "held_out_drugs_seen_in_train": 0,
+    "holdout_drugs": 190,
+    "limitation": "Partner drugs may occur in training; this is one-or-more-drug cold start, not a fully drug-disjoint partition.",
+    "test_rows": 24443,
+    "test_target_distribution": {
+      "Major": 4539,
+      "Minor": 1271,
+      "Moderate": 18633
+    },
+    "train_rows": 105979,
+    "train_target_distribution": {
+      "Major": 22375,
+      "Minor": 5562,
+      "Moderate": 78042
+    }
+  },
+  "source_columns": [
+    "DDInterID_A",
+    "DDInterID_B",
+    "Drug_A",
+    "Drug_B",
+    "Level",
+    "source_file",
+    "atc_category"
+  ],
+  "source_files": {
+    "ddinter_downloads_code_A.csv": {
+      "rows": 56367,
+      "sha256": "a22ca451d2b755ca2331886f7e00540c86f555f9f55704a59a19c691251f52e0"
+    },
+    "ddinter_downloads_code_B.csv": {
+      "rows": 15421,
+      "sha256": "22cee82ccfc60266f3dbf6a5db12f9390c3390c025e8dc945c2c85f00ca4fa58"
+    },
+    "ddinter_downloads_code_D.csv": {
+      "rows": 25681,
+      "sha256": "c0627ec39965dbe27829e4934cd20d71eb079f4e373287678737bba9423a306a"
+    },
+    "ddinter_downloads_code_H.csv": {
+      "rows": 11727,
+      "sha256": "f0f925f0ba1ee68c4668d3e7a6732719b34623b22a0f5d017f9090e59f63c88e"
+    },
+    "ddinter_downloads_code_L.csv": {
+      "rows": 65389,
+      "sha256": "f54f4486cc00344f8c86508c31c2ca3fad6d1d37ec3af5bcf609b4bbda5507ef"
+    },
+    "ddinter_downloads_code_P.csv": {
+      "rows": 5492,
+      "sha256": "83f8c0edb20d09ef29b8500b48f9623e208379525688ade9e70a7df2d8749d55"
+    },
+    "ddinter_downloads_code_R.csv": {
+      "rows": 30563,
+      "sha256": "1c39c3d4a6e41659b7a988538d7f363867592abc6f41a815de8746f6e2150574"
+    },
+    "ddinter_downloads_code_V.csv": {
+      "rows": 12024,
+      "sha256": "353973fb300453946aea95733e8fb52338e4b59426d2ce6ca318363d4f84f10a"
+    }
+  },
+  "target_classes": [
+    "Major",
+    "Moderate",
+    "Minor"
+  ],
+  "target_column": "ddi_severity",
+  "target_distribution": {
+    "Major": 26914,
+    "Minor": 6833,
+    "Moderate": 96675
+  },
+  "task": "DDInter drug-drug interaction severity classification",
+  "test_distinct_drugs": 1787,
+  "test_drug_overlap_percentage": 98.937,
+  "test_drugs_seen_in_train": 1768,
+  "test_rows": 26085,
+  "test_size": 0.2,
+  "test_target_distribution": {
+    "Major": 5383,
+    "Minor": 1367,
+    "Moderate": 19335
+  },
+  "train_rows": 104337,
+  "train_target_distribution": {
+    "Major": 21531,
+    "Minor": 5466,
+    "Moderate": 77340
+  },
+  "unit_of_analysis": "one unique canonical unordered DDInter drug pair",
+  "unmapped_drug_count": 1712,
+  "valid_inchikey_count": 1315,
+  "valid_smiles_count": 1315,
+  "valid_structure_count": 1315,
+  "verified_alias_mapping_count": 0
+}
