@@ -63,6 +63,8 @@ MySQL is used as the application/system data foundation. The biomedical knowledg
 - Sprint 3 uses DDInter 2.0 severity labels (Major, Moderate, Minor). Unknown is
   excluded from supervised data, with no synthetic no-interaction examples.
 - Hetionet supplies optional graph features; `CrC` is resemblance only.
+- PubChem supplies conservatively verified structures, and RDKit supplies
+  deterministic interpretable descriptors. Missing coverage is explicit.
 - Current graph-backed candidates use `mlStatus: "not_applied"`.
 - Current candidate generation is not yet the final multi-drug optimization pipeline.
 - The optimizer is a greedy baseline, not a production-grade optimizer.

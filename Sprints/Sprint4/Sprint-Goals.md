@@ -9,7 +9,7 @@ Sprint 3 dataset, split, preprocessing helper, and target definition.
 
 - [ ] Train Logistic Regression
 - [ ] Train Random Forest
-- [ ] Train Gradient Boosting
+- [ ] Train Histogram Gradient Boosting (`GradientBoostingClassifier` fallback if required)
 - [ ] Use `data/processed/sprint3/train.csv`
 - [ ] Use `data/processed/sprint3/test.csv`
 - [ ] Use `ml_engine/app/data/preprocessing.py`
@@ -17,6 +17,8 @@ Sprint 3 dataset, split, preprocessing helper, and target definition.
 - [ ] Use macro F1 as the same primary metric for all three models
 - [ ] Document pair-split drug overlap and cold-start limitations
 - [ ] Keep the test split out of feature selection and tuning
+- [ ] Report a most-frequent baseline for context only
+- [ ] Apply weighting/resampling only inside training CV folds if justified
 
 ## Important Constraint
 

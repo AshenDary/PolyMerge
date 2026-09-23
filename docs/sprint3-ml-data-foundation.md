@@ -1,56 +1,53 @@
-# Sprint 3 DDInter ML Data Foundation
+# Sprint 3 DDInter Feature Foundation
 
 ## Dataset Contract
 
-- Task: classify severity for a known curated DDInter drug pair.
-- Unit: one unique canonical unordered pair, keyed by stable DDInter IDs.
-- Target: `ddi_severity` from DDInter 2.0.
-- Classes: Major, Moderate, Minor.
-- Excluded label: Unknown, retained in an interim audit file.
-- Graph feature source: the checked-in Hetionet fragment.
-- Molecular descriptors: not applied because the official downloads provide no
-  verified SMILES, InChI, or InChIKey.
+The task remains three-class severity classification for known curated DDInter
+2.0 pairs: Major, Moderate, or Minor. Unknown is audited and excluded. No
+synthetic non-interactions are generated, and absence is never treated as safe.
 
-There are no generated non-interactions or synthetic negatives. Missing DDInter
-records are never interpreted as safe. Hetionet `CrC` contributes resemblance
-context only and is never a label or severity proxy.
+## Reproducible Sources
 
-## Reproducibility and Provenance
+- DDInter 2.0: labels and pair provenance; official files are checksum-verified.
+- PubChem PUG REST: chemical identity and structures. Queries are cached locally,
+  started below five requests/second, and accepted only for a single exact
+  normalized title with SMILES, InChI, InChIKey, and successful RDKit parsing.
+- RDKit: molecular weight, LogP, TPSA, HBD, HBA, and rotatable-bond counts.
+- Hetionet: graph context only. `CrC` is resemblance, never DDI severity.
 
-The tracked source manifest records the official DDInter 2.0 download and terms
-pages, CC BY-NC-SA 4.0 license, retrieval date, source filenames, and SHA-256
-checksums. Raw CSVs are ignored. `scripts/acquire_ddinter.py` retrieves and
-verifies them before `scripts/build_sprint3_dataset.py` runs.
+Run `scripts/acquire_ddinter.py`, `scripts/enrich_pubchem.py`,
+`scripts/build_sprint3_dataset.py`, then `scripts/run_sprint3_eda.py`. The
+PubChem JSONL cache makes normal rebuilds offline and deterministic.
 
-The builder validates the observed five-column schema, preserves source file and
-ATC category provenance, excludes malformed rows, canonicalizes by DDInter IDs,
-deduplicates cross-category records, and quarantines any pair with conflicting
-known labels. It never applies a highest-severity rule.
+## Coverage and Features
 
-## Mapping and Features
+PubChem provides 1,315 accepted structures for 1,939 drugs (67.818%); 77,764
+pairs have both structures (59.62%). Hetionet mapping remains 227 drugs
+(11.707%) and 3,292 both-mapped pairs (2.52%) because the checked-in graph nodes
+contain no additional stable cross-reference.
 
-DDInter names map to Hetionet compounds only when a normalized exact name has one
-unambiguous candidate. Mapping statuses are `exact_name`, `ambiguous`, or
-`unmapped`; ambiguous candidates are not accepted. All DDInter rows remain in
-the primary dataset because requiring both mappings would retain only 3,292 of
-130,422 pairs.
+The 55 model features are symmetric under pair swapping: mean and absolute
+difference for drug-level values, and intersection/union/Jaccard for graph sets.
+Coverage indicators are complete. Missing graph or molecular measurements are
+`NaN`, while a represented empty graph set is a known zero. The feature-coverage
+artifact reports missingness, zeros, unique values, and distribution statistics.
 
-The 29 traditional graph features include per-drug relationship counts and
-degree plus pairwise shared-entity counts and Jaccard similarities. Missing
-features represent unavailable graph coverage, not zero biological activity.
+## Splits and Preprocessing
 
-## Split and Preprocessing
+The primary 80/20 pair-stratified split remains fixed at random state 42 and has
+98.937% test-drug overlap. A secondary deterministic 10% drug-holdout split
+ensures every test pair includes at least one unseen drug. Partner drugs may
+still be familiar, so this is cold-start analysis, not a fully drug-disjoint set.
 
-The checked-in primary split is 80/20, stratified by severity, with random state
-42. Canonical pairs cannot cross splits. The same drug can appear in both; the
-profile records 98.937% test-drug overlap, so the split primarily evaluates new
-pairs among familiar drugs rather than cold-start drugs.
+The shared `ColumnTransformer` excludes labels, identifiers, names, mapping
+metadata, and provenance. Median imputation and scaling are fitted only on
+training data or CV folds.
 
-`ml_engine/app/data/preprocessing.py` returns `X`, `y`, and a scikit-learn
-`ColumnTransformer`. Target and metadata fields are excluded. Imputation,
-scaling, and encoding must be fitted on training data or CV folds only.
+Sprint 4 should compare Logistic Regression, Random Forest, and
+HistGradientBoostingClassifier using identical folds and macro F1. The literal
+GradientBoostingClassifier is the fallback if required by the course. A
+most-frequent predictor is context only, not one of the three models. Class
+weights or resampling may be investigated only inside training/CV folds.
 
-Sprint 4 can compare Logistic Regression, Random Forest, and Gradient Boosting
-using the same split and preprocessing contract. Macro F1 is recommended due to
-the small Minor class. No predictive model has been trained in Sprint 3, and
-application responses remain `mlStatus: "not_applied"`.
+No model has been trained or selected. Application output remains
+`mlStatus: "not_applied"`.

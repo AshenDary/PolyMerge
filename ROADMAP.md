@@ -54,7 +54,10 @@
 - Implemented: official DDInter 2.0 acquisition, checksums, license, and provenance.
 - Implemented: canonical Major/Moderate/Minor severity dataset; Unknown is audited.
 - Implemented: duplicate, reverse-pair, malformed, and label-conflict audits.
-- Implemented: explicit DDInter-to-Hetionet mapping and 29 graph features.
+- Implemented: conservative PubChem structure mapping for 1,315 drugs and six RDKit descriptors.
+- Implemented: symmetric pair features with explicit graph/structure availability indicators.
+- Implemented: 55-feature matrix and per-feature coverage/distribution audit.
+- Implemented: secondary one-or-more-unseen-drug cold-start split for research analysis.
 - Implemented: data dictionary, profile, EDA findings, and seven figures.
 - Implemented: leakage-safe scikit-learn preprocessing helper for Sprint 4.
 - Implemented: deterministic 80/20 stratified train/test split.
@@ -67,12 +70,13 @@
 
 ### Status: Planned
 
-- Train and compare exactly Logistic Regression, Random Forest, and Gradient
-  Boosting.
+- Train and compare exactly Logistic Regression, Random Forest, and Histogram
+  Gradient Boosting. Fall back to literal `GradientBoostingClassifier` if required.
 - Use the Sprint 3 train/test split, preprocessing helper, target definition,
   feature definitions, and primary metric.
 - Fit preprocessing only on training data.
 - Use macro F1 as primary metric and document pair-split drug overlap.
+- Use a most-frequent predictor only as a non-competing context baseline.
 
 Important: Hetionet `CrC` is compound resemblance and must not be treated as a DDI label.
 

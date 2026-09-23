@@ -12,6 +12,7 @@ model predictions.
 - Target: `ddi_severity`, with Major, Moderate, and Minor classes.
 - Unknown remains auditable but is excluded from supervised data.
 - Hetionet supplies optional graph features; `CrC` is never a DDI label.
+- PubChem and RDKit supply verified structures and deterministic descriptors.
 - The old CtD task is retained only as a legacy prototype.
 
 ## Definition of Done
@@ -20,6 +21,10 @@ model predictions.
 - [x] No synthetic negatives or no-interaction class are created
 - [x] Pair canonicalization, duplicate, conflict, and Unknown audits exist
 - [x] DDInter-to-Hetionet mapping coverage is explicit
+- [x] PubChem cache, mapping audit, RDKit validation, and coverage are explicit
+- [x] Pair features are symmetric and missing coverage differs from known zero
+- [x] Primary and secondary cold-start evaluation splits are documented
+- [x] Per-feature coverage and distribution audit exists
 - [x] Data dictionary exists
 - [x] Dataset loading, validation, feature generation, and split code are reusable
 - [x] EDA script, written findings, and at least five figures exist

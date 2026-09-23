@@ -21,6 +21,10 @@ PolyMerge's current multi-drug candidate generation and optimization is a resear
   Unknown is excluded, and absence from DDInter is not a safety label.
 - Exact-name Hetionet mapping covers only part of DDInter; graph-feature
   missingness and the both-mapped subset may be systematically biased.
+- PubChem enrichment accepts only exact-title, RDKit-valid structures. Ambiguous
+  names remain unresolved, and large molecules create real descriptor outliers.
+- The secondary split guarantees at least one unseen drug per test pair, but its
+  partner drug can be present in training; it is not fully drug-disjoint.
 - Evidence preservation is provenance-oriented and should not be interpreted as regulatory or prescribing evidence.
 - Greedy set-cover can miss globally better combinations because it makes local choices.
 - Combination enumeration is bounded by configuration and may omit larger sets.

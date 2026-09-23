@@ -7,8 +7,8 @@ the whole project re-explained every session.
 
 ## Member A — ML Data Engineer (Knowledge Graph & Representation)
 
-**Core skills:** Neo4j + Cypher, RDKit, Python (pandas), Hetionet/DrugBank
-data wrangling, traditional supervised feature engineering, scikit-learn.
+**Core skills:** Neo4j + Cypher, PubChem PUG REST, RDKit, Python (pandas),
+Hetionet data wrangling, traditional supervised feature engineering, scikit-learn.
 
 **Owns:** `ml_engine/app/utils/neo4j_client.py`,
 `scripts/filter_hetionet_fragment.py`, `scripts/load_fragment.py`,

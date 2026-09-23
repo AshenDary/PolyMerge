@@ -14,3 +14,5 @@
 - [ ] Feature/target definitions are documented in the model report
 - [ ] Hetionet `CrC` is not used as a DDI label
 - [ ] Pairwise split and drug-overlap limitations are reported
+- [ ] Use symmetric features and the shared train-fitted preprocessing contract
+- [ ] Keep PubChem, DDInter, Hetionet, and RDKit provenance out of X

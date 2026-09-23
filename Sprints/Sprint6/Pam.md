@@ -6,7 +6,7 @@
 - [ ] Compare greedy KG baseline
 - [ ] Compare Logistic Regression baseline
 - [ ] Compare Random Forest baseline
-- [ ] Compare Gradient Boosting baseline
+- [ ] Compare Histogram Gradient Boosting baseline (`GradientBoostingClassifier` fallback if required)
 - [ ] Prepare final evaluation report structure
 - [ ] Verify explainability output in final results
 

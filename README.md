@@ -55,15 +55,19 @@ No predictive ML model is applied in current graph-backed candidate responses.
 Sprint 3 adds a DDInter 2.0 three-class DDI severity data foundation, but does
 not train or serve a model.
 
+Feature enrichment uses cached, conservatively accepted PubChem structures,
+traditional RDKit descriptors, and symmetric Hetionet graph summaries. Missing
+coverage remains distinct from known zero relationships.
+
 - Graph-backed responses use `dataStatus: "real_graph"`.
 - Predictive model status is `mlStatus: "not_applied"`.
 - `interactionRisk` and `synergyScore` are `null`/not applied for real graph-backed candidates.
 - The supervised target is curated DDInter severity: Major, Moderate, or Minor.
 - Unknown severity is audited but excluded; no synthetic negatives or
   no-interaction class are created.
-- Sprint 4 should compare traditional `LogisticRegression`,
-  `RandomForestClassifier`, and `GradientBoostingClassifier` on the Sprint 3
-  data outputs.
+- Sprint 4 should compare `LogisticRegression`, `RandomForestClassifier`, and
+  `HistGradientBoostingClassifier` on the same data/CV contract. Use the literal
+  `GradientBoostingClassifier` only if required by the course interpretation.
 
 If the ML/Graph service is unavailable or violates the response contract, the backend returns an explicitly labeled fallback:
 
@@ -187,6 +191,7 @@ Sprint 3 data outputs:
 
 ```bash
 python3 scripts/acquire_ddinter.py
+python3 scripts/enrich_pubchem.py
 python3 scripts/build_sprint3_dataset.py
 python3 scripts/run_sprint3_eda.py
 ```

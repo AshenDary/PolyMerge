@@ -9,11 +9,14 @@ the source license. The tracked `data/original/ddinter/source_manifest.json`
 records retrieval date, source URLs, filenames, and SHA-256 checksums.
 Processed DDInter-derived data remains subject to CC BY-NC-SA 4.0; the source
 manifest and this documentation provide attribution and identify transformations.
+`data/original/pubchem/source_manifest.json` separately records the official
+NCBI API, retrieval policy, query fields, cache, and conservative acceptance rule.
 
 Acquire and verify the source, then reproduce all outputs:
 
 ```bash
 python3 scripts/acquire_ddinter.py
+python3 scripts/enrich_pubchem.py
 python3 scripts/build_sprint3_dataset.py
 python3 scripts/run_sprint3_eda.py
 ```
@@ -25,6 +28,9 @@ Primary outputs:
 - `data/processed/sprint3/test.csv`
 - `data/interim/sprint3/dataset_profile.json`
 - `data/interim/sprint3/ddinter_hetionet_mapping.csv`
+- `data/interim/sprint3/ddinter_pubchem_mapping.csv`
+- `data/interim/sprint3/pubchem_query_cache.jsonl`
+- `data/interim/sprint3/feature_coverage.csv`
 - `data/interim/sprint3/ddinter_conflicts.csv`
 - `data/interim/sprint3/excluded_unknown_severity.csv`
 
@@ -36,11 +42,12 @@ safety.
 
 ## Feature Sources
 
-Hetionet supplies optional graph features through strict exact normalized-name
-mapping. Unmapped graph values remain missing for train-fitted preprocessing.
-The official CSVs contain no verified molecular structure identifiers, so RDKit
-descriptors are not generated. Neo4j and Hetionet remain the application graph
-sources and are not replaced by DDInter.
+PubChem PUG REST supplies chemical identities and structures under a conservative
+exact-title policy. The cached audit allows offline rebuilds. RDKit generates six
+traditional descriptors from accepted structures. Hetionet supplies optional
+graph features through strict exact normalized-name mapping. Unavailable graph
+and molecular measurements remain missing and have explicit coverage indicators.
+Neo4j and Hetionet remain the application graph sources and are not replaced.
 
 The previous CtD classification output is retained only at
 `data/processed/sprint3/legacy_ctd/ml_dataset.csv` as a historical graph-relation

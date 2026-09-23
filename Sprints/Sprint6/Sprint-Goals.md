@@ -14,7 +14,7 @@ Researcher -> Disease Selection -> Neo4j -> Candidate Generation -> Hard Safety 
 - [ ] Greedy KG baseline
 - [ ] Logistic Regression baseline
 - [ ] Random Forest baseline
-- [ ] Gradient Boosting baseline
+- [ ] Histogram Gradient Boosting baseline (`GradientBoostingClassifier` fallback if required)
 
 ## Metrics to Track
 

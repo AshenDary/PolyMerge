@@ -19,7 +19,8 @@
 
 Sprint 1 graph foundation is implemented and ready for review. Sprint 3 adds a
 DDInter 2.0 severity data foundation and optional mapped Hetionet graph features.
-No predictive model has been trained or integrated.
+PubChem/RDKit enrichment supplies symmetric molecular features where identity is
+verified. No predictive model has been trained or integrated.
 
 ## Ranee — Backend / ML Integration
 
