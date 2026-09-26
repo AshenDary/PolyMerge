@@ -21,7 +21,8 @@ Sprint 1 graph foundation is implemented and ready for review. Sprint 2
 candidate-set foundations preserve graph-derived coverage and provenance.
 Sprint 3 adds Jared's completed DDInter 2.0 severity dataset, PubChem PUG REST
 enrichment, RDKit descriptors, graph-derived tabular features, EDA, and
-leakage-safe preprocessing. No predictive model has been trained or integrated.
+leakage-safe preprocessing. Sprint 4 completed training-only cross-validation
+and selected `RandomForestClassifier`; no predictive model is integrated or served.
 
 ## Ranee — Backend / Traditional ML Integration
 
@@ -68,7 +69,7 @@ The optimizer consumes graph-derived candidate-set coverage and produces baselin
   and optional graph features rather than the supervised target.
 - Coverage means knowledge-graph treatment coverage, not clinical efficacy.
 - Any future model or dataset integration must include provenance and model/version metadata.
-- The planned academic comparison is `LogisticRegression`,
-  `RandomForestClassifier`, and `HistGradientBoostingClassifier` using the same
-  split, preprocessing, cross-validation strategy, and macro F1 primary metric.
-  `GradientBoostingClassifier` is only a course-compatibility fallback.
+- The completed academic comparison used `LogisticRegression`,
+  `RandomForestClassifier`, and `HistGradientBoostingClassifier` with the same
+  training split, fold-local preprocessing, five-fold strategy, and Macro F1
+  primary metric. `RandomForestClassifier` advances to Sprint 5.

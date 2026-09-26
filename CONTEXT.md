@@ -46,16 +46,15 @@ MySQL is used as the application/system data foundation. The biomedical knowledg
 - Greedy set-cover baseline consumes graph-derived coverage.
 - Backend fallback behavior is explicitly labeled as demo fallback when the ML/Graph service is unavailable.
 - Research-only terminology is used in API and UI text.
+- Sprint 4 compared the three approved traditional classifiers with clean,
+  training-only five-fold cross-validation and selected
+  `RandomForestClassifier` by mean Macro F1.
 
 ### Planned Next
 
-- Sprint 4 comparison of `LogisticRegression`, `RandomForestClassifier`, and
-  `HistGradientBoostingClassifier` using the Sprint 3 split and preprocessing
-  contract. `GradientBoostingClassifier` is only a course-compatibility fallback.
-- Use macro F1 as the primary model-selection metric and evaluate the selected
-  model once on the untouched test set.
-- Save the selected preprocessing pipeline, model, and experiment metadata only
-  after training and validation are complete.
+- Sprint 5 final evaluation of `RandomForestClassifier` exactly once on the
+  untouched test set.
+- Save the selected preprocessing pipeline and model only after final evaluation.
 - Graph visualization.
 
 ## Data Reality and Current Limitations
@@ -73,8 +72,8 @@ MySQL is used as the application/system data foundation. The biomedical knowledg
   1,315 validated mappings and 67.818% distinct-drug structure coverage; missing
   coverage is explicit.
 - Current graph-backed candidates use `mlStatus: "not_applied"`.
-- Current predictive ML output is inactive until a traditional model is trained,
-  validated, and integrated.
+- Current predictive ML output remains inactive until the selected traditional
+  model is finally evaluated, persisted, and integrated in Sprint 5.
 - The optimizer is a greedy baseline, not a production-grade optimizer.
 
 ## Scope Boundaries

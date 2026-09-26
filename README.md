@@ -57,8 +57,8 @@ MySQL and Prisma are used for application/system data foundations. Neo4j remains
 ## Current ML Status
 
 No predictive ML model is applied in current graph-backed candidate responses.
-Sprint 3 adds a DDInter 2.0 three-class DDI severity data foundation, but does
-not train or serve a model.
+Sprint 4 completed a training-only comparison on the DDInter 2.0 data
+foundation, but does not serve or integrate the selected model.
 
 Feature enrichment uses cached, conservatively accepted PubChem structures,
 traditional RDKit descriptors, and symmetric Hetionet graph summaries. Missing
@@ -74,9 +74,10 @@ validated mappings and 67.818% structure coverage across distinct drugs.
 - The supervised target is curated DDInter severity: Major, Moderate, or Minor.
 - Unknown severity is audited but excluded; no synthetic negatives or
   no-interaction class are created.
-- Sprint 4 should compare `LogisticRegression`, `RandomForestClassifier`, and
-  `HistGradientBoostingClassifier` on the same data/CV contract. Use the literal
-  `GradientBoostingClassifier` only if required by the course interpretation.
+- Sprint 4 compared `LogisticRegression`, `RandomForestClassifier`, and
+  `HistGradientBoostingClassifier` under one five-fold CV contract and selected
+  `RandomForestClassifier` by mean Macro F1.
+- The untouched test split remains reserved for Sprint 5 final evaluation.
 - The academic ML solution is restricted to traditional supervised learning;
   neural networks, deep learning, GNNs, transformers, foundation models, and
   AutoML-generated models are out of scope.
@@ -101,8 +102,8 @@ Fallback responses must not be interpreted as real graph evidence or real ML pre
 - `/api/drugs/:id` and `/api/drugs/:id/interactions` still provide reference/demo backend responses and are not the primary graph-backed candidate-search flow.
 - Explainability is limited and does not yet provide advanced graph visualization or model explanation.
 - Hetionet `CrC` means compound resemblance and is not a DDI label.
-- DDI severity prediction requires Sprint 4 model training and validation on the
-  documented DDInter dataset before any integration.
+- DDI severity prediction requires Sprint 5 final test evaluation and model
+  integration before it can appear in candidate responses.
 - Absence of a DDInter label is not evidence that a drug pair is safe.
 - Clinical recommendations, dosage decisions, and autonomous prescribing are outside project scope.
 
