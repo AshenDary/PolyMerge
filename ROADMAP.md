@@ -66,20 +66,20 @@
 - Implemented: Sprint 3 tests for dataset validity, features, preprocessing,
   and split behavior.
 - Preserved: old CtD data only as a clearly named legacy prototype.
-- Not implemented: model training, GNNs, graph embeddings, neural networks, or transformers.
+- Not implemented in Sprint 3: model training, GNNs, graph embeddings, neural networks, or transformers.
 
 ## Sprint 4 — Traditional Supervised ML Model Comparison
 
-### Status: Planned
+### Status: Implemented / Ready for Sprint 5
 
-- Train and compare exactly `LogisticRegression`, `RandomForestClassifier`, and
-  `HistGradientBoostingClassifier`. Use `GradientBoostingClassifier` only as a
-  course-compatibility fallback.
-- Use the Sprint 3 train/test split, preprocessing helper, target definition,
-  feature definitions, and primary metric.
-- Fit preprocessing only on training data.
-- Use macro F1 as primary metric and document pair-split drug overlap.
-- Use a most-frequent predictor only as a non-competing context baseline.
+- Compared exactly `LogisticRegression`, `RandomForestClassifier`, and
+  `HistGradientBoostingClassifier` using fixed parameters.
+- Used one materialized five-fold stratified split of the Sprint 3 training data.
+- Fitted median imputation and standard scaling separately within each training fold.
+- Selected `RandomForestClassifier` by mean validation Macro F1.
+- Reported a most-frequent predictor as a non-competing context baseline.
+- Kept the Sprint 3 test split untouched for Sprint 5 final evaluation.
+- Kept model persistence, serving, and candidate scoring inactive.
 
 Important: Hetionet `CrC` is compound resemblance and must not be treated as a DDI label.
 

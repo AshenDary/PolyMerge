@@ -1,320 +1,84 @@
 # Sprint 4 Model Comparison Report
 
-## Objective
-
-Define and produce the Sprint 4 comparison report used to select one traditional classifier from shared cross-validation results without evaluating the untouched test set early.
-
-## Executive Summary
-
-This report documents the comparison of three candidate machine learning models for DDI severity classification using 5-fold stratified cross-validation on the training data. The **primary selection metric is macro F1**, which gives equal weight to all three severity classes (Major, Moderate, Minor) regardless of their frequency in the dataset.
-
-### Key Findings
-
-- **Best Model**: [To be determined after running evaluation]
-- **Selection Basis**: Highest mean macro F1 score across 5 cross-validation folds
-- **Test Set Status**: Untouched and reserved for Sprint 5 final evaluation
-- **Baseline Context**: Most-frequent classifier included as non-competing baseline
-
-## Scope
-
-### Models Compared
-
-1. **LogisticRegression**
-   - Multi-class multinomial logistic regression
-   - Linear decision boundaries
-   - Interpretable coefficients
-   - Configuration: `max_iter=1000`, `solver='lbfgs'`, `random_state=42`
-
-2. **RandomForestClassifier**
-   - Ensemble of decision trees
-   - Non-linear decision boundaries
-   - Handles feature interactions
-   - Configuration: `n_estimators=100`, `class_weight='balanced'`, `random_state=42`
-
-3. **HistGradientBoostingClassifier**
-   - Histogram-based gradient boosting
-   - Fast training on large datasets
-   - Native support for missing values
-   - Configuration: `max_iter=100`, `learning_rate=0.1`, `random_state=42`
-
-### Baseline
-
-- **Most-Frequent Classifier (DummyClassifier)**
-  - Always predicts the majority class
-  - Provides non-competing context for minimum acceptable performance
-  - Not a candidate for selection
-
-## Evaluation Protocol
-
-### Dataset
-
-- **Source**: DDInter 2.0 processed dataset
-- **Training Rows**: 104,337 canonical drug pairs
-- **Test Rows**: 26,085 pairs (untouched)
-- **Features**: 55 numeric symmetric pair features
-  - Hetionet graph summaries and availability indicators
-  - PubChem structure availability indicators
-  - RDKit molecular descriptor summaries
-- **Target Classes**: Major, Moderate, Minor
-- **Split Strategy**: 80/20 stratified by severity, random_state=42
-
-### Cross-Validation Strategy
-
-- **Method**: StratifiedKFold
-- **Folds**: 5
-- **Stratification**: Target class (ddi_severity)
-- **Shuffle**: True with random_state=42
-- **Fit/Transform**: Preprocessing fitted on training folds only, then applied to validation folds
-
-### Preprocessing Pipeline
-
-All models use identical preprocessing:
-
-1. **Imputation**: Median imputation for numeric features (fitted on training data per fold)
-2. **Scaling**: StandardScaler normalization (fitted on training data per fold)
-3. **Leak Prevention**: Preprocessing fitted only on training folds, never on validation data
-
-Reference: `ml_engine/app/data/preprocessing.py`
-
-### Metrics Collected
-
-#### Primary Metric
-
-- **Macro F1**: Unweighted average of per-class F1 scores
-  - Gives equal importance to all classes regardless of frequency
-  - **This is the sole model selection criterion**
-
-#### Secondary Metrics (for context and minority-class assessment)
-
-- **Per-Class Metrics**: Precision, Recall, F1 for each severity class
-- **Weighted F1**: Class-frequency-weighted average F1
-- **Micro F1**: Global precision and recall average
-- **Accuracy**: Overall classification accuracy
-- **AUROC**: Multi-class one-vs-rest area under ROC curve (where applicable)
-- **AUPRC**: Multi-class one-vs-rest average precision-recall curve (where applicable)
-- **Confusion Matrix**: Predicted vs true class counts
-
-#### Minority Class Focus
-
-Given the class imbalance, we explicitly report:
-- Minor class precision, recall, and F1
-- Per-class support (sample counts)
-- Confusion patterns showing minority class misclassifications
-
-## Comparison Results
-
-> **Note**: Results will be populated when `run_sprint4_model_comparison.py` is executed.
-
-### Macro F1 Comparison
-
-| Model | Macro F1 Mean | Macro F1 Std | Status |
-|-------|---------------|--------------|--------|
-| Baseline (Most Frequent) | TBD | TBD | Non-competing context |
-| Model 1 | TBD | TBD | Candidate |
-| Model 2 | TBD | TBD | Candidate |
-| Model 3 | TBD | TBD | Candidate |
-
-### Per-Class Performance
-
-#### Major Class
-
-| Model | Precision | Recall | F1 Score | Support |
-|-------|-----------|--------|----------|---------|
-| LogisticRegression | TBD | TBD | TBD | TBD |
-| RandomForestClassifier | TBD | TBD | TBD | TBD |
-| HistGradientBoostingClassifier | TBD | TBD | TBD | TBD |
-
-#### Moderate Class
-
-| Model | Precision | Recall | F1 Score | Support |
-|-------|-----------|--------|----------|---------|
-| LogisticRegression | TBD | TBD | TBD | TBD |
-| RandomForestClassifier | TBD | TBD | TBD | TBD |
-| HistGradientBoostingClassifier | TBD | TBD | TBD | TBD |
-
-#### Minor Class (Minority)
-
-| Model | Precision | Recall | F1 Score | Support |
-|-------|-----------|--------|----------|---------|
-| LogisticRegression | TBD | TBD | TBD | TBD |
-| RandomForestClassifier | TBD | TBD | TBD | TBD |
-| HistGradientBoostingClassifier | TBD | TBD | TBD | TBD |
-
-### Confusion Matrices
-
-> See `docs/figures/sprint4/confusion_matrices.svg` after running visualization script.
-
-### Cross-Validation Score Variability
-
-Reporting mean ± standard deviation across folds provides uncertainty estimates:
-- Low variability indicates stable, generalizable performance
-- High variability suggests sensitivity to fold composition or potential overfitting
-
-## Recommendation
-
-### Selected Model
-
-**Model**: [TBD after evaluation]
-
-**Macro F1**: [TBD] ± [TBD]
-
-**Justification**: 
-[Will be populated with the model achieving highest mean macro F1 across cross-validation folds]
-
-### Minority Class Performance
-
-[Will document Minor class precision, recall, and F1 for the selected model]
-
-### Next Steps
-
-**Sprint 5**: Final evaluation on the untouched test set (26,085 pairs)
-- Single evaluation run with no further tuning
-- Comprehensive performance report
-- Comparison of validation vs test performance
-- Secondary cold-start split evaluation
-
-## Future Comparison Views and Explainability
-
-The report structure includes placeholders for future enhancement fields:
-
-### Future Comparison Views (Not Implemented in Sprint 4)
-
-- **Side-by-Side Prediction Comparison**: Compare predictions across models for same drug pairs
-- **Disagreement Analysis**: Identify pairs where models disagree on severity
-- **Confidence Intervals**: Bootstrap or Bayesian confidence intervals for metrics
-- **Learning Curves**: Performance vs training set size
-- **Feature Importance Comparison**: Model-specific feature importance rankings
-
-### Future Explainability Fields (Reserved for Later Sprints)
-
-- **Per-Prediction Explanations**: SHAP, LIME, or attention weights for individual predictions
-- **Feature Attribution**: Which features contribute most to severity predictions
-- **Graph Evidence Paths**: Hetionet metapaths supporting predictions (kept visually distinct from model outputs)
-- **Deterministic Rule Integration**: Hard contraindications or known interactions (kept separate from ML predictions)
-- **Uncertainty Quantification**: Calibrated probabilities, prediction intervals
-
-**Important**: Graph evidence, deterministic rules, and model outputs remain **visually and conceptually distinct**:
-- Graph features (Hetionet) are **model inputs**, not predictions
-- Deterministic rules (if added) are **independent checks**, not ML outputs  
-- Model predictions are **statistical estimates**, not known facts
-
-This separation prevents confusion between:
-1. **Known evidence** (graph relationships, verified interactions)
-2. **Model predictions** (learned statistical patterns)
-3. **Rule-based constraints** (hard safety checks)
-
-## Limitations and Context
-
-### Split Characteristics
-
-1. **Drug Overlap**: 98.94% of test drugs appear in training
-   - Split evaluates new combinations among familiar drugs
-   - **Not** a cold-start or fully unseen-drug evaluation
-   - Secondary cold-start split (190 held-out drugs) available for stress testing
-
-2. **Pair-Level Split**: Pairs are disjoint between train/test, drugs are not
-   - Tests generalization to new drug combinations
-   - Does not test generalization to completely novel drugs
-
-### Model Limitations
-
-1. **Validation Performance**: Results are cross-validation on training data
-   - Final test performance may differ
-   - Test set is reserved for Sprint 5 unbiased evaluation
-
-2. **Hyperparameter Tuning**: Models use default or lightly tuned parameters
-   - No comprehensive grid search performed
-   - Focus is on architecture comparison, not optimal tuning
-
-3. **Class Imbalance**: Minority class (Minor) has limited representation
-   - Macro F1 prioritizes balanced performance over majority-class accuracy
-   - Per-class metrics show performance variability across severities
-
-4. **Feature Coverage**: Graph and molecular features have varying availability
-   - Missing values imputed from training data
-   - Availability indicators distinguish missing from zero values
-
-5. **Evaluation Scope**: Comparison uses the same folds and preprocessing
-   - Ensures fair comparison
-   - Does not explore alternative feature engineering or sampling strategies
-
-### System Status
-
-This is a **research classification system** for DDI severity prediction:
-- **Not validated for clinical safety decisions**
-- **Not a drug interaction compatibility claim**
-- Intended for decision-support and research purposes only
-- No clinical guarantee provided
-
-### Provenance
-
-- **Target Annotations**: DDInter 2.0
-- **Chemical Identity**: PubChem PUG REST API
-- **Molecular Descriptors**: RDKit
-- **Graph Evidence**: Hetionet v1.0
-- **Processing Scripts**: Checked into repository with manifests
-- **Reproducibility**: All random states fixed, full pipeline documented
-
-## Visualizations
-
-After running the comparison, visualizations are generated in `docs/figures/sprint4/`:
-
-1. **macro_f1_comparison.svg**: Bar chart comparing macro F1 across models
-2. **per_class_performance.svg**: Per-class precision, recall, F1 breakdown
-3. **confusion_matrices.svg**: Confusion matrices for each model
-4. **metric_distributions.svg**: Distribution of CV scores across metrics
-5. **minority_class_focus.svg**: Detailed Minor class performance analysis
+## Experiment
+
+- Dataset: `data/processed/sprint3/train.csv` (104,337 canonical drug pairs)
+- Target: `ddi_severity`
+- Classes: Major, Moderate, Minor
+- Features: 55 numeric symmetric pair features
+- Cross-validation: `StratifiedKFold(n_splits=5, shuffle=True, random_state=42)`
+- Fold fingerprint: `fae1f6e6165e5d065540990eb4f3fda8f9c42a79d9609b0efecb4a16021896a3`
+- Primary metric: mean validation Macro F1
+- Preprocessing: median imputation and `StandardScaler`, fitted separately on each training fold
+- Random state: 42
+- Clean commit: `81aa3d413dcd45d5110b7b7aef6cb77307423897`
+- Canonical artifact: `data/interim/sprint4/training_experiment.json`
+
+The target labels come from DDInter 2.0. PubChem and RDKit provide molecular
+features, while Hetionet provides graph context. Hetionet `CrC` is compound
+resemblance context and is not DDI evidence. Unknown labels are excluded, and
+unlabeled pairs are not converted into synthetic negatives.
+
+## Model Parameters
+
+These are fixed Sprint 4 comparison parameters, not tuned or "best"
+hyperparameters. No grid search, randomized search, or other hyperparameter
+tuning was performed.
+
+| Model | Fixed parameters |
+|---|---|
+| LogisticRegression | `max_iter=1000`, `solver="lbfgs"`, `random_state=42`, `class_weight=None` |
+| RandomForestClassifier | `n_estimators=100`, `max_features="sqrt"`, `n_jobs=1`, `random_state=42`, `class_weight=None` |
+| HistGradientBoostingClassifier | `max_iter=100`, `learning_rate=0.1`, `random_state=42`, `class_weight=None` |
+
+All other estimator parameters retain the scikit-learn 1.4.0 defaults recorded
+in the canonical artifact.
+
+## Validation Results
+
+All class metrics, AUROC, and AUPRC below are computed from out-of-fold
+predictions on the training split. AUROC and AUPRC are macro one-vs-rest values.
+
+| Model | Mean Macro F1 | Std Macro F1 | Major F1 | Moderate F1 | Minor F1 | Macro AUROC | Macro AUPRC |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| LogisticRegression | 0.290759 | 0.001509 | 0.013229 | 0.851459 | 0.007602 | 0.620185 | 0.402097 |
+| RandomForestClassifier | 0.506086 | 0.005695 | 0.341365 | 0.869865 | 0.307134 | 0.787447 | 0.618778 |
+| HistGradientBoostingClassifier | 0.407769 | 0.005931 | 0.211538 | 0.860662 | 0.151255 | 0.739625 | 0.545643 |
+
+## Baseline
+
+The `MostFrequentBaseline` is non-selection-eligible. It achieved validation
+Macro F1 `0.283800 +/- 0.000004`, Major F1 `0.000000`, Moderate F1 `0.851401`,
+Minor F1 `0.000000`, macro AUROC `0.500000`, and macro AUPRC `0.333333`.
+
+## Selected Model
+
+`RandomForestClassifier` advances to Sprint 5 because it has the highest mean
+validation Macro F1 among the three eligible models. The untouched Sprint 3
+test split was not loaded or evaluated. Sprint 5 owns final test evaluation,
+model persistence, and any later integration.
+
+## Figures
+
+Sprint 4 does not require or publish figures. The canonical JSON artifact
+contains per-fold scores, out-of-fold per-class metrics, and confusion matrices
+for reproducible downstream reporting without another training run.
+
+## Limitations
+
+- The Moderate class dominates the dataset; the Minor class is underrepresented.
+- The primary pair split contains mostly drugs already represented in training,
+  so it mainly measures new-pair generalization rather than drug cold start.
+- Hetionet graph coverage remains sparse, and missing coverage is not known zero evidence.
+- These cross-validation results are research evidence, not clinical validation.
+- The test set remains untouched and reserved for Sprint 5 final evaluation.
+- No hyperparameter tuning was performed in Sprint 4.
 
 ## Reproducibility
 
-### Running the Comparison
+Run `python3 scripts/run_sprint4_training.py` from the repository root. The
+canonical implementation is `ml_engine/app/models/training_pipeline.py`; it
+does not persist a trained estimator or activate model serving. Current
+candidate responses remain `mlStatus: "not_applied"`.
 
-```bash
-# Run model comparison (generates report JSON)
-python ml_engine/scripts/run_sprint4_model_comparison.py
-
-# Generate visualizations
-python ml_engine/scripts/visualize_model_comparison.py
-```
-
-### Outputs
-
-- **JSON Report**: `data/interim/sprint4/model_comparison_report.json`
-- **Figures**: `docs/figures/sprint4/*.svg`
-- **Console Summary**: Printed during execution
-
-### Dependencies
-
-- scikit-learn: Model training and evaluation
-- pandas: Data manipulation
-- numpy: Numerical operations
-- matplotlib: Visualization
-- seaborn: Statistical plotting
-
-## References
-
-- **Experiment Contract**: `docs/sprint4-experiment-contract.md`
-- **Data Dictionary**: `docs/data-dictionary.md`
-- **Feature Contract**: `data/interim/sprint4/feature_contract.json`
-- **Dataset Profile**: `data/interim/sprint3/dataset_profile.json`
-- **Preprocessing**: `ml_engine/app/data/preprocessing.py`
-- **Model Comparison Code**: `ml_engine/app/models/model_comparison.py`
-
-## Acceptance Criteria Checklist
-
-- [x] Report structure and metric definitions are reproducible
-- [x] Macro F1 is the sole primary model-selection metric
-- [x] All three models compared under identical evaluation contract
-- [x] Minority-class results and uncertainty/variability explicit
-- [x] Untouched test set reserved for Sprint 5 final evaluation
-- [x] Recommendation includes limitations and provenance
-- [x] Results framed as research decision-support, not clinical guarantee
-- [x] No separate model implementation trained (uses cross_validate)
-- [x] No model serving activated
-- [x] Predicted risk kept distinct from known graph evidence
-
----
-
-**Document Version**: 1.0  
-**Last Updated**: [To be set after first run]  
-**Status**: Ready for evaluation execution
+**Status**: Implemented / Ready for Sprint 5
