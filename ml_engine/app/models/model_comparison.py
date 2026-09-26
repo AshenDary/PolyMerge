@@ -13,6 +13,7 @@ from sklearn.dummy import DummyClassifier
 from sklearn.ensemble import HistGradientBoostingClassifier, RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import (
+    average_precision_score,
     classification_report,
     confusion_matrix,
     f1_score,
@@ -42,6 +43,8 @@ class ModelResult:
     per_class_metrics: pd.DataFrame
     auroc: float | None = None
     auroc_per_class: dict[str, float] = field(default_factory=dict)
+    auprc: float | None = None
+    auprc_per_class: dict[str, float] = field(default_factory=dict)
     metadata: dict[str, Any] = field(default_factory=dict)
 
 
@@ -97,6 +100,8 @@ class ComparisonReport:
             "classification_report": result.classification_report,
             "auroc": float(result.auroc) if result.auroc is not None else None,
             "auroc_per_class": {k: float(v) for k, v in result.auroc_per_class.items()},
+            "auprc": float(result.auprc) if result.auprc is not None else None,
+            "auprc_per_class": {k: float(v) for k, v in result.auprc_per_class.items()},
             "metadata": result.metadata,
         }
 
@@ -224,9 +229,11 @@ def evaluate_model(
         "support": support,
     })
     
-    # AUROC if probabilities available
+    # AUROC and AUPRC if probabilities available
     auroc = None
     auroc_per_class = {}
+    auprc = None
+    auprc_per_class = {}
     if y_pred_proba is not None:
         try:
             # Multi-class AUROC (one-vs-rest)
@@ -237,13 +244,23 @@ def evaluate_model(
                 average="macro",
             )
             
-            # Per-class AUROC
+            # Multi-class AUPRC (one-vs-rest, macro average)
             from sklearn.preprocessing import label_binarize
             y_bin = label_binarize(y, classes=["Major", "Moderate", "Minor"])
+            
+            # Per-class AUROC and AUPRC
+            auprc_scores = []
             for idx, class_name in enumerate(["Major", "Moderate", "Minor"]):
                 auroc_per_class[class_name] = roc_auc_score(
                     y_bin[:, idx], y_pred_proba[:, idx]
                 )
+                auprc_per_class[class_name] = average_precision_score(
+                    y_bin[:, idx], y_pred_proba[:, idx]
+                )
+                auprc_scores.append(auprc_per_class[class_name])
+            
+            # Macro average AUPRC
+            auprc = float(np.mean(auprc_scores))
         except (ValueError, AttributeError):
             pass
     
@@ -260,6 +277,8 @@ def evaluate_model(
         per_class_metrics=per_class,
         auroc=auroc,
         auroc_per_class=auroc_per_class,
+        auprc=auprc,
+        auprc_per_class=auprc_per_class,
         metadata={
             "cv_folds": cv_folds,
             "random_state": random_state,
@@ -285,6 +304,20 @@ def generate_comparison_report(
         "target_classes": ["Major", "Moderate", "Minor"],
         "source": "DDInter 2.0",
         "split_strategy": "80/20 stratified pair split, random_state=42",
+        "split_characteristics": {
+            "unit": "canonical unordered drug pairs",
+            "drug_overlap": "98.94% of test drugs appear in training",
+            "pair_overlap": "0% (pairs are disjoint between train/test)",
+            "interpretation": "Measures new combinations among familiar drugs, not cold-start generalization",
+        },
+        "secondary_cold_start_split": {
+            "available": True,
+            "description": "190 held-out drugs, one-or-more-unseen-drug evaluation",
+            "train_rows": 105979,
+            "test_rows": 24443,
+            "limitation": "Partner drugs may occur in both partitions; not fully drug-disjoint",
+            "note": "Available for optional stress testing, not used for primary model selection",
+        },
         "note": "Test set is untouched and reserved for Sprint 5 final evaluation",
     }
     
@@ -366,7 +399,9 @@ def generate_comparison_report(
         "This is a research classification system, not validated for clinical safety decisions.",
         "Graph and molecular features have varying coverage; missing measurements are imputed from training data.",
         "Models are compared using default or lightly tuned hyperparameters; comprehensive tuning was not performed.",
-        "AUROC may not be reliable for imbalanced multiclass problems; macro F1 is the primary selection metric.",
+        "AUROC and AUPRC are reported where valid but may not be reliable for imbalanced multiclass problems; macro F1 is the primary selection metric.",
+        "Future comparison views and explainability fields are defined in report structure but not yet implemented.",
+        "Graph evidence (Hetionet features), deterministic rules, and model outputs remain visually and conceptually distinct; no mixing of known evidence with predicted risk.",
     ]
     
     return ComparisonReport(
@@ -427,6 +462,8 @@ def print_comparison_summary(report: ComparisonReport) -> None:
         print(f"     Accuracy: {result.cv_scores['accuracy'].mean():.4f}")
         if result.auroc is not None:
             print(f"     AUROC (macro): {result.auroc:.4f}")
+        if result.auprc is not None:
+            print(f"     AUPRC (macro): {result.auprc:.4f}")
         
         print(f"\n     Per-class metrics:")
         for _, row in result.per_class_metrics.iterrows():

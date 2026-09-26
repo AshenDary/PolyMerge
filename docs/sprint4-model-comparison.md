@@ -91,6 +91,7 @@ Reference: `ml_engine/app/data/preprocessing.py`
 - **Micro F1**: Global precision and recall average
 - **Accuracy**: Overall classification accuracy
 - **AUROC**: Multi-class one-vs-rest area under ROC curve (where applicable)
+- **AUPRC**: Multi-class one-vs-rest average precision-recall curve (where applicable)
 - **Confusion Matrix**: Predicted vs true class counts
 
 #### Minority Class Focus
@@ -171,6 +172,36 @@ Reporting mean ± standard deviation across folds provides uncertainty estimates
 - Comprehensive performance report
 - Comparison of validation vs test performance
 - Secondary cold-start split evaluation
+
+## Future Comparison Views and Explainability
+
+The report structure includes placeholders for future enhancement fields:
+
+### Future Comparison Views (Not Implemented in Sprint 4)
+
+- **Side-by-Side Prediction Comparison**: Compare predictions across models for same drug pairs
+- **Disagreement Analysis**: Identify pairs where models disagree on severity
+- **Confidence Intervals**: Bootstrap or Bayesian confidence intervals for metrics
+- **Learning Curves**: Performance vs training set size
+- **Feature Importance Comparison**: Model-specific feature importance rankings
+
+### Future Explainability Fields (Reserved for Later Sprints)
+
+- **Per-Prediction Explanations**: SHAP, LIME, or attention weights for individual predictions
+- **Feature Attribution**: Which features contribute most to severity predictions
+- **Graph Evidence Paths**: Hetionet metapaths supporting predictions (kept visually distinct from model outputs)
+- **Deterministic Rule Integration**: Hard contraindications or known interactions (kept separate from ML predictions)
+- **Uncertainty Quantification**: Calibrated probabilities, prediction intervals
+
+**Important**: Graph evidence, deterministic rules, and model outputs remain **visually and conceptually distinct**:
+- Graph features (Hetionet) are **model inputs**, not predictions
+- Deterministic rules (if added) are **independent checks**, not ML outputs  
+- Model predictions are **statistical estimates**, not known facts
+
+This separation prevents confusion between:
+1. **Known evidence** (graph relationships, verified interactions)
+2. **Model predictions** (learned statistical patterns)
+3. **Rule-based constraints** (hard safety checks)
 
 ## Limitations and Context
 
