@@ -2,7 +2,12 @@ from __future__ import annotations
 
 import pytest
 
-from app.services.graph_service import GRAPH_VERSION, GraphService, Neo4jConnectionError
+from app.services.graph_service import (
+    GRAPH_VERSION,
+    GraphService,
+    Neo4jConnectionError,
+    _evidence_path,
+)
 
 
 DISEASES = {
@@ -245,12 +250,108 @@ def test_each_covered_disease_has_matching_ctd_evidence():
                 and evidence["evidenceType"] == "known"
                 for evidence in matching_evidence
             )
+            matching_paths = [
+                path
+                for path in candidate["graphEvidence"]["paths"]
+                if path["relationship"]["type"] == "CtD"
+                and path["targetEntity"]["id"] == disease_id
+            ]
+            assert matching_paths, (
+                f"{candidate['drugId']} covers {disease_id} without a matching CtD path"
+            )
 
 
 def test_drug_evidence_includes_targets_and_side_effects():
     relationships = GraphService(FakeGraphClient()).get_drug_relationships("Compound::DB00177")
     assert relationships["targets"][0]["relationship"] == "CbG"
     assert relationships["sideEffects"][0]["relationship"] == "CcSE"
+
+
+def test_candidate_exposes_traceable_treatment_gene_and_side_effect_paths():
+    result = GraphService(FakeGraphClient()).build_candidate_drugs(["hypertension"])
+    valsartan = next(
+        candidate for candidate in result["candidates"]
+        if candidate["drugId"] == "Compound::DB00177"
+    )
+    graph_evidence = valsartan["graphEvidence"]
+
+    assert graph_evidence["source"] == "Hetionet"
+    assert graph_evidence["graphVersion"] == GRAPH_VERSION
+    assert {path["semanticType"] for path in graph_evidence["paths"]} == {
+        "treatment",
+        "gene_context",
+        "side_effect_context",
+    }
+    treatment_path = next(
+        path for path in graph_evidence["paths"] if path["semanticType"] == "treatment"
+    )
+    assert treatment_path["sourceEntity"] == {
+        "id": "Compound::DB00177",
+        "name": "Valsartan",
+        "kind": "Compound",
+    }
+    assert treatment_path["relationship"] == {"type": "CtD", "metaedge": "CtD"}
+    assert treatment_path["targetEntity"]["id"] == "Disease::DOID:10763"
+    assert treatment_path["provenance"] == {
+        "source": "Hetionet",
+        "graphVersion": GRAPH_VERSION,
+        "evidenceType": "known",
+    }
+
+
+@pytest.mark.parametrize("relationship", ["CbG", "CuG", "CdG"])
+def test_gene_relationships_have_gene_context_semantics(relationship):
+    path = _evidence_path(
+        "Compound::DB00177",
+        "Valsartan",
+        {
+            "source": "Hetionet",
+            "graphVersion": GRAPH_VERSION,
+            "relationship": relationship,
+            "metaedge": relationship,
+            "targetId": "Gene::7422",
+            "targetName": "VEGFA",
+            "targetKind": "Gene",
+            "evidenceType": "known",
+        },
+    )
+
+    assert path is not None
+    assert path["semanticType"] == "gene_context"
+    assert path["relationship"] == {"type": relationship, "metaedge": relationship}
+    assert path["targetEntity"]["id"] == "Gene::7422"
+
+
+def test_evidence_path_id_is_stable_and_graph_version_sensitive():
+    evidence = {
+        "relationship": "CcSE",
+        "targetId": "Side Effect::C0018681",
+        "targetName": "Headache",
+        "graphVersion": GRAPH_VERSION,
+    }
+    first = _evidence_path("Compound::DB00177", "Valsartan", evidence)
+    second = _evidence_path("Compound::DB00177", "Renamed display value", evidence)
+    changed_version = _evidence_path(
+        "Compound::DB00177", "Valsartan", {**evidence, "graphVersion": "next-version"}
+    )
+
+    assert first is not None and second is not None and changed_version is not None
+    assert first["pathId"] == second["pathId"]
+    assert first["pathId"] != changed_version["pathId"]
+    assert first["semanticType"] == "side_effect_context"
+
+
+def test_crc_is_not_emitted_as_graph_evidence():
+    assert _evidence_path(
+        "Compound::DB00177",
+        "Valsartan",
+        {
+            "relationship": "CrC",
+            "metaedge": "CrC",
+            "targetId": "Compound::DB00381",
+            "targetName": "Amlodipine",
+        },
+    ) is None
 
 
 def test_empty_candidate_result_for_unrepresented_disease():

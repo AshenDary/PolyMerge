@@ -147,6 +147,43 @@ Response shape:
       "status": "accepted",
       "rejectionReasons": [],
       "evidence": [{ "source": "Hetionet", "relationship": "CtD" }],
+      "graphEvidence": {
+        "source": "Hetionet",
+        "graphVersion": "Hetionet v1.0 filtered PolyMerge fragment",
+        "paths": [
+          {
+            "pathId": "graph-path:a60e0433840b09f0eaa3b4a7",
+            "semanticType": "treatment",
+            "sourceEntity": {
+              "id": "Compound::DB00177",
+              "name": "Valsartan",
+              "kind": "Compound"
+            },
+            "relationship": { "type": "CtD", "metaedge": "CtD" },
+            "targetEntity": {
+              "id": "Disease::DOID:10763",
+              "name": "hypertension",
+              "kind": "Disease"
+            },
+            "provenance": {
+              "source": "Hetionet",
+              "graphVersion": "Hetionet v1.0 filtered PolyMerge fragment",
+              "evidenceType": "known"
+            }
+          }
+        ]
+      },
+      "comparison": {
+        "drugs": [
+          {
+            "drugId": "Compound::DB00177",
+            "drugName": "Valsartan",
+            "coveredDiseaseIds": ["Disease::DOID:10763"],
+            "evidenceCount": 1,
+            "evidencePathIds": ["graph-path:a60e0433840b09f0eaa3b4a7"]
+          }
+        ]
+      },
       "dataStatus": "real_graph",
       "mlStatus": "not_applied",
       "interactionRisk": null,
@@ -272,6 +309,30 @@ Candidate evidence may include:
 - `CbG`, `CuG`, `CdG` gene evidence.
 - `CcSE` side-effect evidence.
 
+`graphEvidence` is the structured, traceable form of these represented graph
+relationships. Its `paths` array supports only these semantic types:
+
+- `treatment` for `CtD` paths from a compound to a disease.
+- `gene_context` for `CbG`, `CuG`, and `CdG` paths from a compound to a gene.
+- `side_effect_context` for `CcSE` paths from a compound to a side effect.
+
+Each path preserves stable entity IDs, names, relationship type and metaedge,
+plus path-level source, graph version, and evidence type. Candidate sets contain
+the deterministic union of member-drug paths. `comparison.drugs[].evidencePathIds`
+references the paths belonging to that compound without duplicating their full
+payload.
+
+`pathId` has the form `graph-path:<24 hex characters>`. The suffix is the first
+24 hexadecimal characters of SHA-256 over the compact JSON array
+`[source, sourceEntity.id, relationship.type, targetEntity.id, graphVersion]`.
+Paths are deduplicated by `pathId` and returned in ascending `pathId` order.
+
+`graphEvidence` is independent of `rejectionReasons` and predictive ML output.
+It does not populate `interactionRisk` or `synergyScore`; while ML inference is
+not applied, those fields remain `null` and `mlStatus` remains `not_applied`.
+`CrC` is resemblance context only and is never emitted as treatment, DDI,
+severity, contraindication, or safety evidence.
+
 For every disease ID in `treatedDiseaseIds`, the candidate evidence should
 include corresponding treatment evidence where:
 
@@ -282,6 +343,10 @@ include corresponding treatment evidence where:
 
 `interactionRisk` and `synergyScore` are not applied for real graph-backed
 candidates.
+
+An empty context array means no corresponding relationship is represented in
+the current graph fragment. It is not a known negative biomedical fact. See
+`docs/sprint5-graph-evidence-provenance.md` for the full #43 handoff contract.
 
 ### `GET /api/combinations/:id`
 

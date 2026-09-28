@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import hashlib
+import json
 import re
 from typing import Any, Optional, Protocol
 
@@ -13,6 +15,11 @@ GRAPH_VERSION = "Hetionet v1.0 filtered PolyMerge fragment"
 TREATMENT_RELATIONSHIP = "CtD"
 TARGET_RELATIONSHIPS = ("CdG", "CuG", "CbG")
 SIDE_EFFECT_RELATIONSHIP = "CcSE"
+PATH_SEMANTICS = {
+    TREATMENT_RELATIONSHIP: ("treatment", "Disease"),
+    **{relationship: ("gene_context", "Gene") for relationship in TARGET_RELATIONSHIPS},
+    SIDE_EFFECT_RELATIONSHIP: ("side_effect_context", "Side Effect"),
+}
 
 
 class QueryClient(Protocol):
@@ -226,6 +233,13 @@ class GraphService:
             targets = self.get_drug_targets(drug_id, limit=5)
             side_effects = self.get_drug_side_effects(drug_id, limit=5)
             coverage = len(disease_ids) / denominator
+            graph_evidence = _graph_evidence(
+                drug_id=drug_id,
+                drug_name=row["drug_name"],
+                treatment_evidence=treatment_evidence,
+                targets=targets,
+                side_effects=side_effects,
+            )
 
             candidates.append(
                 {
@@ -252,6 +266,7 @@ class GraphService:
                     ],
                     "targets": targets,
                     "sideEffects": side_effects,
+                    "graphEvidence": graph_evidence,
                     "reasons": [
                         "Candidate was retrieved from represented knowledge-graph treatment relationships.",
                         "Coverage is knowledge-graph treatment coverage, not a clinical efficacy claim.",
@@ -332,9 +347,80 @@ def _entity_evidence(drug_id: str, entity: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def _graph_evidence(
+    drug_id: str,
+    drug_name: str,
+    treatment_evidence: list[dict[str, Any]],
+    targets: list[dict[str, Any]],
+    side_effects: list[dict[str, Any]],
+) -> dict[str, Any]:
+    represented_evidence = [
+        *treatment_evidence,
+        *[_entity_evidence(drug_id, target) for target in targets],
+        *[_entity_evidence(drug_id, side_effect) for side_effect in side_effects],
+    ]
+    paths = [
+        path
+        for evidence in represented_evidence
+        if (path := _evidence_path(drug_id, drug_name, evidence)) is not None
+    ]
+    unique_paths = {path["pathId"]: path for path in paths}
+    return {
+        "source": HETIONET_SOURCE,
+        "graphVersion": GRAPH_VERSION,
+        "paths": sorted(unique_paths.values(), key=lambda path: path["pathId"]),
+    }
+
+
+def _evidence_path(
+    drug_id: str,
+    drug_name: str,
+    evidence: dict[str, Any],
+) -> Optional[dict[str, Any]]:
+    relationship = evidence.get("relationship")
+    semantics = PATH_SEMANTICS.get(relationship)
+    target_id = evidence.get("targetId")
+    if semantics is None or not target_id:
+        return None
+
+    semantic_type, target_kind = semantics
+    source = evidence.get("source", HETIONET_SOURCE)
+    graph_version = evidence.get("graphVersion", GRAPH_VERSION)
+    path_identity = json.dumps(
+        [source, drug_id, relationship, target_id, graph_version],
+        ensure_ascii=True,
+        separators=(",", ":"),
+    )
+    path_id = f"graph-path:{hashlib.sha256(path_identity.encode('utf-8')).hexdigest()[:24]}"
+    return {
+        "pathId": path_id,
+        "semanticType": semantic_type,
+        "sourceEntity": {
+            "id": drug_id,
+            "name": drug_name,
+            "kind": "Compound",
+        },
+        "relationship": {
+            "type": relationship,
+            "metaedge": evidence.get("metaedge", relationship),
+        },
+        "targetEntity": {
+            "id": target_id,
+            "name": evidence.get("targetName"),
+            "kind": evidence.get("targetKind", target_kind),
+        },
+        "provenance": {
+            "source": source,
+            "graphVersion": graph_version,
+            "evidenceType": evidence.get("evidenceType", "known"),
+        },
+    }
+
+
 __all__ = [
     "GRAPH_VERSION",
     "HETIONET_SOURCE",
+    "PATH_SEMANTICS",
     "Neo4jConnectionError",
     "GraphService",
     "SIDE_EFFECT_RELATIONSHIP",
