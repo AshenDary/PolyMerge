@@ -23,6 +23,7 @@ __pycache__/
 *.pt
 *.pth
 *.onnx
+*.joblib
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
