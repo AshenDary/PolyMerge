@@ -121,6 +121,33 @@ LIMIT $limit
 - Predictive ML and clinical validation are not applied in this phase.
 - Side effects and gene relationships are returned as evidence/provenance context, not as safety predictions.
 
+## Traceable Evidence Paths
+
+A graph evidence path is a normalized view of one represented relationship in
+the loaded graph fragment:
+
+- `Compound -> CtD -> Disease` is a `treatment` path and may contribute to
+  represented disease-treatment coverage.
+- `Compound -> CbG/CuG/CdG -> Gene` is a `gene_context` path.
+- `Compound -> CcSE -> Side Effect` is a `side_effect_context` path.
+
+Each path retains the source and target entity IDs and names, relationship type
+and metaedge, Hetionet source, graph version, and evidence type. Its stable ID is
+derived from source, source entity ID, relationship, target entity ID, and graph
+version. Candidate sets expose a deterministic, deduplicated union of their
+member-drug paths.
+
+`CrC` is compound resemblance only. It is not emitted as a treatment path and
+must not be interpreted as DDI truth, DDI severity, clinical interaction,
+contraindication, treatment evidence, or safety evidence. Its existing use as a
+documented Sprint 3 graph feature remains unchanged.
+
+A path records what this graph fragment represents. It is not clinical
+validation, causal proof, evidence of treatment efficacy, a DDI severity
+prediction, or a safety recommendation. Likewise, an absent path means no such
+relationship is represented here; it does not establish a negative biomedical
+fact.
+
 ## Baseline Research Optimization
 
 The ML engine represents graph-derived candidate coverage as a matrix:

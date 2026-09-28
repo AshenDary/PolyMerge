@@ -6,7 +6,12 @@ from datetime import datetime, timezone
 from itertools import combinations
 from typing import Any, Optional
 
-from app.services.graph_service import GRAPH_VERSION, GraphService, Neo4jConnectionError
+from app.services.graph_service import (
+    GRAPH_VERSION,
+    HETIONET_SOURCE,
+    GraphService,
+    Neo4jConnectionError,
+)
 from app.services.safety_filter import check_hard_contraindications
 
 
@@ -159,6 +164,7 @@ def _candidate_set_from_combo(
     side_effects = [
         side_effect for candidate in combo for side_effect in candidate.get("sideEffects", [])
     ]
+    graph_paths = _aggregate_graph_paths(combo)
     violation = check_hard_contraindications(drug_ids)
     uncovered = [
         disease_id for disease_id in target_disease_ids if disease_id not in treated_disease_ids
@@ -188,6 +194,11 @@ def _candidate_set_from_combo(
         "evidence": evidence,
         "targets": targets,
         "sideEffects": side_effects,
+        "graphEvidence": {
+            "source": HETIONET_SOURCE,
+            "graphVersion": GRAPH_VERSION,
+            "paths": graph_paths,
+        },
         "reasons": [
             "Candidate set was generated from represented knowledge-graph treatment relationships.",
             "Coverage is knowledge-graph treatment coverage, not a clinical efficacy claim.",
@@ -206,6 +217,11 @@ def _candidate_set_from_combo(
                         set(candidate.get("treatedDiseaseIds", [])) & set(target_disease_ids)
                     ),
                     "evidenceCount": len(candidate.get("evidence", [])),
+                    "evidencePathIds": [
+                        path["pathId"]
+                        for path in graph_paths
+                        if path.get("sourceEntity", {}).get("id") == candidate["drugId"]
+                    ],
                 }
                 for candidate in combo
             ],
@@ -233,6 +249,18 @@ def _candidate_set_from_combo(
         ]
 
     return candidate_set
+
+
+def _aggregate_graph_paths(
+    combo: tuple[dict[str, Any], ...],
+) -> list[dict[str, Any]]:
+    paths_by_id: dict[str, dict[str, Any]] = {}
+    for candidate in combo:
+        for path in candidate.get("graphEvidence", {}).get("paths", []):
+            path_id = path.get("pathId")
+            if path_id:
+                paths_by_id.setdefault(path_id, path)
+    return sorted(paths_by_id.values(), key=lambda path: path["pathId"])
 
 
 def _empty_result(

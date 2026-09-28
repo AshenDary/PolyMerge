@@ -2,13 +2,13 @@
 
 ## Tasks
 
-- [ ] Provide graph evidence paths for selected candidates
-- [ ] Prepare provenance for explainability views
+- [x] Provide graph evidence paths for selected candidates
+- [x] Prepare provenance for explainability views
 - [ ] Support graph queries needed for visualization
-- [ ] Document limitations of graph evidence
+- [x] Document limitations of graph evidence
 
 ## Definition of Done
 
-- [ ] Evidence paths are traceable to graph relationships
-- [ ] Provenance appears in explainability payloads
-- [ ] Graph limitations are documented
+- [x] Evidence paths are traceable to graph relationships
+- [x] Provenance appears in explainability payloads
+- [x] Graph limitations are documented

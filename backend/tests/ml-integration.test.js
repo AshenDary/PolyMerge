@@ -260,6 +260,11 @@ test('forwards candidate-set requests and preserves IDs, safety, coverage, and p
         status: 'accepted',
         rejectionReasons: [],
         evidence: [{ source: 'Hetionet', relationship: 'CtD' }],
+        graphEvidence: {
+          source: 'Hetionet',
+          graphVersion: 'Hetionet v1.0 filtered PolyMerge fragment',
+          paths: [{ pathId: 'graph-path:test-treatment' }],
+        },
         dataStatus: 'real_graph',
         mlStatus: 'not_applied',
         interactionRisk: null,
@@ -301,6 +306,7 @@ test('forwards candidate-set requests and preserves IDs, safety, coverage, and p
   assert.equal(payload.candidateSets[0].coverage, 1);
   assert.equal(payload.candidateSets[0].status, 'accepted');
   assert.equal(payload.candidateSets[0].evidence[0].source, 'Hetionet');
+  assert.equal(payload.candidateSets[0].graphEvidence.paths[0].pathId, 'graph-path:test-treatment');
   assert.equal(payload.candidateSets[0].dataStatus, 'real_graph');
   assert.equal(payload.candidateSets[0].mlStatus, 'not_applied');
   assert.equal(payload.candidateSets[0].interactionRisk, null);
