@@ -41,24 +41,24 @@ model metadata, reproducible model-serving contracts, and unavailable-model
 handling.
 
 **Owns:** `backend/src/server.js`, `backend/src/rules/contraindications.js`,
-`backend/prisma/schema.prisma`, `ml_engine/main.py`, future traditional model
-training/serving modules in `ml_engine/`, and
+`backend/prisma/schema.prisma`, `ml_engine/main.py`, selected-model serving
+modules in `ml_engine/`, and
 `ml_engine/app/services/combination_search.py` (shared with Member C).
 
 **"Done" looks like:** every response from `/api/combinations/search` and
 candidate-set endpoints passes through deterministic safety checks before
 reaching a client; the Fastify-to-FastAPI JSON contract stays stable across
-model swaps; current graph-backed responses keep `mlStatus: "not_applied"`
-until a trained traditional model is integrated.
+model updates; current graph-backed responses keep `mlStatus: "not_applied"`
+until the finalized traditional model is integrated.
 
 **Known gotchas:**
 - Do not add neural-network, deep-learning, graph-neural-network, transformer,
   pretrained foundation-model, or AutoML-generated solutions for the academic
   ML model.
-- The planned comparison algorithms are `LogisticRegression`,
-  `RandomForestClassifier`, and `HistGradientBoostingClassifier`. They must use
-  the same split, preprocessing, cross-validation strategy, and macro F1
-  primary metric. `GradientBoostingClassifier` is only a course fallback.
+- The completed comparison used `LogisticRegression`,
+  `RandomForestClassifier`, and `HistGradientBoostingClassifier` under the same
+  split, preprocessing, cross-validation strategy, and Macro F1 primary metric.
+  `RandomForestClassifier` is the selected final model.
 - Local MySQL migrations need the shadow database
   (`docker/mysql/init/01-shadow-database.sql`). Do not remove it or switch to
   the root user to "simplify" this.

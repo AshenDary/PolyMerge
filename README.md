@@ -29,6 +29,7 @@ MySQL and Prisma are used for application/system data foundations. Neo4j remains
   - `GET /api/diseases`
   - `GET /api/drugs/:id`
   - `GET /api/drugs/:id/interactions`
+  - `POST /api/candidate-sets/search`
   - `POST /api/combinations/search`
   - `GET /api/combinations/:id`
   - `GET /api/combinations/:id/explain`
@@ -37,6 +38,7 @@ MySQL and Prisma are used for application/system data foundations. Neo4j remains
   - `GET /health`
   - `GET /api/diseases`
   - `GET /api/drugs/{drug_id}`
+  - `POST /predict/candidate-sets`
   - `POST /predict/combination`
 - Real Neo4j integration through environment-configured connection settings.
 - Hetionet-derived graph data loaded into Neo4j.
@@ -44,7 +46,8 @@ MySQL and Prisma are used for application/system data foundations. Neo4j remains
 - Graph-backed disease to compound retrieval using `CtD`.
 - Compound-gene evidence using `CbG`, `CuG`, and `CdG`.
 - Compound side-effect evidence using `CcSE`.
-- Evidence/provenance fields such as `source`, `graphVersion`, `relationship`, `metaedge`, `targetId`, and `evidenceType`.
+- Structured `graphEvidence.paths` with stable path IDs, source and graph
+  version, represented relationship semantics, target entities, and provenance.
 - Graph-backed candidate generation from represented knowledge-graph relationships.
 - Disease x drug coverage matrix derived from represented `CtD` edges for the requested target diseases.
 - Candidate-set generation from graph-derived single-drug candidates, including multi-drug sets up to the configured maximum drug count.
@@ -53,12 +56,15 @@ MySQL and Prisma are used for application/system data foundations. Neo4j remains
 - Candidate comparison structures that show each drug's contribution to candidate-set disease coverage.
 - Backend to ML/Graph service integration with request validation and dependency health checks.
 - Static frontend disease-selection workflow that loads diseases from the backend and sends stable disease IDs.
+- Frozen Random Forest evaluation metadata, checksums, environment versions,
+  and a reproducible preprocessing/classifier pipeline contract.
 
 ## Current ML Status
 
-No predictive ML model is applied in current graph-backed candidate responses.
-Sprint 4 completed a training-only comparison on the DDInter 2.0 data
-foundation, but does not serve or integrate the selected model.
+The selected `RandomForestClassifier` completed its one-time final evaluation on
+the Sprint 3 primary test split. The fitted preprocessing/classifier pipeline
+contract is frozen for serving integration, but runtime inference is not yet
+active in `main`; Issue #42 owns model loading and API integration.
 
 Feature enrichment uses cached, conservatively accepted PubChem structures,
 traditional RDKit descriptors, and symmetric Hetionet graph summaries. Missing
@@ -67,6 +73,14 @@ coverage remains distinct from known zero relationships.
 The finalized Sprint 3 dataset contains 130,422 canonical labeled drug pairs
 and 55 features. PubChem enrichment uses the official PUG REST API, with 1,315
 validated mappings and 67.818% structure coverage across distinct drugs.
+
+| Evaluation | Result |
+| --- | ---: |
+| Sprint 4 CV Macro F1 | 0.506086 +/- 0.005695 |
+| Sprint 5 final test Macro F1 | 0.524630 |
+| Final test balanced accuracy | 0.475467 |
+| Final test Macro AUROC | 0.798793 |
+| Final test Macro AUPRC | 0.632468 |
 
 - Graph-backed responses use `dataStatus: "real_graph"`.
 - Predictive model status is `mlStatus: "not_applied"`.
@@ -77,7 +91,14 @@ validated mappings and 67.818% structure coverage across distinct drugs.
 - Sprint 4 compared `LogisticRegression`, `RandomForestClassifier`, and
   `HistGradientBoostingClassifier` under one five-fold CV contract and selected
   `RandomForestClassifier` by mean Macro F1.
-- The untouched test split remains reserved for Sprint 5 final evaluation.
+- The primary test split was used exactly once for final evaluation and must not
+  be reused for tuning, feature selection, threshold adjustment, or model
+  switching.
+- The final model version is
+  `RandomForestClassifier-sprint5-v1-65e9834666ad19c5`.
+- Reproducibility metadata and the final report are tracked in Git. The
+  251,404,304-byte (approximately 240 MB) joblib binary is intentionally ignored
+  because of its size and is not hosted in this repository.
 - The academic ML solution is restricted to traditional supervised learning;
   neural networks, deep learning, GNNs, transformers, foundation models, and
   AutoML-generated models are out of scope.
@@ -100,10 +121,16 @@ Fallback responses must not be interpreted as real graph evidence or real ML pre
 - Candidate-set generation is a deterministic graph-derived foundation for Sprint 2, not a final production optimization system.
 - The optimizer is a greedy set-cover baseline over candidate sets, not a production-grade optimization system.
 - `/api/drugs/:id` and `/api/drugs/:id/interactions` still provide reference/demo backend responses and are not the primary graph-backed candidate-search flow.
-- Explainability is limited and does not yet provide advanced graph visualization or model explanation.
+- Structured graph evidence paths are available, while final candidate
+  comparison and explainability integration remains in progress under #43 and
+  depends on the #42 prediction contract.
 - Hetionet `CrC` means compound resemblance and is not a DDI label.
-- DDI severity prediction requires Sprint 5 final test evaluation and model
-  integration before it can appear in candidate responses.
+- Active DDI severity inference remains pending #42; graph-backed candidate
+  responses continue to use `mlStatus: "not_applied"`.
+- Major and Minor recall remains substantially lower than Moderate recall due
+  to the observed class-imbalanced performance profile.
+- Final model metrics are research classification results, not clinical
+  validation or a safety guarantee.
 - Absence of a DDInter label is not evidence that a drug pair is safe.
 - Clinical recommendations, dosage decisions, and autonomous prescribing are outside project scope.
 
@@ -227,5 +254,5 @@ See `docs/api.md` for the current API contract.
 - Absence from DDInter is not evidence of safety.
 - Graph coverage is knowledge-graph treatment coverage, not clinical efficacy.
 - Safety rules are deterministic guardrails, not a clinical safety guarantee.
-- Future traditional ML predictions must be clearly separated from graph
-  evidence and deterministic rule outcomes.
+- Traditional ML predictions, once actively served, must remain clearly
+  separated from graph evidence and deterministic rule outcomes.
