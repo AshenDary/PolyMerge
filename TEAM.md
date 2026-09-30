@@ -22,7 +22,8 @@ candidate-set foundations preserve graph-derived coverage and provenance.
 Sprint 3 adds Jared's completed DDInter 2.0 severity dataset, PubChem PUG REST
 enrichment, RDKit descriptors, graph-derived tabular features, EDA, and
 leakage-safe preprocessing. Sprint 4 completed training-only cross-validation
-and selected `RandomForestClassifier`; no predictive model is integrated or served.
+and selected `RandomForestClassifier`. Sprint 5 final evaluation and graph
+evidence/provenance are complete; runtime model serving remains pending.
 
 ## Ranee — Backend / Traditional ML Integration
 
@@ -58,9 +59,42 @@ Backend and ML/Graph integration is implemented for Sprint 1. Real graph-backed 
 
 The optimizer consumes graph-derived candidate-set coverage and produces baseline selected candidates. Future work is richer constraints, comparison views, rejection explanation presentation, academic evaluation reporting, and Streamlit/frontend visualization.
 
+## Current Sprint 5 Ownership
+
+### Jared / AshenDary
+
+Completed:
+
+- Issue #40 / PR #44: final Random Forest evaluation, frozen pipeline contract,
+  model version/checksum provenance, and final test report.
+- Issue #41 / PR #45: deterministic graph evidence paths, provenance, candidate
+  aggregation, and the handoff contract for Issue #43.
+
+Current:
+
+- Sprint 5 integration coordination and the eventual Issue #39 closeout audit.
+
+### Ranee / seavens3nt
+
+Current:
+
+- Issue #42: selected-model serving, backend/API integration, runtime metadata,
+  and explicit active/unavailable inference behavior.
+
+Issue #42 is open; these serving capabilities are not documented as merged.
+
+### Pamela / Qiuyuan26
+
+Current:
+
+- Issue #43 / open PR #46: candidate comparison and explainability integration,
+  including distinct presentation of graph, rule, and ML channels.
+
+PR #46 is in progress and is not documented as part of `main`.
+
 ## Handoff Expectations
 
-- Graph evidence must remain separate from future traditional ML predictions.
+- Graph evidence must remain separate from traditional ML predictions.
 - Hard safety rules must remain deterministic and independent of model scores.
 - `CrC` must not be treated as a DDI label.
 - DDInter is the Sprint 3 severity-label source. Unknown is excluded from
