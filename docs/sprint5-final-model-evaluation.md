@@ -76,6 +76,10 @@ Final test Macro F1 minus Sprint 4 validation mean Macro F1 is `0.018544`. This 
 - Size: 251404304 bytes
 - Model version: `RandomForestClassifier-sprint5-v1-65e9834666ad19c5`
 
+The approximately 240 MB joblib binary is intentionally ignored and is not
+stored in Git. The repository stores the evaluation metadata and this report so
+the expected artifact can be identified and verified by version and checksum.
+
 ## Reproducibility
 
 - Metadata artifact: `data/interim/sprint5/final_model_evaluation.json`

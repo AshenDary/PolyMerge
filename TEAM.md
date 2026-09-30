@@ -42,7 +42,11 @@ evidence/provenance are complete; runtime model serving remains pending.
 
 ### Current Status
 
-Backend and ML/Graph integration is implemented for Sprint 1. Real graph-backed responses are labeled with `dataStatus: "real_graph"` and `mlStatus: "not_applied"`. Demo fallback remains available only as clearly labeled fallback output. Future model integration should serve a selected traditional ML model, not a neural-network model.
+Backend and ML/Graph integration is implemented for Sprint 1. Real graph-backed
+responses are labeled with `dataStatus: "real_graph"` and
+`mlStatus: "not_applied"`. Demo fallback remains available only as clearly
+labeled fallback output. Issue #42 should serve the selected traditional model,
+not a neural-network model.
 
 ## Pamela — Optimization / Explainability
 
@@ -102,7 +106,7 @@ PR #46 is in progress and is not documented as part of `main`.
 - PubChem/RDKit provide molecular features; Hetionet provides graph evidence
   and optional graph features rather than the supervised target.
 - Coverage means knowledge-graph treatment coverage, not clinical efficacy.
-- Any future model or dataset integration must include provenance and model/version metadata.
+- Any model or dataset integration must include provenance and model/version metadata.
 - The completed academic comparison used `LogisticRegression`,
   `RandomForestClassifier`, and `HistGradientBoostingClassifier` with the same
   training split, fold-local preprocessing, five-fold strategy, and Macro F1
