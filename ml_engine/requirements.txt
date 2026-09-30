@@ -4,6 +4,7 @@ rdkit==2023.9.5
 neo4j==5.17.0
 pandas==2.2.0
 scikit-learn==1.4.0
+joblib==1.5.3
 matplotlib==3.8.3
 seaborn==0.13.2
 python-dotenv==1.0.1

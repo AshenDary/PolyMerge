@@ -1,7 +1,7 @@
 import { after, afterEach, test } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { app } from '../src/server.js';
+import { app, DDI_FEATURE_NAMES } from '../src/server.js';
 
 const originalFetch = globalThis.fetch;
 
@@ -19,6 +19,110 @@ function jsonResponse(payload, status = 200) {
     headers: { 'content-type': 'application/json' },
   });
 }
+
+function ddiFeatures() {
+  return Object.fromEntries(DDI_FEATURE_NAMES.map((name, index) => [name, index % 7]));
+}
+
+test('DDI endpoint forwards the exact feature contract and preserves model provenance', async () => {
+  const calls = [];
+  globalThis.fetch = async (url, options = {}) => {
+    calls.push({ url: String(url), body: JSON.parse(options.body) });
+    return jsonResponse({
+      predictedClass: 'Moderate',
+      inferenceStatus: 'applied',
+      mlStatus: 'applied',
+      model: {
+        name: 'RandomForestClassifier',
+        version: 'RandomForestClassifier-sprint5-v1-65e9834666ad19c5',
+        artifactSha256: 'a'.repeat(64),
+        featureContractSha256: 'b'.repeat(64),
+      },
+    });
+  };
+
+  const features = ddiFeatures();
+  const response = await app.inject({
+    method: 'POST',
+    url: '/api/ddi-severity/predict',
+    payload: { features },
+  });
+
+  assert.equal(response.statusCode, 200);
+  assert.match(calls[0].url, /\/predict\/ddi-severity$/);
+  assert.deepEqual(calls[0].body, { features });
+  assert.equal(response.json().predictedClass, 'Moderate');
+  assert.equal(response.json().mlStatus, 'applied');
+  assert.match(response.json().model.version, /sprint5/);
+});
+
+test('DDI endpoint rejects malformed features before calling the ML service', async () => {
+  let fetchCalled = false;
+  globalThis.fetch = async () => {
+    fetchCalled = true;
+    throw new Error('must not be called');
+  };
+  const features = ddiFeatures();
+  delete features[DDI_FEATURE_NAMES[0]];
+  features.invented_score = 0.99;
+
+  const response = await app.inject({
+    method: 'POST',
+    url: '/api/ddi-severity/predict',
+    payload: { features },
+  });
+
+  assert.equal(response.statusCode, 400);
+  assert.equal(fetchCalled, false);
+  assert.deepEqual(response.json().missingFeatures, [DDI_FEATURE_NAMES[0]]);
+  assert.deepEqual(response.json().unexpectedFeatures, ['invented_score']);
+});
+
+test('DDI endpoint preserves explicit unavailable state without inventing a class', async () => {
+  globalThis.fetch = async () => jsonResponse({
+    predictedClass: null,
+    inferenceStatus: 'unavailable',
+    mlStatus: 'not_applied',
+    model: {
+      name: 'RandomForestClassifier',
+      version: 'RandomForestClassifier-sprint5-v1-65e9834666ad19c5',
+      artifactSha256: 'a'.repeat(64),
+      featureContractSha256: 'b'.repeat(64),
+    },
+    error: 'artifact not installed',
+  }, 503);
+
+  const response = await app.inject({
+    method: 'POST',
+    url: '/api/ddi-severity/predict',
+    payload: { features: ddiFeatures() },
+  });
+
+  assert.equal(response.statusCode, 503);
+  assert.equal(response.json().predictedClass, null);
+  assert.equal(response.json().mlStatus, 'not_applied');
+  assert.equal(Object.hasOwn(response.json(), 'score'), false);
+});
+
+test('DDI endpoint fails closed on malformed applied inference', async () => {
+  globalThis.fetch = async () => jsonResponse({
+    predictedClass: 'Certain',
+    inferenceStatus: 'applied',
+    mlStatus: 'applied',
+    model: {},
+  });
+
+  const response = await app.inject({
+    method: 'POST',
+    url: '/api/ddi-severity/predict',
+    payload: { features: ddiFeatures() },
+  });
+
+  assert.equal(response.statusCode, 503);
+  assert.equal(response.json().predictedClass, null);
+  assert.equal(response.json().mlStatus, 'not_applied');
+  assert.match(response.json().error, /malformed applied-inference provenance/);
+});
 
 const graphDiseases = [
   {

@@ -35,8 +35,10 @@ MySQL and Prisma are used for application/system data foundations. Neo4j remains
   - `GET /api/history`
 - FastAPI ML/Graph service:
   - `GET /health`
+  - `GET /health/model`
   - `GET /api/diseases`
   - `GET /api/drugs/{drug_id}`
+  - `POST /predict/ddi-severity`
   - `POST /predict/combination`
 - Real Neo4j integration through environment-configured connection settings.
 - Hetionet-derived graph data loaded into Neo4j.
@@ -56,9 +58,11 @@ MySQL and Prisma are used for application/system data foundations. Neo4j remains
 
 ## Current ML Status
 
-No predictive ML model is applied in current graph-backed candidate responses.
-Sprint 4 completed a training-only comparison on the DDInter 2.0 data
-foundation, but does not serve or integrate the selected model.
+No predictive ML model is applied automatically to graph-backed candidate
+responses. The frozen Sprint 5 Random Forest is served through the separate
+DDI-severity endpoints (`POST /predict/ddi-severity` in the ML service and
+`POST /api/ddi-severity/predict` in the backend) when its reviewed joblib
+artifact is installed and passes checksum/schema verification.
 
 Feature enrichment uses cached, conservatively accepted PubChem structures,
 traditional RDKit descriptors, and symmetric Hetionet graph summaries. Missing
@@ -77,7 +81,8 @@ validated mappings and 67.818% structure coverage across distinct drugs.
 - Sprint 4 compared `LogisticRegression`, `RandomForestClassifier`, and
   `HistGradientBoostingClassifier` under one five-fold CV contract and selected
   `RandomForestClassifier` by mean Macro F1.
-- The untouched test split remains reserved for Sprint 5 final evaluation.
+- Sprint 5 completed the one-time final evaluation on the previously untouched
+  test split and froze the selected pipeline; serving does not rerun evaluation.
 - The academic ML solution is restricted to traditional supervised learning;
   neural networks, deep learning, GNNs, transformers, foundation models, and
   AutoML-generated models are out of scope.
