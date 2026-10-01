@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import os
 from contextlib import asynccontextmanager
+from itertools import combinations
 from pathlib import Path
 from typing import Any, Literal, Optional
 
@@ -17,6 +18,7 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from app.services.candidate_generator import build_graph_candidates
+from app.services.ddi_feature_builder import PairFeatureBuilder, PairFeatureUnavailableError
 from app.services.candidate_ranker import rank_candidates
 from app.services.knowledge_graph import get_available_diseases, get_drug_metadata
 from app.services.model_serving import (
@@ -132,7 +134,8 @@ class CandidateSetResult(BaseModel):
     rejectionReasons: list[dict[str, Any]] = Field(default_factory=list)
     evidence: list[dict[str, Any]] = Field(default_factory=list)
     dataStatus: Literal["real_graph"]
-    mlStatus: Literal["not_applied"]
+    mlStatus: Literal["applied", "not_applied"]
+    mlPrediction: dict[str, Any] = Field(default_factory=dict)
     interactionRisk: None = None
     synergyScore: None = None
 
@@ -159,11 +162,11 @@ class CandidateSetMetadata(BaseModel):
     model_config = ConfigDict(extra="allow")
 
     dataStatus: Literal["real_graph"]
-    mlStatus: Literal["not_applied"]
+    mlStatus: Literal["applied", "not_applied"]
     graph: Optional[str] = None
     dataset: Optional[str] = None
     model: str
-    modelVersion: None = None
+    modelVersion: Optional[str] = None
     resolvedDiseases: list[DiseaseReference]
     missingDiseases: list[str]
 
@@ -259,23 +262,39 @@ def _candidate_set_response(result: dict[str, Any]) -> dict[str, Any]:
     metadata = result["metadata"]
     resolved_diseases = metadata.get("resolvedDiseases", [])
     target_disease_ids = [disease["id"] for disease in resolved_diseases]
-    ml_status = metadata.get("mlStatus", "not_applied")
 
     candidate_sets = []
+    any_applied = False
     for candidate in result.get("candidates", []):
         treated_ids = candidate.get("treatedDiseaseIds", [])
+        candidate_with_prediction = _apply_pair_predictions(candidate)
+        any_applied = any_applied or candidate_with_prediction.get("mlStatus") == "applied"
         candidate_sets.append({
-            **candidate,
+            **candidate_with_prediction,
             "uncoveredDiseaseIds": candidate.get(
                 "uncoveredDiseaseIds",
                 [disease_id for disease_id in target_disease_ids if disease_id not in treated_ids],
             ),
             "rejectionReasons": candidate.get("rejectionReasons", []),
             "dataStatus": candidate.get("dataStatus", metadata["dataStatus"]),
-            "mlStatus": candidate.get("mlStatus", ml_status),
             "interactionRisk": None,
             "synergyScore": None,
         })
+    if any_applied:
+        metadata = {
+            **metadata,
+            "mlStatus": "applied",
+            "model": "RandomForestClassifier",
+            "modelVersion": next(
+                (
+                    pair["model"]["version"]
+                    for candidate in candidate_sets
+                    for pair in candidate.get("mlPrediction", {}).get("pairs", [])
+                    if pair.get("model", {}).get("version")
+                ),
+                metadata.get("modelVersion"),
+            ),
+        }
 
     return {
         "queryId": result["queryId"],
@@ -283,6 +302,52 @@ def _candidate_set_response(result: dict[str, Any]) -> dict[str, Any]:
         "diseases": resolved_diseases,
         "candidateSets": candidate_sets,
         "metadata": metadata,
+    }
+
+
+def _apply_pair_predictions(candidate: dict[str, Any]) -> dict[str, Any]:
+    drugs = sorted(candidate.get("drugs", []))
+    if len(drugs) < 2:
+        return {
+            **candidate,
+            "mlStatus": "not_applied",
+            "mlPrediction": {
+                "status": "not_applied",
+                "pairs": [],
+                "reason": "At least two drugs are required for pair-level DDI inference.",
+            },
+        }
+
+    try:
+        builder = PairFeatureBuilder()
+        predicted_pairs = []
+        for drug_a, drug_b in combinations(drugs, 2):
+            features = builder.build_features(drug_a, drug_b)
+            prediction = ddi_model_service.predict(features)
+            predicted_pairs.append({
+                "drugPair": [drug_a, drug_b],
+                "predictedSeverity": prediction["predictedClass"],
+                "model": prediction["model"],
+                "inferenceStatus": prediction["inferenceStatus"],
+            })
+    except (PairFeatureUnavailableError, FeatureSchemaError, ModelUnavailableError) as error:
+        return {
+            **candidate,
+            "mlStatus": "not_applied",
+            "mlPrediction": {
+                "status": "not_applied",
+                "pairs": [],
+                "reason": str(error),
+            },
+        }
+
+    return {
+        **candidate,
+        "mlStatus": "applied",
+        "mlPrediction": {
+            "status": "applied",
+            "pairs": predicted_pairs,
+        },
     }
 
 
