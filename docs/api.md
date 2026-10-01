@@ -26,6 +26,12 @@ deep-learning, graph-embedding, GNN, transformer, large-language-model,
 foundation-model, and AutoML models are not part of the planned academic ML
 solution.
 
+The frozen Random Forest is exposed through a separate DDI-severity endpoint.
+Only a successful, checksum-verified inference uses `mlStatus: "applied"`.
+Missing/tampered artifacts and inference failures use `mlStatus: "not_applied"`,
+return no predicted class, and never substitute graph evidence or deterministic
+safety rules for a model prediction.
+
 The legacy `POST /api/combinations/search` compatibility endpoint retains its
 Sprint 1 demo fallback (`dataStatus: "demo"`, `mlStatus: "demo"`).
 
@@ -61,6 +67,67 @@ Success response:
 ```
 
 If the ML/Graph service is unavailable, this endpoint returns HTTP 503 and reports `mlEngine: "unavailable"`.
+
+### `POST /api/ddi-severity/predict`
+
+Purpose: validates and forwards one already-derived DDInter drug-pair feature
+record to the frozen Sprint 5 Random Forest. This endpoint is predictive ML
+only. It does not query graph evidence, declare a contraindication, or override
+the independent deterministic safety layer.
+
+Request:
+
+```json
+{
+  "features": {
+    "hetionet_available_count": 2,
+    "both_hetionet_available": 1,
+    "graph_ctd_disease_count_mean": 4.5,
+    "... all remaining approved fields ...": 0
+  }
+}
+```
+
+`features` must contain exactly the 55 fields, in the contract documented by
+`data/interim/sprint4/feature_contract.json`. Each value is a finite JSON number
+or `null`; `null` represents a missing value handled by the fitted preprocessing
+inside the frozen pipeline. Missing fields, extra fields, strings, booleans,
+NaN, and infinity are rejected before the ML service is called.
+
+Successful response (HTTP 200):
+
+```json
+{
+  "predictedClass": "Moderate",
+  "inferenceStatus": "applied",
+  "mlStatus": "applied",
+  "model": {
+    "name": "RandomForestClassifier",
+    "version": "RandomForestClassifier-sprint5-v1-65e9834666ad19c5",
+    "artifactSha256": "2b9ed9ca9a57a3eed256eb28d369df89403666a1c5ea1231c47ebe1e053ccc6d",
+    "featureContractSha256": "a3adc02c91e1af0cf47d978c3c87d47b22f696edc7f797dc24a14ad246328efa"
+  }
+}
+```
+
+Unavailable response (HTTP 503):
+
+```json
+{
+  "predictedClass": null,
+  "inferenceStatus": "unavailable",
+  "mlStatus": "not_applied",
+  "model": {
+    "name": "RandomForestClassifier",
+    "version": "RandomForestClassifier-sprint5-v1-65e9834666ad19c5",
+    "artifactSha256": "2b9ed9ca9a57a3eed256eb28d369df89403666a1c5ea1231c47ebe1e053ccc6d",
+    "featureContractSha256": "a3adc02c91e1af0cf47d978c3c87d47b22f696edc7f797dc24a14ad246328efa"
+  },
+  "error": "Frozen model artifact is not installed ..."
+}
+```
+
+No score or fallback severity is emitted when inference is unavailable.
 
 ### `GET /api/diseases`
 
@@ -374,6 +441,30 @@ of an interaction record must not be interpreted as proof of safety.
 ### `GET /health`
 
 Returns ML/Graph service liveness.
+
+### `GET /health/model`
+
+Returns HTTP 200 with `inferenceStatus: "ready"` only after the artifact,
+feature contract, pipeline shape, and class schema pass verification. Returns
+HTTP 503 with `inferenceStatus: "unavailable"` and `mlStatus: "not_applied"`
+when the model is not ready. This does not change the liveness result from
+`GET /health`.
+
+### `POST /predict/ddi-severity`
+
+Direct ML-service form of `POST /api/ddi-severity/predict`, with the same exact
+55-feature request and applied/unavailable response contracts.
+
+At first readiness check or prediction, the service loads the artifact once.
+Before deserializing it, the service verifies the feature-contract SHA-256
+(with JSON line endings normalized to LF for cross-platform Git checkouts),
+artifact byte size, and artifact SHA-256 from
+`data/interim/sprint5/final_model_evaluation.json`. It then verifies the frozen
+pipeline steps, selected Random Forest parameters, and output classes. The
+default artifact path is `models/sprint5/random_forest_ddi_pipeline.joblib`;
+deployments may point to the reviewed artifact with
+`POLYMERGE_DDI_MODEL_PATH`. Because joblib deserialization is pickle-based,
+only the reviewed artifact with the documented checksum should be installed.
 
 ### `GET /api/diseases`
 

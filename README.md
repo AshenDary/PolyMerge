@@ -36,9 +36,11 @@ MySQL and Prisma are used for application/system data foundations. Neo4j remains
   - `GET /api/history`
 - FastAPI ML/Graph service:
   - `GET /health`
+  - `GET /health/model`
   - `GET /api/diseases`
   - `GET /api/drugs/{drug_id}`
   - `POST /predict/candidate-sets`
+  - `POST /predict/ddi-severity`
   - `POST /predict/combination`
 - Real Neo4j integration through environment-configured connection settings.
 - Hetionet-derived graph data loaded into Neo4j.
@@ -61,10 +63,11 @@ MySQL and Prisma are used for application/system data foundations. Neo4j remains
 
 ## Current ML Status
 
-The selected `RandomForestClassifier` completed its one-time final evaluation on
-the Sprint 3 primary test split. The fitted preprocessing/classifier pipeline
-contract is frozen for serving integration, but runtime inference is not yet
-active in `main`; Issue #42 owns model loading and API integration.
+No predictive ML model is applied automatically to graph-backed candidate
+responses. The frozen Sprint 5 Random Forest is served through the separate
+DDI-severity endpoints (`POST /predict/ddi-severity` in the ML service and
+`POST /api/ddi-severity/predict` in the backend) when its reviewed joblib
+artifact is installed and passes checksum/schema verification.
 
 Feature enrichment uses cached, conservatively accepted PubChem structures,
 traditional RDKit descriptors, and symmetric Hetionet graph summaries. Missing
@@ -91,6 +94,8 @@ validated mappings and 67.818% structure coverage across distinct drugs.
 - Sprint 4 compared `LogisticRegression`, `RandomForestClassifier`, and
   `HistGradientBoostingClassifier` under one five-fold CV contract and selected
   `RandomForestClassifier` by mean Macro F1.
+- Sprint 5 completed the one-time final evaluation on the previously untouched
+  test split and froze the selected pipeline; serving does not rerun evaluation.
 - The primary test split was used exactly once for final evaluation and must not
   be reused for tuning, feature selection, threshold adjustment, or model
   switching.

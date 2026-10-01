@@ -16,6 +16,12 @@ const PORT = Number(process.env.PORT) || 3000;
 const HOST = process.env.HOST || '0.0.0.0';
 const ML_SERVICE_URL = process.env.ML_SERVICE_URL || 'http://localhost:8000';
 const ML_SERVICE_TIMEOUT_MS = Number(process.env.ML_SERVICE_TIMEOUT_MS) || 15000;
+const ddiFeatureContract = JSON.parse(await fs.readFile(
+  path.resolve(__dirname, '../../data/interim/sprint4/feature_contract.json'),
+  'utf8',
+));
+export const DDI_FEATURE_NAMES = Object.freeze([...ddiFeatureContract.features]);
+const DDI_CLASSES = new Set(ddiFeatureContract.classes);
 
 const DRUGS = {
   lisinopril: {
@@ -217,6 +223,53 @@ export function normalizeCandidateSetConfig(config) {
     normalized.maxCandidateSets = config.maxCandidateSets;
   }
   return { candidateSetConfig: normalized };
+}
+
+export function normalizeDdiFeatures(features) {
+  if (features === null || typeof features !== 'object' || Array.isArray(features)) {
+    return { error: 'features must be a JSON object' };
+  }
+  const expected = new Set(DDI_FEATURE_NAMES);
+  const supplied = Object.keys(features);
+  const missing = DDI_FEATURE_NAMES.filter((name) => !Object.hasOwn(features, name));
+  const unexpected = supplied.filter((name) => !expected.has(name)).sort();
+  if (missing.length > 0 || unexpected.length > 0) {
+    return {
+      error: 'features must match the approved 55-column contract',
+      missingFeatures: missing,
+      unexpectedFeatures: unexpected,
+    };
+  }
+  for (const name of DDI_FEATURE_NAMES) {
+    const value = features[name];
+    if (value !== null && (typeof value !== 'number' || !Number.isFinite(value))) {
+      return { error: `feature ${name} must be a finite number or null` };
+    }
+  }
+  return {
+    features: Object.fromEntries(DDI_FEATURE_NAMES.map((name) => [name, features[name]])),
+  };
+}
+
+export function validateDdiPrediction(payload, expectedStatus) {
+  if (payload === null || typeof payload !== 'object' || Array.isArray(payload)
+    || payload.model === null || typeof payload.model !== 'object' || Array.isArray(payload.model)) {
+    throw new Error('ML engine returned an invalid DDI prediction response');
+  }
+  if (expectedStatus === 'applied') {
+    if (payload.inferenceStatus !== 'applied' || payload.mlStatus !== 'applied'
+      || !DDI_CLASSES.has(payload.predictedClass)
+      || typeof payload.model.name !== 'string'
+      || typeof payload.model.version !== 'string'
+      || typeof payload.model.artifactSha256 !== 'string'
+      || typeof payload.model.featureContractSha256 !== 'string') {
+      throw new Error('ML engine returned malformed applied-inference provenance');
+    }
+  } else if (payload.inferenceStatus !== 'unavailable'
+    || payload.mlStatus !== 'not_applied' || payload.predictedClass !== null) {
+    throw new Error('ML engine returned a prediction while inference was unavailable');
+  }
+  return payload;
 }
 
 function createDemoSearchResult(inputDiseases, warning = 'ML engine unavailable; returning explicitly labeled demo output.') {
@@ -564,6 +617,47 @@ app.get('/api/drugs/:id/interactions', async (request, reply) => {
       },
     ],
   };
+});
+
+app.post('/api/ddi-severity/predict', async (request, reply) => {
+  if (request.body === null || typeof request.body !== 'object' || Array.isArray(request.body)) {
+    return reply.code(400).send({ error: 'Request body must be a JSON object' });
+  }
+  const normalized = normalizeDdiFeatures(request.body.features);
+  if (normalized.error) {
+    return reply.code(400).send(normalized);
+  }
+
+  try {
+    const response = await fetch(`${ML_SERVICE_URL}/predict/ddi-severity`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ features: normalized.features }),
+      signal: AbortSignal.timeout(ML_SERVICE_TIMEOUT_MS),
+    });
+    const payload = await response.json();
+    if (response.ok) {
+      return validateDdiPrediction(payload, 'applied');
+    }
+    if (response.status === 503) {
+      return reply.code(503).send(validateDdiPrediction(payload, 'unavailable'));
+    }
+    throw new Error(`ML DDI service responded ${response.status}`);
+  } catch (error) {
+    request.log?.warn?.({ error: error.message }, 'ML DDI prediction request failed');
+    return reply.code(503).send({
+      predictedClass: null,
+      inferenceStatus: 'unavailable',
+      mlStatus: 'not_applied',
+      model: {
+        name: null,
+        version: null,
+        artifactSha256: null,
+        featureContractSha256: null,
+      },
+      error: error.message,
+    });
+  }
 });
 
 app.post('/api/candidate-sets/search', async (request, reply) => {

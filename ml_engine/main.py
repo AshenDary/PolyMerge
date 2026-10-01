@@ -6,23 +6,41 @@ research-oriented pipeline shape the repository will evolve toward.
 from __future__ import annotations
 
 import os
+from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Any, Literal, Optional
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from app.services.candidate_generator import build_graph_candidates
 from app.services.candidate_ranker import rank_candidates
 from app.services.knowledge_graph import get_available_diseases, get_drug_metadata
+from app.services.model_serving import (
+    FeatureSchemaError,
+    ModelUnavailableError,
+    ddi_model_service,
+)
 from app.services.set_cover_optimizer import optimize_candidate_sets
 
 # Single shared .env lives at the repo root, not inside ml_engine/.
 load_dotenv(Path(__file__).resolve().parent.parent / ".env")
 
-app = FastAPI(title="PolyMerge ML Engine", version="0.1.0")
+
+@asynccontextmanager
+async def lifespan(_: FastAPI):
+    """Warm the singleton model once; absence degrades inference, not liveness."""
+    try:
+        ddi_model_service.load()
+    except ModelUnavailableError:
+        pass
+    yield
+
+
+app = FastAPI(title="PolyMerge ML Engine", version="0.1.0", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -75,6 +93,14 @@ class CandidateSetRequest(BaseModel):
         if any(not disease_id for disease_id in normalized):
             raise ValueError("disease IDs must not be blank")
         return list(dict.fromkeys(normalized))
+
+
+class DDISeverityRequest(BaseModel):
+    """The reviewed 55-feature pair contract for frozen-model inference."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    features: dict[str, Any]
 
 
 class CombinationResponse(BaseModel):
@@ -156,6 +182,16 @@ async def health():
     return {"status": "ok", "service": "polymerge-ml-engine"}
 
 
+@app.get("/health/model")
+async def model_health():
+    """Report model readiness independently from service liveness."""
+    status = ddi_model_service.status()
+    return JSONResponse(
+        status_code=200 if status["inferenceStatus"] == "ready" else 503,
+        content=status,
+    )
+
+
 @app.get("/api/diseases")
 async def diseases():
     return {"diseases": get_available_diseases()}
@@ -167,6 +203,27 @@ async def drug_by_id(drug_id: str):
     if drug is None:
         return {"error": "Drug not found"}
     return drug
+
+
+@app.post("/predict/ddi-severity")
+async def predict_ddi_severity(payload: DDISeverityRequest):
+    """Run only the frozen DDI classifier; graph and hard rules remain separate."""
+    try:
+        return ddi_model_service.predict(payload.features)
+    except FeatureSchemaError as error:
+        raise HTTPException(
+            status_code=422,
+            detail={
+                "error": "Invalid DDI feature schema",
+                "message": str(error),
+                "mlStatus": "not_applied",
+            },
+        ) from error
+    except ModelUnavailableError as error:
+        return JSONResponse(
+            status_code=503,
+            content=ddi_model_service.unavailable_response(str(error)),
+        )
 
 
 def _run_candidate_set_pipeline(
