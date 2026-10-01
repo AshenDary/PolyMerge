@@ -17,9 +17,11 @@ Candidate-set fallback responses use:
 - `upstreamStatus: "fallback"`
 - `candidateSets: []`
 
-No trained traditional supervised ML model is applied to current candidate
-sets. Graph-backed candidate sets therefore retain `mlStatus: "not_applied"`,
-and `interactionRisk` / `synergyScore` remain `null`. Neural-network,
+The final `RandomForestClassifier` is evaluated and frozen, but it is not yet
+loaded for runtime inference in `main`. No trained traditional supervised ML
+model is therefore applied to current candidate sets. Graph-backed candidate
+sets retain `mlStatus: "not_applied"`, and `interactionRisk` / `synergyScore`
+remain `null` until Issue #42 is integrated. Neural-network,
 deep-learning, graph-embedding, GNN, transformer, large-language-model,
 foundation-model, and AutoML models are not part of the planned academic ML
 solution.

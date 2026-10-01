@@ -2,23 +2,31 @@
 
 ## Goal
 
-Evaluate the selected traditional model once on the untouched test set and integrate outputs with PolyMerge without mixing predictions with graph evidence.
+Complete final evaluation and integrate model predictions with PolyMerge without
+mixing predictions, graph evidence, or deterministic rule outcomes.
+
+## Status
+
+In progress under master Issue #39. Issues #40 and #41 are complete; Issues #42
+and #43 remain open.
 
 ## Shared Tasks
 
-- [ ] Evaluate selected model exactly once on untouched test data
-- [ ] Save preprocessing pipeline
-- [ ] Save selected model
-- [ ] Expose model metadata
+- [x] Evaluate selected model exactly once on the primary test split (#40)
+- [x] Freeze the preprocessing/classifier pipeline contract (#40)
+- [x] Record model artifact checksum, version, and reproducibility metadata (#40)
+- [x] Expose traceable graph evidence and provenance paths (#41)
 - [ ] Integrate predictions with PolyMerge candidate scoring where appropriate
-- [ ] Keep deterministic safety rules independent
-- [ ] Preserve graph evidence/provenance separately from ML prediction
+- [x] Keep deterministic safety rules independent
+- [x] Preserve graph evidence/provenance separately from ML prediction
 - [ ] Add candidate comparison and rejection reason presentation
-- [ ] Add evidence paths and graph visualization where useful
+- [x] Add deterministic treatment, gene-context, and side-effect evidence paths
+- [ ] Complete graph evidence presentation and visualization where useful
+- [ ] Run the #42/#43 integration and Sprint 5 master regression audit
 
 ## Definition of Done
 
 - [ ] Candidate results include explainability payloads
-- [ ] Rejection reasons are structured
+- [x] Rejection reasons are structured independently from graph evidence
 - [ ] Predictions remain clearly labeled as model outputs
-- [ ] No clinical validation claims are introduced
+- [x] No clinical validation claims are introduced
