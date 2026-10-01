@@ -7,6 +7,7 @@ import cors from '@fastify/cors';
 import dotenv from 'dotenv';
 
 import { checkHardContraindications } from './rules/contraindications.js';
+import { buildExplainabilityResponse } from './explainability/presentation.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 // Single shared .env lives at the repo root, not inside backend/.
@@ -859,6 +860,30 @@ app.get('/api/combinations/:id/explain', async (request, reply) => {
 app.get('/api/history', async () => ({
   history: Array.from(history.values()),
 }));
+
+app.get('/api/candidate-sets/:id/explain', async (request, reply) => {
+  const result = history.get(request.params.id);
+  
+  if (!result) {
+    return reply.code(404).send({ error: 'Candidate set result not found' });
+  }
+  
+  const format = request.query.format ?? 'detailed';
+  const validFormats = ['detailed', 'comparison', 'visualization', 'structured'];
+  
+  if (!validFormats.includes(format)) {
+    return reply.code(400).send({ 
+      error: `Invalid format. Must be one of: ${validFormats.join(', ')}` 
+    });
+  }
+  
+  return buildExplainabilityResponse(
+    result.queryId,
+    result.diseaseIds,
+    result.candidateSets ?? [],
+    format
+  );
+});
 
 const isMainModule = process.argv[1]
   && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
