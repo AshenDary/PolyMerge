@@ -2,7 +2,9 @@
 
 ## Status
 
-Issues #40 and #41 are complete and merged through PRs #44 and #45.
+Issues #40 and #41 are complete and merged through PRs #44 and #45. The
+temporary Sprint 5 integration branch now also carries the repaired #42/#43
+integration for #39 review.
 
 ## Tasks
 
@@ -13,6 +15,8 @@ Issues #40 and #41 are complete and merged through PRs #44 and #45.
 - [x] Prepare provenance for explainability views
 - [x] Provide stable path IDs and per-drug evidence path references
 - [x] Document limitations of graph evidence
+- [x] Validate #42/#43 together on the temporary integration branch
+- [x] Document the final integrated branch state for #39 review
 
 ## Definition of Done
 

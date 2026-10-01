@@ -1,12 +1,13 @@
 # PolyMerge Project Status
 
-Current as of 2026-09-30.
+Current as of 2026-10-01.
 
 ## Current Phase
 
-Sprint 5 - Final Evaluation and Integration is in progress under master Issue
-#39. Sprint 1 through Sprint 4 milestones are implemented. Sprint 6 remains
-planned and depends on Sprint 5 closeout.
+Sprint 5 - Final Evaluation and Integration is repaired on the temporary
+integration branch for final Issue #39 validation. Sprint 1 through Sprint 4
+milestones are implemented. Sprint 6 remains planned and depends on Sprint 5
+closeout.
 
 ## Completed Milestones
 
@@ -23,11 +24,13 @@ planned and depends on Sprint 5 closeout.
 
 ## Current Work
 
-- Issue #42, owned by Ranee: selected-model serving and API integration.
-- Issue #43 and open PR #46, owned by Pamela: candidate comparison and
-  explainability integration.
-- Issue #39, owned by Jared: integrated Sprint 5 validation and closeout after
-  #42 and #43 are complete.
+- Issue #42 implementation is integrated on the temporary branch with
+  fail-closed model serving, checksum/version validation, and candidate-pair
+  inference through the reviewed 55-feature bridge.
+- Issue #43 implementation is integrated on the temporary branch with canonical
+  graph/rule/ML explainability and frontend wiring.
+- Issue #39, owned by Jared: final integrated Sprint 5 validation and closeout
+  after branch review.
 
 ## Current ML State
 
@@ -40,8 +43,8 @@ planned and depends on Sprint 5 closeout.
 | Model version | `RandomForestClassifier-sprint5-v1-65e9834666ad19c5` |
 | Pipeline artifact | 251,404,304-byte joblib; intentionally not tracked in Git |
 | Reproducibility record | Tracked metadata and final evaluation report |
-| Runtime serving in `main` | Not active; pending #42 |
-| Graph-backed response status | `mlStatus: "not_applied"` |
+| Runtime serving on integration branch | Active for bridgeable candidate pairs; unavailable pairs fail closed |
+| Graph-backed response status | `mlStatus: "applied"` only after real inference; otherwise `not_applied` |
 
 Moderate-class performance is substantially stronger than Major and Minor.
 The final results are research classification performance, not clinical
@@ -67,18 +70,17 @@ PolyMerge keeps three independent result channels:
 1. Graph evidence records represented relationships, graph paths, and
    provenance.
 2. Deterministic rules record accepted/rejected status and hard-rule reasons.
-3. ML prediction will record predicted DDI severity and inference metadata once
-   #42 is integrated.
+3. ML prediction records pair-level predicted DDInter severity and model
+   metadata only after the real frozen model runs.
 
 Graph coverage does not establish clinical efficacy. Predicted severity does
 not establish clinical safety.
 
 ## Remaining Before Sprint 6
 
-- Merge and validate #42 model serving and API integration.
-- Complete #43 comparison and explainability integration against the final
-  graph and ML contracts.
-- Run #42/#43 integration tests and the #39 master regression audit.
+- Review and merge the repaired temporary Sprint 5 integration branch.
+- Use the passing integration tests and regression audit as evidence for #39
+  closeout.
 - Prepare the Sprint 6 deployment and academic-submission handoff.
 
 ## Research and Clinical Boundaries

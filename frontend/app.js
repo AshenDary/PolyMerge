@@ -41,8 +41,7 @@ function renderSummaryCards(candidates) {
 
   const cards = [
     { label: 'Treatment Coverage', value: `${(candidate.coverage ?? 0) * 100}% KG Coverage` },
-    { label: 'Interaction Risk', value: candidate.interactionRisk != null ? candidate.interactionRisk.toFixed(2) : 'Not applied' },
-    { label: 'Synergy Model', value: candidate.synergyScore != null ? candidate.synergyScore.toFixed(2) : 'Not applied' },
+    { label: 'ML Prediction', value: candidate.mlStatus === 'applied' ? 'Applied' : 'Not applied' },
     { label: 'Drug Count', value: candidate.drugCount ?? 'N/A' },
     { label: 'Evidence Level', value: candidate.evidenceLevel ?? 'N/A' },
   ];
@@ -60,7 +59,7 @@ function renderSummaryCards(candidates) {
 }
 
 function renderResults(data) {
-  const results = data.candidates ?? [];
+  const results = data.candidateSets ?? data.candidates ?? [];
 
   renderSummaryCards(results);
 
@@ -78,8 +77,7 @@ function renderResults(data) {
               </div>
               <div class="result-meta">
                 <span>Coverage: ${(candidate.coverage ?? 0) * 100}% KG Coverage</span>
-                <span>Interaction Risk: ${candidate.interactionRisk ?? 'Not applied'}</span>
-                <span>Synergy Model: ${candidate.synergyScore ?? 'Not applied'}</span>
+                <span>ML Prediction: ${candidate.mlStatus === 'applied' ? 'Applied' : 'Not applied'}</span>
                 <span>Evidence: ${candidate.evidenceLevel ?? 'N/A'}</span>
                 <span>Status: ${candidate.status ?? 'accepted'}</span>
               </div>
@@ -98,22 +96,7 @@ function renderResults(data) {
       const target = Number(button.dataset.candidate) - 1;
       const candidate = results[target];
       if (!candidate) return;
-
-      // Render a simple explanation panel.
-      explainability.innerHTML = `
-        <div class="explainability-list">
-          <div class="explainability-item">
-            <h3>Why was this candidate ranked?</h3>
-            <ul>
-              ${(candidate.reasons ?? []).map((reason) => `<li>${reason}</li>`).join('')}
-            </ul>
-          </div>
-          <div class="explainability-item">
-            <h3>Why not Candidate #${target + 2}?</h3>
-            <p class="muted">Lower-ranked or rejected candidates can be reviewed in the future with explicit rejection reasons, evidence provenance, and penalty explanations.</p>
-          </div>
-        </div>
-      `;
+      window.PolyMergeExplainability?.loadExplainability(data.queryId, 'detailed', candidate.candidateSetId);
     });
   });
 }
@@ -145,10 +128,10 @@ async function analyzeCombination() {
   statusTag.textContent = 'Running';
 
   try {
-    const response = await fetch('/api/combinations/search', {
+    const response = await fetch('/api/candidate-sets/search', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ diseases: Array.from(selectedDiseases) }),
+      body: JSON.stringify({ diseaseIds: Array.from(selectedDiseases) }),
     });
 
     const data = await response.json();
@@ -164,7 +147,7 @@ async function analyzeCombination() {
       <div class="explainability-list">
         <div class="explainability-item">
           <h3>Evidence panel</h3>
-          <p class="muted">${data.metadata?.dataStatus === 'real_graph' ? 'Candidates are based on represented knowledge-graph relationships. ML DDI and synergy prediction are not applied.' : 'Demo fallback output is clearly labeled and should not be interpreted as graph evidence or clinical evidence.'}</p>
+          <p class="muted">${data.metadata?.dataStatus === 'real_graph' ? 'Candidates are based on represented knowledge-graph relationships. Open a candidate to inspect graph evidence, configured deterministic rules, and ML prediction state.' : 'Fallback output is clearly labeled and should not be interpreted as graph evidence or clinical evidence.'}</p>
         </div>
       </div>
     `;

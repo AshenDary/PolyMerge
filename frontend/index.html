@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>PolyMerge Research Dashboard</title>
     <link rel="stylesheet" href="/frontend/styles.css" />
+    <link rel="stylesheet" href="/frontend/explainability.css" />
   </head>
   <body>
     <div class="page-shell">
@@ -31,10 +32,10 @@
           <ol class="workflow">
             <li class="done">Knowledge Graph Retrieval</li>
             <li class="done">Candidate Drug Mapping</li>
-            <li class="pending">ML DDI Prediction — Not Applied</li>
+            <li class="active">ML DDI Prediction</li>
             <li class="active">Safety Filtering</li>
             <li class="active">Greedy Set-Cover Baseline</li>
-            <li class="pending">Explainability</li>
+            <li class="active">Explainability</li>
           </ol>
         </section>
 
@@ -63,6 +64,7 @@
       </main>
     </div>
 
+    <script src="/frontend/explainability.js"></script>
     <script src="/frontend/app.js"></script>
   </body>
 </html>

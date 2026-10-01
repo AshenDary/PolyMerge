@@ -1,0 +1,440 @@
+/**
+ * Sprint 5 Explainability Styles
+ * 
+ * Visual separation of evidence channels:
+ * - Graph Evidence: Blue (#2196F3)
+ * - Safety Rules: Green (#4CAF50) / Red (#F44336)
+ * - ML Predictions: Purple (#9C27B0)
+ */
+
+/* Candidate Card */
+.candidate-explanation {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 24px;
+  background: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.candidate-explanation.candidate-rejected {
+  border-left: 4px solid #F44336;
+}
+
+.candidate-explanation.candidate-accepted {
+  border-left: 4px solid #4CAF50;
+}
+
+/* Header */
+.candidate-header {
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid #eee;
+}
+
+.candidate-header h3 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 12px 0;
+}
+
+.rank-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #2196F3;
+  color: white;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.status-badge {
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  margin-left: auto;
+}
+
+.status-badge.status-accepted {
+  background: #E8F5E9;
+  color: #2E7D32;
+}
+
+.status-badge.status-rejected {
+  background: #FFEBEE;
+  color: #C62828;
+}
+
+.drug-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.drug-chip {
+  padding: 4px 12px;
+  background: #E3F2FD;
+  color: #1565C0;
+  border-radius: 16px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+/* Evidence Sections Container */
+.evidence-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin: 20px 0;
+}
+
+/* Individual Evidence Section */
+.evidence-section {
+  padding: 16px;
+  border-radius: 6px;
+  background: #fafafa;
+}
+
+/* Graph Evidence Section (Blue) */
+.evidence-section.section-graph {
+  border-left-color: #2196F3 !important;
+  background: #E3F2FD;
+}
+
+.section-graph .section-header {
+  color: #1565C0 !important;
+}
+
+/* Safety Rules Section (Green/Red) */
+.evidence-section.section-rules {
+  border-left-color: #4CAF50 !important;
+  background: #E8F5E9;
+}
+
+.section-rules .section-header {
+  color: #2E7D32 !important;
+}
+
+/* ML Predictions Section (Purple) */
+.evidence-section.section-predictions {
+  border-left-color: #9C27B0 !important;
+  background: #F3E5F5;
+}
+
+.section-predictions .section-header {
+  color: #6A1B9A !important;
+}
+
+/* Section Header */
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.section-header h4 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.section-icon {
+  font-size: 20px;
+}
+
+/* Section Content */
+.section-content {
+  margin: 12px 0;
+}
+
+/* Section Disclaimer */
+.section-disclaimer {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.section-disclaimer small {
+  color: #666;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+/* Graph Evidence Content */
+.graph-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.metric {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.metric-label {
+  font-size: 12px;
+  color: #666;
+  font-weight: 500;
+}
+
+.metric-value {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1565C0;
+}
+
+.treatment-paths ul {
+  list-style: none;
+  padding: 0;
+  margin: 8px 0 0 0;
+}
+
+.treatment-paths li {
+  padding: 6px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.evidence-type {
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.evidence-type.evidence-known {
+  color: #4CAF50;
+}
+
+.evidence-type.evidence-inferred {
+  color: #FF9800;
+}
+
+.graph-provenance {
+  margin-top: 12px;
+  color: #666;
+  font-size: 12px;
+}
+
+/* Rules Content */
+.rules-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.rule-item {
+  padding: 12px;
+  border-radius: 4px;
+  border: 1px solid transparent;
+}
+
+.rule-item.rule-accepted {
+  background: #E8F5E9;
+  border-color: #4CAF50;
+}
+
+.rule-item.rule-rejected {
+  background: #FFEBEE;
+  border-color: #F44336;
+}
+
+.rule-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.rule-icon {
+  font-size: 16px;
+}
+
+.rule-item p {
+  margin: 6px 0;
+  font-size: 14px;
+}
+
+.affected-drugs {
+  font-size: 12px;
+  color: #666;
+  margin-top: 8px;
+}
+
+.rule-source {
+  margin-top: 8px;
+  font-size: 11px;
+  color: #999;
+}
+
+/* ML Predictions Content */
+.predictions-unavailable {
+  padding: 16px;
+  background: #F5F5F5;
+  border-radius: 4px;
+  border-left: 3px solid #9C27B0;
+  text-align: center;
+}
+
+.predictions-unavailable p {
+  margin: 0 0 8px 0;
+  color: #666;
+}
+
+.predictions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.prediction-item {
+  padding: 12px;
+  border-radius: 4px;
+  border: 1px solid #E0E0E0;
+  background: white;
+}
+
+.prediction-item.prediction-warning {
+  border-left: 3px solid #F44336;
+}
+
+.prediction-item.prediction-caution {
+  border-left: 3px solid #FF9800;
+}
+
+.prediction-item.prediction-info {
+  border-left: 3px solid #2196F3;
+}
+
+.prediction-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.severity-badge {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.severity-badge.severity-major {
+  background: #FFEBEE;
+  color: #C62828;
+}
+
+.severity-badge.severity-moderate {
+  background: #FFF3E0;
+  color: #E65100;
+}
+
+.severity-badge.severity-minor {
+  background: #E8F5E9;
+  color: #2E7D32;
+}
+
+.prediction-meta {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid #eee;
+  color: #999;
+  font-size: 11px;
+}
+
+/* Overall Disclaimer */
+.overall-disclaimer {
+  margin-top: 20px;
+  padding: 12px 16px;
+  background: #FFF9C4;
+  border-left: 4px solid #F57C00;
+  border-radius: 4px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.global-disclaimer {
+  margin-top: 24px;
+  padding: 16px;
+  background: #FFEBEE;
+  border: 1px solid #F44336;
+  border-radius: 4px;
+  font-size: 14px;
+  line-height: 1.6;
+  text-align: center;
+}
+
+/* Comparison Table */
+.comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  background: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.comparison-table th {
+  background: #F5F5F5;
+  padding: 12px;
+  text-align: left;
+  font-weight: 600;
+  border-bottom: 2px solid #ddd;
+}
+
+.comparison-table td {
+  padding: 12px;
+  border-bottom: 1px solid #eee;
+}
+
+.comparison-table tr.row-success {
+  background: #E8F5E9;
+}
+
+.comparison-table tr.row-error {
+  background: #FFEBEE;
+}
+
+.comparison-table .rank-cell {
+  font-weight: 600;
+  color: #2196F3;
+}
+
+.coverage-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 12px;
+  background: #E3F2FD;
+  color: #1565C0;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .evidence-sections {
+    gap: 16px;
+  }
+  
+  .graph-summary {
+    grid-template-columns: 1fr;
+  }
+  
+  .prediction-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .prob-bar {
+    grid-template-columns: 70px 1fr 40px;
+  }
+}

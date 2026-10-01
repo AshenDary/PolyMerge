@@ -1,7 +1,7 @@
 import { after, afterEach, test } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { app } from '../src/server.js';
+import { app, DDI_FEATURE_NAMES } from '../src/server.js';
 
 const originalFetch = globalThis.fetch;
 
@@ -19,6 +19,110 @@ function jsonResponse(payload, status = 200) {
     headers: { 'content-type': 'application/json' },
   });
 }
+
+function ddiFeatures() {
+  return Object.fromEntries(DDI_FEATURE_NAMES.map((name, index) => [name, index % 7]));
+}
+
+test('DDI endpoint forwards the exact feature contract and preserves model provenance', async () => {
+  const calls = [];
+  globalThis.fetch = async (url, options = {}) => {
+    calls.push({ url: String(url), body: JSON.parse(options.body) });
+    return jsonResponse({
+      predictedClass: 'Moderate',
+      inferenceStatus: 'applied',
+      mlStatus: 'applied',
+      model: {
+        name: 'RandomForestClassifier',
+        version: 'RandomForestClassifier-sprint5-v1-65e9834666ad19c5',
+        artifactSha256: 'a'.repeat(64),
+        featureContractSha256: 'b'.repeat(64),
+      },
+    });
+  };
+
+  const features = ddiFeatures();
+  const response = await app.inject({
+    method: 'POST',
+    url: '/api/ddi-severity/predict',
+    payload: { features },
+  });
+
+  assert.equal(response.statusCode, 200);
+  assert.match(calls[0].url, /\/predict\/ddi-severity$/);
+  assert.deepEqual(calls[0].body, { features });
+  assert.equal(response.json().predictedClass, 'Moderate');
+  assert.equal(response.json().mlStatus, 'applied');
+  assert.match(response.json().model.version, /sprint5/);
+});
+
+test('DDI endpoint rejects malformed features before calling the ML service', async () => {
+  let fetchCalled = false;
+  globalThis.fetch = async () => {
+    fetchCalled = true;
+    throw new Error('must not be called');
+  };
+  const features = ddiFeatures();
+  delete features[DDI_FEATURE_NAMES[0]];
+  features.invented_score = 0.99;
+
+  const response = await app.inject({
+    method: 'POST',
+    url: '/api/ddi-severity/predict',
+    payload: { features },
+  });
+
+  assert.equal(response.statusCode, 400);
+  assert.equal(fetchCalled, false);
+  assert.deepEqual(response.json().missingFeatures, [DDI_FEATURE_NAMES[0]]);
+  assert.deepEqual(response.json().unexpectedFeatures, ['invented_score']);
+});
+
+test('DDI endpoint preserves explicit unavailable state without inventing a class', async () => {
+  globalThis.fetch = async () => jsonResponse({
+    predictedClass: null,
+    inferenceStatus: 'unavailable',
+    mlStatus: 'not_applied',
+    model: {
+      name: 'RandomForestClassifier',
+      version: 'RandomForestClassifier-sprint5-v1-65e9834666ad19c5',
+      artifactSha256: 'a'.repeat(64),
+      featureContractSha256: 'b'.repeat(64),
+    },
+    error: 'artifact not installed',
+  }, 503);
+
+  const response = await app.inject({
+    method: 'POST',
+    url: '/api/ddi-severity/predict',
+    payload: { features: ddiFeatures() },
+  });
+
+  assert.equal(response.statusCode, 503);
+  assert.equal(response.json().predictedClass, null);
+  assert.equal(response.json().mlStatus, 'not_applied');
+  assert.equal(Object.hasOwn(response.json(), 'score'), false);
+});
+
+test('DDI endpoint fails closed on malformed applied inference', async () => {
+  globalThis.fetch = async () => jsonResponse({
+    predictedClass: 'Certain',
+    inferenceStatus: 'applied',
+    mlStatus: 'applied',
+    model: {},
+  });
+
+  const response = await app.inject({
+    method: 'POST',
+    url: '/api/ddi-severity/predict',
+    payload: { features: ddiFeatures() },
+  });
+
+  assert.equal(response.statusCode, 503);
+  assert.equal(response.json().predictedClass, null);
+  assert.equal(response.json().mlStatus, 'not_applied');
+  assert.match(response.json().error, /malformed applied-inference provenance/);
+});
 
 const graphDiseases = [
   {
@@ -368,6 +472,133 @@ test('candidate-set endpoint preserves structured rejection reasons from the ML 
   }]);
 });
 
+test('candidate-set endpoint preserves real pair-level ML prediction shape', async () => {
+  globalThis.fetch = async (url) => {
+    if (String(url).endsWith('/api/diseases')) {
+      return jsonResponse({ diseases: graphDiseases });
+    }
+    return jsonResponse({
+      queryId: 'active-ml-candidate-set',
+      diseaseIds: ['Disease::DOID:10763', 'Disease::DOID:9352'],
+      diseases: graphDiseases,
+      candidateSets: [{
+        candidateSetId: 'candidate-set:Compound::DB00177+Compound::DB00331',
+        rank: 1,
+        drugs: ['Compound::DB00177', 'Compound::DB00331'],
+        drugNames: ['Valsartan', 'Metformin'],
+        treatedDiseaseIds: ['Disease::DOID:10763', 'Disease::DOID:9352'],
+        uncoveredDiseaseIds: [],
+        coverage: 1,
+        drugCount: 2,
+        status: 'accepted',
+        rejectionReasons: [],
+        evidence: [{ source: 'Hetionet', relationship: 'CtD' }],
+        graphEvidence: {
+          source: 'Hetionet',
+          graphVersion: 'Hetionet v1.0 filtered PolyMerge fragment',
+          paths: [],
+        },
+        dataStatus: 'real_graph',
+        mlStatus: 'applied',
+        mlPrediction: {
+          status: 'applied',
+          pairs: [{
+            drugPair: ['Compound::DB00177', 'Compound::DB00331'],
+            predictedSeverity: 'Moderate',
+            inferenceStatus: 'applied',
+            model: {
+              name: 'RandomForestClassifier',
+              version: 'RandomForestClassifier-sprint5-v1-65e9834666ad19c5',
+              artifactSha256: 'a'.repeat(64),
+              featureContractSha256: 'b'.repeat(64),
+            },
+          }],
+        },
+        interactionRisk: null,
+        synergyScore: null,
+      }],
+      metadata: {
+        dataStatus: 'real_graph',
+        mlStatus: 'applied',
+        model: 'RandomForestClassifier',
+        modelVersion: 'RandomForestClassifier-sprint5-v1-65e9834666ad19c5',
+      },
+    });
+  };
+
+  const response = await app.inject({
+    method: 'POST',
+    url: '/api/candidate-sets/search',
+    payload: { diseaseIds: ['Disease::DOID:10763', 'Disease::DOID:9352'] },
+  });
+
+  assert.equal(response.statusCode, 200);
+  const [candidateSet] = response.json().candidateSets;
+  assert.equal(candidateSet.mlStatus, 'applied');
+  assert.equal(candidateSet.mlPrediction.pairs[0].predictedSeverity, 'Moderate');
+  assert.equal(candidateSet.mlPrediction.pairs[0].model.version, 'RandomForestClassifier-sprint5-v1-65e9834666ad19c5');
+  assert.equal(Object.hasOwn(candidateSet.mlPrediction.pairs[0], 'probabilities'), false);
+  assert.equal(Object.hasOwn(candidateSet.mlPrediction.pairs[0], 'confidence'), false);
+  assert.equal(Object.hasOwn(candidateSet, 'safetyScore'), false);
+});
+
+test('candidate-set endpoint fails closed on unsupported fabricated probability fields', async () => {
+  globalThis.fetch = async (url) => {
+    if (String(url).endsWith('/api/diseases')) {
+      return jsonResponse({ diseases: graphDiseases });
+    }
+    return jsonResponse({
+      queryId: 'fabricated-probability',
+      diseaseIds: ['Disease::DOID:10763'],
+      diseases: [graphDiseases[0]],
+      candidateSets: [{
+        candidateSetId: 'candidate-set:Compound::DB00177+Compound::DB00331',
+        rank: 1,
+        drugs: ['Compound::DB00177', 'Compound::DB00331'],
+        drugNames: ['Valsartan', 'Metformin'],
+        treatedDiseaseIds: ['Disease::DOID:10763'],
+        uncoveredDiseaseIds: [],
+        coverage: 1,
+        drugCount: 2,
+        status: 'accepted',
+        rejectionReasons: [],
+        evidence: [],
+        dataStatus: 'real_graph',
+        mlStatus: 'applied',
+        mlPrediction: {
+          status: 'applied',
+          pairs: [{
+            drugPair: ['Compound::DB00177', 'Compound::DB00331'],
+            predictedSeverity: 'Moderate',
+            inferenceStatus: 'applied',
+            probabilities: { Moderate: 1 },
+            model: {
+              name: 'RandomForestClassifier',
+              version: 'RandomForestClassifier-sprint5-v1-65e9834666ad19c5',
+            },
+          }],
+        },
+        interactionRisk: null,
+        synergyScore: null,
+      }],
+      metadata: {
+        dataStatus: 'real_graph',
+        mlStatus: 'applied',
+      },
+    });
+  };
+
+  const response = await app.inject({
+    method: 'POST',
+    url: '/api/candidate-sets/search',
+    payload: { diseaseIds: ['Disease::DOID:10763'] },
+  });
+
+  assert.equal(response.statusCode, 200);
+  assert.equal(response.json().metadata.mlStatus, 'not_applied');
+  assert.match(response.json().metadata.warning, /unsupported probability or confidence/);
+});
+
 test('candidate-set endpoint rejects invalid IDs and configuration before prediction', async () => {
   const calls = [];
   globalThis.fetch = async (url) => {
@@ -425,6 +656,85 @@ test('candidate-set endpoint preserves an empty valid result', async () => {
   assert.equal(response.statusCode, 200);
   assert.deepEqual(response.json().candidateSets, []);
   assert.equal(response.json().metadata.dataStatus, 'real_graph');
+});
+
+test('candidate-set explain endpoint supports formats and rejects invalid or unknown queries', async () => {
+  globalThis.fetch = async (url) => {
+    if (String(url).endsWith('/api/diseases')) {
+      return jsonResponse({ diseases: graphDiseases });
+    }
+    return jsonResponse({
+      queryId: 'explain-query',
+      diseaseIds: ['Disease::DOID:10763'],
+      diseases: [graphDiseases[0]],
+      candidateSets: [{
+        candidateSetId: 'candidate-set:Compound::DB00177',
+        rank: 1,
+        drugs: ['Compound::DB00177'],
+        drugNames: ['Valsartan'],
+        treatedDiseaseIds: ['Disease::DOID:10763'],
+        uncoveredDiseaseIds: [],
+        coverage: 1,
+        drugCount: 1,
+        status: 'accepted',
+        rejectionReasons: [],
+        evidence: [{ source: 'Hetionet', relationship: 'CtD' }],
+        graphEvidence: {
+          source: 'Hetionet',
+          graphVersion: 'Hetionet v1.0 filtered PolyMerge fragment',
+          paths: [{
+            pathId: 'graph-path:treatment',
+            semanticType: 'treatment',
+            sourceEntity: { id: 'Compound::DB00177', name: 'Valsartan', kind: 'Compound' },
+            relationship: { type: 'CtD', metaedge: 'CtD' },
+            targetEntity: { id: 'Disease::DOID:10763', name: 'hypertension', kind: 'Disease' },
+            provenance: {
+              source: 'Hetionet',
+              graphVersion: 'Hetionet v1.0 filtered PolyMerge fragment',
+              evidenceType: 'known',
+            },
+          }],
+        },
+        dataStatus: 'real_graph',
+        mlStatus: 'not_applied',
+        mlPrediction: { status: 'not_applied', pairs: [], reason: 'single-drug candidate' },
+        interactionRisk: null,
+        synergyScore: null,
+      }],
+      metadata: {
+        dataStatus: 'real_graph',
+        mlStatus: 'not_applied',
+      },
+    });
+  };
+
+  const search = await app.inject({
+    method: 'POST',
+    url: '/api/candidate-sets/search',
+    payload: { diseaseIds: ['Disease::DOID:10763'] },
+  });
+  assert.equal(search.statusCode, 200);
+
+  for (const format of ['detailed', 'comparison', 'visualization', 'structured']) {
+    const explain = await app.inject({
+      method: 'GET',
+      url: `/api/candidate-sets/explain-query/explain?format=${format}`,
+    });
+    assert.equal(explain.statusCode, 200);
+    assert.equal(explain.json().queryId, 'explain-query');
+  }
+
+  const invalidFormat = await app.inject({
+    method: 'GET',
+    url: '/api/candidate-sets/explain-query/explain?format=invalid',
+  });
+  assert.equal(invalidFormat.statusCode, 400);
+
+  const unknown = await app.inject({
+    method: 'GET',
+    url: '/api/candidate-sets/missing-query/explain',
+  });
+  assert.equal(unknown.statusCode, 404);
 });
 
 test('candidate-set endpoint returns an explicit empty fallback on upstream failure', async () => {

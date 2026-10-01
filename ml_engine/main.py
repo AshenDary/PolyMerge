@@ -6,23 +6,43 @@ research-oriented pipeline shape the repository will evolve toward.
 from __future__ import annotations
 
 import os
+from contextlib import asynccontextmanager
+from itertools import combinations
 from pathlib import Path
 from typing import Any, Literal, Optional
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from app.services.candidate_generator import build_graph_candidates
+from app.services.ddi_feature_builder import PairFeatureBuilder, PairFeatureUnavailableError
 from app.services.candidate_ranker import rank_candidates
 from app.services.knowledge_graph import get_available_diseases, get_drug_metadata
+from app.services.model_serving import (
+    FeatureSchemaError,
+    ModelUnavailableError,
+    ddi_model_service,
+)
 from app.services.set_cover_optimizer import optimize_candidate_sets
 
 # Single shared .env lives at the repo root, not inside ml_engine/.
 load_dotenv(Path(__file__).resolve().parent.parent / ".env")
 
-app = FastAPI(title="PolyMerge ML Engine", version="0.1.0")
+
+@asynccontextmanager
+async def lifespan(_: FastAPI):
+    """Warm the singleton model once; absence degrades inference, not liveness."""
+    try:
+        ddi_model_service.load()
+    except ModelUnavailableError:
+        pass
+    yield
+
+
+app = FastAPI(title="PolyMerge ML Engine", version="0.1.0", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -77,6 +97,14 @@ class CandidateSetRequest(BaseModel):
         return list(dict.fromkeys(normalized))
 
 
+class DDISeverityRequest(BaseModel):
+    """The reviewed 55-feature pair contract for frozen-model inference."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    features: dict[str, Any]
+
+
 class CombinationResponse(BaseModel):
     queryId: str
     diseases: list[str]
@@ -106,7 +134,8 @@ class CandidateSetResult(BaseModel):
     rejectionReasons: list[dict[str, Any]] = Field(default_factory=list)
     evidence: list[dict[str, Any]] = Field(default_factory=list)
     dataStatus: Literal["real_graph"]
-    mlStatus: Literal["not_applied"]
+    mlStatus: Literal["applied", "not_applied"]
+    mlPrediction: dict[str, Any] = Field(default_factory=dict)
     interactionRisk: None = None
     synergyScore: None = None
 
@@ -133,11 +162,11 @@ class CandidateSetMetadata(BaseModel):
     model_config = ConfigDict(extra="allow")
 
     dataStatus: Literal["real_graph"]
-    mlStatus: Literal["not_applied"]
+    mlStatus: Literal["applied", "not_applied"]
     graph: Optional[str] = None
     dataset: Optional[str] = None
     model: str
-    modelVersion: None = None
+    modelVersion: Optional[str] = None
     resolvedDiseases: list[DiseaseReference]
     missingDiseases: list[str]
 
@@ -156,6 +185,16 @@ async def health():
     return {"status": "ok", "service": "polymerge-ml-engine"}
 
 
+@app.get("/health/model")
+async def model_health():
+    """Report model readiness independently from service liveness."""
+    status = ddi_model_service.status()
+    return JSONResponse(
+        status_code=200 if status["inferenceStatus"] == "ready" else 503,
+        content=status,
+    )
+
+
 @app.get("/api/diseases")
 async def diseases():
     return {"diseases": get_available_diseases()}
@@ -167,6 +206,27 @@ async def drug_by_id(drug_id: str):
     if drug is None:
         return {"error": "Drug not found"}
     return drug
+
+
+@app.post("/predict/ddi-severity")
+async def predict_ddi_severity(payload: DDISeverityRequest):
+    """Run only the frozen DDI classifier; graph and hard rules remain separate."""
+    try:
+        return ddi_model_service.predict(payload.features)
+    except FeatureSchemaError as error:
+        raise HTTPException(
+            status_code=422,
+            detail={
+                "error": "Invalid DDI feature schema",
+                "message": str(error),
+                "mlStatus": "not_applied",
+            },
+        ) from error
+    except ModelUnavailableError as error:
+        return JSONResponse(
+            status_code=503,
+            content=ddi_model_service.unavailable_response(str(error)),
+        )
 
 
 def _run_candidate_set_pipeline(
@@ -202,23 +262,39 @@ def _candidate_set_response(result: dict[str, Any]) -> dict[str, Any]:
     metadata = result["metadata"]
     resolved_diseases = metadata.get("resolvedDiseases", [])
     target_disease_ids = [disease["id"] for disease in resolved_diseases]
-    ml_status = metadata.get("mlStatus", "not_applied")
 
     candidate_sets = []
+    any_applied = False
     for candidate in result.get("candidates", []):
         treated_ids = candidate.get("treatedDiseaseIds", [])
+        candidate_with_prediction = _apply_pair_predictions(candidate)
+        any_applied = any_applied or candidate_with_prediction.get("mlStatus") == "applied"
         candidate_sets.append({
-            **candidate,
+            **candidate_with_prediction,
             "uncoveredDiseaseIds": candidate.get(
                 "uncoveredDiseaseIds",
                 [disease_id for disease_id in target_disease_ids if disease_id not in treated_ids],
             ),
             "rejectionReasons": candidate.get("rejectionReasons", []),
             "dataStatus": candidate.get("dataStatus", metadata["dataStatus"]),
-            "mlStatus": candidate.get("mlStatus", ml_status),
             "interactionRisk": None,
             "synergyScore": None,
         })
+    if any_applied:
+        metadata = {
+            **metadata,
+            "mlStatus": "applied",
+            "model": "RandomForestClassifier",
+            "modelVersion": next(
+                (
+                    pair["model"]["version"]
+                    for candidate in candidate_sets
+                    for pair in candidate.get("mlPrediction", {}).get("pairs", [])
+                    if pair.get("model", {}).get("version")
+                ),
+                metadata.get("modelVersion"),
+            ),
+        }
 
     return {
         "queryId": result["queryId"],
@@ -226,6 +302,52 @@ def _candidate_set_response(result: dict[str, Any]) -> dict[str, Any]:
         "diseases": resolved_diseases,
         "candidateSets": candidate_sets,
         "metadata": metadata,
+    }
+
+
+def _apply_pair_predictions(candidate: dict[str, Any]) -> dict[str, Any]:
+    drugs = sorted(candidate.get("drugs", []))
+    if len(drugs) < 2:
+        return {
+            **candidate,
+            "mlStatus": "not_applied",
+            "mlPrediction": {
+                "status": "not_applied",
+                "pairs": [],
+                "reason": "At least two drugs are required for pair-level DDI inference.",
+            },
+        }
+
+    try:
+        builder = PairFeatureBuilder()
+        predicted_pairs = []
+        for drug_a, drug_b in combinations(drugs, 2):
+            features = builder.build_features(drug_a, drug_b)
+            prediction = ddi_model_service.predict(features)
+            predicted_pairs.append({
+                "drugPair": [drug_a, drug_b],
+                "predictedSeverity": prediction["predictedClass"],
+                "model": prediction["model"],
+                "inferenceStatus": prediction["inferenceStatus"],
+            })
+    except (PairFeatureUnavailableError, FeatureSchemaError, ModelUnavailableError) as error:
+        return {
+            **candidate,
+            "mlStatus": "not_applied",
+            "mlPrediction": {
+                "status": "not_applied",
+                "pairs": [],
+                "reason": str(error),
+            },
+        }
+
+    return {
+        **candidate,
+        "mlStatus": "applied",
+        "mlPrediction": {
+            "status": "applied",
+            "pairs": predicted_pairs,
+        },
     }
 
 
