@@ -25,7 +25,7 @@ function renderCandidateExplanation(explanation, container) {
       <span class="rank-badge">#${rank}</span>
       Candidate ${rank}
       <span class="status-badge status-${status}">
-        ${status === 'accepted' ? '✓ Accepted' : '✗ Rejected'}
+        ${status === 'accepted' ? 'Accepted' : 'Rejected'}
       </span>
     </h3>
     <div class="drug-list">
@@ -52,7 +52,7 @@ function renderCandidateExplanation(explanation, container) {
         ${renderSectionContent(section)}
       </div>
       <div class="section-disclaimer">
-        <small>⚠️ ${section.disclaimer}</small>
+        <small>${section.disclaimer}</small>
       </div>
     `;
     
@@ -117,10 +117,10 @@ function renderGraphEvidenceContent(content) {
           ${content.treatmentPaths.map((path) => `
             <li>
               <span class="evidence-type evidence-${path.evidenceType}">
-                ${path.evidenceType === 'known' ? '●' : '○'}
+                ${path.evidenceType === 'known' ? 'known' : 'context'}
               </span>
               ${path.description}
-              <small>(${path.source})</small>
+              <small>${path.pathId} (${path.source})</small>
             </li>
           `).join('')}
         </ul>
@@ -146,7 +146,7 @@ function renderRulesContent(rules) {
       ${rules.map((rule) => `
         <div class="rule-item rule-${rule.status}">
           <div class="rule-header">
-            <span class="rule-icon">${rule.status === 'accepted' ? '✓' : '✗'}</span>
+            <span class="rule-icon">${rule.status === 'accepted' ? 'OK' : 'Blocked'}</span>
             <strong>${rule.type}</strong>
           </div>
           <p>${rule.message}</p>
@@ -182,36 +182,16 @@ function renderPredictionsContent(content) {
       ${content.pairs.map((pred) => `
         <div class="prediction-item prediction-${pred.visualStyle}">
           <div class="prediction-header">
-            <strong>${pred.drugs[0]} ↔ ${pred.drugs[1]}</strong>
+            <strong>${pred.drugs[0]} to ${pred.drugs[1]}</strong>
             <span class="severity-badge severity-${pred.severity?.toLowerCase()}">
               ${pred.severity ?? 'N/A'}
             </span>
           </div>
           
-          ${pred.probabilities ? `
-            <div class="probability-bars">
-              <div class="prob-bar">
-                <span class="prob-label">Major:</span>
-                <div class="prob-bar-fill" style="width: ${(pred.probabilities.Major ?? 0) * 100}%"></div>
-                <span class="prob-value">${((pred.probabilities.Major ?? 0) * 100).toFixed(0)}%</span>
-              </div>
-              <div class="prob-bar">
-                <span class="prob-label">Moderate:</span>
-                <div class="prob-bar-fill" style="width: ${(pred.probabilities.Moderate ?? 0) * 100}%"></div>
-                <span class="prob-value">${((pred.probabilities.Moderate ?? 0) * 100).toFixed(0)}%</span>
-              </div>
-              <div class="prob-bar">
-                <span class="prob-label">Minor:</span>
-                <div class="prob-bar-fill" style="width: ${(pred.probabilities.Minor ?? 0) * 100}%"></div>
-                <span class="prob-value">${((pred.probabilities.Minor ?? 0) * 100).toFixed(0)}%</span>
-              </div>
-            </div>
-          ` : ''}
-          
           <div class="prediction-meta">
             <small>
               Model: ${pred.model?.name ?? 'N/A'} ${pred.model?.version ?? ''}
-              ${pred.confidence ? ` | Confidence: ${(pred.confidence * 100).toFixed(0)}%` : ''}
+              ${pred.inferenceStatus ? ` | Inference: ${pred.inferenceStatus}` : ''}
             </small>
           </div>
         </div>
@@ -280,18 +260,18 @@ function getSectionColor(color) {
  */
 function getSectionIcon(icon) {
   const icons = {
-    database: '🗄️',
-    shield: '🛡️',
-    cpu: '🧠',
+    database: 'KG',
+    shield: 'RULE',
+    cpu: 'ML',
   };
-  return icons[icon] || '📊';
+  return icons[icon] || 'DATA';
 }
 
 /**
  * Fetch and render explainability for a query
  */
-async function loadExplainability(queryId, format = 'detailed') {
-  const container = document.getElementById('explainability-container');
+async function loadExplainability(queryId, format = 'detailed', candidateSetId = null) {
+  const container = document.getElementById('explainability');
   container.innerHTML = '<p>Loading explainability...</p>';
   
   try {
@@ -306,8 +286,14 @@ async function loadExplainability(queryId, format = 'detailed') {
     
     // Render based on format
     if (format === 'detailed' && data.detailedExplanations) {
-      for (const explanation of data.detailedExplanations) {
+      const explanations = candidateSetId
+        ? data.detailedExplanations.filter((item) => item.candidateId === candidateSetId)
+        : data.detailedExplanations;
+      for (const explanation of explanations) {
         renderCandidateExplanation(explanation, container);
+      }
+      if (explanations.length === 0) {
+        container.innerHTML = '<p class="muted">No explanation found for this candidate.</p>';
       }
     } else if (format === 'comparison' && data.comparisonView) {
       renderComparisonTable(data.comparisonView, container);
@@ -326,6 +312,12 @@ async function loadExplainability(queryId, format = 'detailed') {
     container.innerHTML = `<p class="error">Error loading explainability: ${error.message}</p>`;
   }
 }
+
+window.PolyMergeExplainability = {
+  renderCandidateExplanation,
+  renderComparisonTable,
+  loadExplainability,
+};
 
 // Export for use in other modules
 if (typeof module !== 'undefined' && module.exports) {
