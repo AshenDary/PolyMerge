@@ -63,11 +63,15 @@ MySQL and Prisma are used for application/system data foundations. Neo4j remains
 
 ## Current ML Status
 
-No predictive ML model is applied automatically to graph-backed candidate
-responses. The frozen Sprint 5 Random Forest is served through the separate
-DDI-severity endpoints (`POST /predict/ddi-severity` in the ML service and
+The frozen Sprint 5 Random Forest is served through the DDI-severity endpoints
+(`POST /predict/ddi-severity` in the ML service and
 `POST /api/ddi-severity/predict` in the backend) when its reviewed joblib
-artifact is installed and passes checksum/schema verification.
+artifact is installed and passes checksum/schema verification. The Sprint 5
+integration branch also applies the same model to candidate-set drug pairs when
+the runtime bridge can deterministically build the frozen 55-feature row from
+the reviewed DDInter-Hetionet and PubChem mappings. If a pair cannot be bridged
+or the model is unavailable, candidate ML state remains explicitly
+`mlStatus: "not_applied"` with no fallback severity.
 
 Feature enrichment uses cached, conservatively accepted PubChem structures,
 traditional RDKit descriptors, and symmetric Hetionet graph summaries. Missing
@@ -86,7 +90,8 @@ validated mappings and 67.818% structure coverage across distinct drugs.
 | Final test Macro AUPRC | 0.632468 |
 
 - Graph-backed responses use `dataStatus: "real_graph"`.
-- Predictive model status is `mlStatus: "not_applied"`.
+- Predictive model status is `mlStatus: "applied"` only after real pair-level
+  inference succeeds; otherwise it remains `mlStatus: "not_applied"`.
 - `interactionRisk` and `synergyScore` are `null`/not applied for real graph-backed candidates.
 - The supervised target is curated DDInter severity: Major, Moderate, or Minor.
 - Unknown severity is audited but excluded; no synthetic negatives or
@@ -126,12 +131,12 @@ Fallback responses must not be interpreted as real graph evidence or real ML pre
 - Candidate-set generation is a deterministic graph-derived foundation for Sprint 2, not a final production optimization system.
 - The optimizer is a greedy set-cover baseline over candidate sets, not a production-grade optimization system.
 - `/api/drugs/:id` and `/api/drugs/:id/interactions` still provide reference/demo backend responses and are not the primary graph-backed candidate-search flow.
-- Structured graph evidence paths are available, while final candidate
-  comparison and explainability integration remains in progress under #43 and
-  depends on the #42 prediction contract.
+- Structured graph evidence paths, deterministic rule results, and ML
+  prediction presentation are wired into the candidate-set explainability flow.
 - Hetionet `CrC` means compound resemblance and is not a DDI label.
-- Active DDI severity inference remains pending #42; graph-backed candidate
-  responses continue to use `mlStatus: "not_applied"`.
+- Candidate-set ML inference is available only for pairs that can be represented
+  by the frozen Sprint 3 feature contract; unsupported pairs fail closed without
+  a fabricated prediction.
 - Major and Minor recall remains substantially lower than Moderate recall due
   to the observed class-imbalanced performance profile.
 - Final model metrics are research classification results, not clinical

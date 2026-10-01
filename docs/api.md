@@ -8,7 +8,8 @@ implemented behavior only.
 Graph-backed candidate responses use:
 
 - `dataStatus: "real_graph"`
-- `mlStatus: "not_applied"`
+- `mlStatus: "applied"` only when real pair-level DDI inference succeeds;
+  otherwise `mlStatus: "not_applied"`
 
 Candidate-set fallback responses use:
 
@@ -17,14 +18,15 @@ Candidate-set fallback responses use:
 - `upstreamStatus: "fallback"`
 - `candidateSets: []`
 
-The final `RandomForestClassifier` is evaluated and frozen, but it is not yet
-loaded for runtime inference in `main`. No trained traditional supervised ML
-model is therefore applied to current candidate sets. Graph-backed candidate
-sets retain `mlStatus: "not_applied"`, and `interactionRisk` / `synergyScore`
-remain `null` until Issue #42 is integrated. Neural-network,
-deep-learning, graph-embedding, GNN, transformer, large-language-model,
-foundation-model, and AutoML models are not part of the planned academic ML
-solution.
+The final `RandomForestClassifier` is evaluated, frozen, and available for
+runtime inference when the reviewed artifact is installed and verified.
+Candidate-set inference is pair-level: every unique unordered drug pair is
+bridged through the frozen 55-feature contract and sent to the serving layer.
+If feature construction or model serving fails, no severity is fabricated.
+`interactionRisk` / `synergyScore` remain `null`; the canonical ML field is
+`mlPrediction`. Neural-network, deep-learning, graph-embedding, GNN,
+transformer, large-language-model, foundation-model, and AutoML models are not
+part of the planned academic ML solution.
 
 The frozen Random Forest is exposed through a separate DDI-severity endpoint.
 Only a successful, checksum-verified inference uses `mlStatus: "applied"`.
@@ -397,8 +399,33 @@ payload.
 Paths are deduplicated by `pathId` and returned in ascending `pathId` order.
 
 `graphEvidence` is independent of `rejectionReasons` and predictive ML output.
-It does not populate `interactionRisk` or `synergyScore`; while ML inference is
-not applied, those fields remain `null` and `mlStatus` remains `not_applied`.
+It does not populate `interactionRisk` or `synergyScore`; those fields remain
+`null`. Predictive output, when available, is reported separately in
+`mlPrediction`:
+
+```json
+{
+  "mlStatus": "applied",
+  "mlPrediction": {
+    "status": "applied",
+    "pairs": [
+      {
+        "drugPair": ["Compound::DB00177", "Compound::DB00331"],
+        "predictedSeverity": "Moderate",
+        "model": {
+          "name": "RandomForestClassifier",
+          "version": "RandomForestClassifier-sprint5-v1-65e9834666ad19c5"
+        },
+        "inferenceStatus": "applied"
+      }
+    ]
+  }
+}
+```
+
+If the candidate pair cannot be represented by the reviewed runtime feature
+bridge or the model is unavailable, `mlStatus` is `not_applied` and
+`mlPrediction.pairs` is empty.
 `CrC` is resemblance context only and is never emitted as treatment, DDI,
 severity, contraindication, or safety evidence.
 
@@ -410,8 +437,8 @@ include corresponding treatment evidence where:
 - `source`, `graphVersion`, `metaedge`, `targetName`, and `evidenceType`
   preserve graph provenance.
 
-`interactionRisk` and `synergyScore` are not applied for real graph-backed
-candidates.
+`interactionRisk`, `synergyScore`, confidence, probabilities, and a combined
+safety score are not emitted for real graph-backed candidates.
 
 An empty context array means no corresponding relationship is represented in
 the current graph fragment. It is not a known negative biomedical fact. See
@@ -423,7 +450,26 @@ Returns an in-memory candidate-search result from the current backend process.
 
 ### `GET /api/combinations/:id/explain`
 
-Returns the current limited explainability payload for a stored in-memory result. Advanced explainability and graph visualization are future work.
+Compatibility route. It returns the canonical explainability channels for a
+stored in-memory result where represented evidence is available and does not
+synthesize graph relationships.
+
+### `GET /api/candidate-sets/:id/explain`
+
+Returns explainability for a stored candidate-set search result produced by
+`POST /api/candidate-sets/search`. Supported `format` query values are:
+
+- `detailed`
+- `comparison`
+- `visualization`
+- `structured`
+
+Unknown query IDs return HTTP 404. Invalid formats return HTTP 400. The response
+keeps these channels structurally separate:
+
+- `graphEvidence`
+- `deterministicRules`
+- `mlPrediction`
 
 ### `GET /api/drugs/:id`
 
@@ -494,6 +540,6 @@ diseases, retrieves `CtD` compound candidates, attaches graph
 evidence/provenance, generates candidate sets, runs deterministic safety checks,
 ranks candidates, and runs the greedy candidate-set optimization baseline.
 
-No trained predictive model is run for current graph-backed responses. Future
-model fields should represent traditional supervised ML predictions and remain
-separate from known graph evidence and deterministic rule outcomes.
+The compatibility route preserves graph evidence and deterministic rule
+channels. Candidate-set pair prediction is exposed through the canonical
+`/predict/candidate-sets` and backend `/api/candidate-sets/search` flow.

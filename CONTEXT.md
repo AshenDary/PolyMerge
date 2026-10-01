@@ -22,8 +22,9 @@ Graph-backed candidate generation / safety filtering / greedy set-cover baseline
 
 Traditional ML is built from DDInter severity labels plus PubChem, RDKit, and
 Hetionet tabular features. The finalized Random Forest pipeline predicts DDI
-severity, but runtime prediction is not active in `main` until Issue #42 is
-integrated.
+severity. On the Sprint 5 integration branch, candidate-set drug pairs are
+scored only when the reviewed runtime bridge can build the frozen 55-feature
+row; otherwise prediction remains explicitly not applied.
 
 MySQL is used as the application/system data foundation. The biomedical knowledge graph is not duplicated into MySQL.
 
@@ -61,14 +62,17 @@ MySQL is used as the application/system data foundation. The biomedical knowledg
 - Sprint 5 Issue #41 added structured `graphEvidence.paths`, deterministic path
   IDs, path-level provenance, and per-drug evidence path references.
 
-### Current Integration Gap
+### Current Integration State
 
-- Issue #42 must load the frozen model for runtime inference and expose active or
-  unavailable prediction metadata through the API.
-- Issue #43 must complete candidate comparison and explainability integration
-  against the merged graph path contract and final #42 prediction contract.
-- Issue #39 remains open for the integrated Sprint 5 regression audit and
-  closeout before the Sprint 6 handoff.
+- Issue #42 serving is integrated on the temporary branch with checksum,
+  version, feature-schema, unavailable-model, and corrupt-artifact protections.
+- Candidate-set pair inference uses the same frozen 55-feature contract and
+  fails closed when a graph candidate pair cannot be deterministically bridged.
+- Issue #43 explainability consumes `graphEvidence.paths`, precomputed
+  deterministic rule state, and real ML prediction output without mixing the
+  channels.
+- Issue #39 remains pending final branch review and closeout before the Sprint
+  6 handoff.
 
 ### Three Independent Result Channels
 
@@ -76,8 +80,8 @@ MySQL is used as the application/system data foundation. The biomedical knowledg
    paths with source and graph-version provenance.
 2. Deterministic rules: accepted/rejected status and structured hard-rule
    reasons.
-3. ML prediction: predicted DDInter severity, model version, and inference
-   metadata once #42 is integrated.
+3. ML prediction: pair-level predicted DDInter severity, model version, and
+   inference metadata only when the frozen model actually runs.
 
 These channels must not be collapsed into a single safety score. Graph coverage
 is not clinical efficacy, and predicted severity is not a clinical safety
@@ -97,9 +101,11 @@ determination.
   deterministic interpretable descriptors. Official PUG REST enrichment produced
   1,315 validated mappings and 67.818% distinct-drug structure coverage; missing
   coverage is explicit.
-- Current graph-backed candidates use `mlStatus: "not_applied"`.
-- The selected model is finalized and evaluated, but current predictive output
-  remains inactive until Issue #42 integrates runtime serving.
+- Current graph-backed candidates use `mlStatus: "applied"` only for successful
+  pair-level Random Forest inference; unsupported pairs remain
+  `mlStatus: "not_applied"`.
+- The selected model is finalized, evaluated, and served from the verified
+  joblib artifact without rerunning final evaluation.
 - The joblib pipeline is approximately 240 MB and intentionally ignored by Git;
   its metadata and final evaluation report are tracked for reproducibility.
 - The optimizer is a greedy baseline, not a production-grade optimizer.
@@ -121,4 +127,5 @@ determination.
 - Dosage recommendations.
 - Clinical validation or regulatory approval.
 - Chemical stability/formulation guarantees.
-- Predictive DDI severity output until the finalized model is integrated by #42.
+- Predictive DDI severity output for graph pairs that cannot be represented by
+  the frozen 55-feature contract.

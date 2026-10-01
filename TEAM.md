@@ -22,8 +22,9 @@ candidate-set foundations preserve graph-derived coverage and provenance.
 Sprint 3 adds Jared's completed DDInter 2.0 severity dataset, PubChem PUG REST
 enrichment, RDKit descriptors, graph-derived tabular features, EDA, and
 leakage-safe preprocessing. Sprint 4 completed training-only cross-validation
-and selected `RandomForestClassifier`. Sprint 5 final evaluation and graph
-evidence/provenance are complete; runtime model serving remains pending.
+and selected `RandomForestClassifier`. Sprint 5 final evaluation,
+graph evidence/provenance, runtime model serving, and explainability integration
+are repaired together on the temporary integration branch.
 
 ## Ranee — Backend / Traditional ML Integration
 
@@ -44,9 +45,10 @@ evidence/provenance are complete; runtime model serving remains pending.
 
 Backend and ML/Graph integration is implemented for Sprint 1. Real graph-backed
 responses are labeled with `dataStatus: "real_graph"` and
-`mlStatus: "not_applied"`. Demo fallback remains available only as clearly
-labeled fallback output. Issue #42 should serve the selected traditional model,
-not a neural-network model.
+`mlStatus: "not_applied"` unless a real pair-level Random Forest inference has
+run. Demo fallback remains available only as clearly labeled fallback output.
+The integration branch serves the selected traditional model, not a
+neural-network model.
 
 ## Pamela — Optimization / Explainability
 
@@ -76,25 +78,24 @@ Completed:
 
 Current:
 
-- Sprint 5 integration coordination and the eventual Issue #39 closeout audit.
+- Sprint 5 integration coordination, regression evidence, and the Issue #39
+  closeout audit.
 
 ### Ranee / seavens3nt
 
-Current:
+Integrated on the temporary branch:
 
 - Issue #42: selected-model serving, backend/API integration, runtime metadata,
-  and explicit active/unavailable inference behavior.
-
-Issue #42 is open; these serving capabilities are not documented as merged.
+  explicit active/unavailable inference behavior, and candidate-pair prediction
+  through the reviewed feature bridge.
 
 ### Pamela / Qiuyuan26
 
-Current:
+Integrated on the temporary branch:
 
-- Issue #43 / open PR #46: candidate comparison and explainability integration,
-  including distinct presentation of graph, rule, and ML channels.
-
-PR #46 is in progress and is not documented as part of `main`.
+- Issue #43: candidate comparison and explainability integration, including
+  distinct presentation of graph, rule, and ML channels in the backend and
+  frontend flow.
 
 ## Handoff Expectations
 

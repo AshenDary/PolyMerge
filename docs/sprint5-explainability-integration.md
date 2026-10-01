@@ -22,10 +22,9 @@ PolyMerge maintains **three distinct evidence channels** that must never be comb
 
 ### 3. ML Predictions (Purple Channel)
 - **Source**: Trained ML model (Sprint 4 selected model)
-- **Content**: Predicted DDI severity, class probabilities, confidence
+- **Content**: Pair-level predicted DDI severity and model provenance
 - **Interpretation**: Statistical estimates, **not clinical validation**
-- **Status Field**: `mlStatus` (`applied`, `not_applied`, `unavailable`)
-- **Dependency**: Requires Ranee's API integration (Issue #42)
+- **Status Field**: `mlStatus` (`applied`, `not_applied`)
 
 ## Candidate Comparison Structure
 
@@ -47,13 +46,16 @@ PolyMerge maintains **three distinct evidence channels** that must never be comb
     coverageDescription: "100% of requested diseases",
     treatmentPaths: [
       {
-        drugId: "lisinopril",
-        diseaseId: "hypertension",
-        relationship: "treats",
+        pathId: "graph-path:a60e0433840b09f0eaa3b4a7",
+        drugId: "Compound::DB00177",
+        drugName: "Valsartan",
+        diseaseId: "Disease::DOID:10763",
+        diseaseName: "hypertension",
+        relationship: "CtD",
         source: "Hetionet",
+        graphVersion: "Hetionet v1.0 filtered PolyMerge fragment",
         evidenceType: "known"
-      },
-      // ... more paths
+      }
     ],
     geneContext: [ /* gene associations */ ],
     sideEffectContext: [ /* side effect associations */ ],
@@ -71,7 +73,7 @@ PolyMerge maintains **three distinct evidence channels** that must never be comb
       ruleId: "rule-accepted",
       type: "accepted",
       status: "accepted",
-      message: "No contraindications detected",
+      message: "No configured deterministic hard-rule violation detected",
       affectedDrugs: [],
       source: "PolyMerge Safety Rules",
       stage: "backend_validation"
@@ -79,25 +81,18 @@ PolyMerge maintains **three distinct evidence channels** that must never be comb
   ],
   
   // ML PREDICTIONS SECTION
-  predictions: [
-    {
-      drugPair: ["lisinopril", "amlodipine"],
-      predictedSeverity: "Minor", // or "Major", "Moderate"
-      severityProbabilities: {
-        Major: 0.05,
-        Moderate: 0.15,
-        Minor: 0.80
-      },
-      confidence: 0.85,
-      modelName: "RandomForestClassifier",
-      modelVersion: "sprint4-v1.0",
-      datasetVersion: "DDInter-2.0-sprint3",
-      predictionTimestamp: "2026-09-30T12:00:00Z",
-      mlStatus: "applied",
-      metadata: {}
-    },
-    // ... one prediction per drug pair
-  ],
+  mlPrediction: {
+    status: "applied",
+    pairs: [
+      {
+        drugPair: ["Compound::DB00177", "Compound::DB00331"],
+        predictedSeverity: "Moderate",
+        modelName: "RandomForestClassifier",
+        modelVersion: "RandomForestClassifier-sprint5-v1-65e9834666ad19c5",
+        inferenceStatus: "applied"
+      }
+    ]
+  },
   
   // PRESENTATION HINTS
   presentation: {
@@ -212,15 +207,15 @@ Returns explainability payload for a candidate set query.
    - Use tabs, accordions, or columns to separate channels
 
 4. **Never Combine Into Single Score**
-   - ❌ Don't create: `safetyScore = 0.4*graph + 0.3*rules + 0.3*ml`
-   - ✅ Do present: Three separate evidence summaries
+   - Do not create: `safetyScore = 0.4*graph + 0.3*rules + 0.3*ml`
+   - Do present: three separate evidence summaries
 
 ### Example UI Layout
 
 ```
 ┌─────────────────────────────────────────────────┐
 │ Candidate #1: Lisinopril + Metformin           │
-│ Status: ✓ Accepted                             │
+│ Status: Accepted                               │
 ├─────────────────────────────────────────────────┤
 │ ┌──────────── Graph Evidence (Blue) ──────────┐│
 │ │ Coverage: 100% of requested diseases         ││
@@ -229,14 +224,15 @@ Returns explainability payload for a candidate set query.
 │ └──────────────────────────────────────────────┘│
 ├─────────────────────────────────────────────────┤
 │ ┌──────────── Safety Rules (Green) ───────────┐│
-│ │ Status: ✓ No contraindications detected      ││
+│ │ No configured deterministic hard-rule        ││
+│ │ violation detected                           ││
 │ │ Disclaimer: Hard-coded checks only           ││
 │ └──────────────────────────────────────────────┘│
 ├─────────────────────────────────────────────────┤
 │ ┌──────────── ML Predictions (Purple) ────────┐│
-│ │ Pair: Lisinopril ↔ Metformin                ││
-│ │ Predicted Severity: Minor (80% confidence)   ││
-│ │ Model: RandomForestClassifier v1.0           ││
+│ │ Pair: Valsartan to Metformin                 ││
+│ │ Predicted Severity: Moderate                 ││
+│ │ Model: RandomForestClassifier sprint5        ││
 │ │ Disclaimer: Statistical estimate only        ││
 │ └──────────────────────────────────────────────┘│
 └─────────────────────────────────────────────────┘
@@ -286,8 +282,8 @@ For evidence path visualization:
 ### mlStatus Values
 
 - `"applied"`: ML model successfully generated predictions
-- `"not_applied"`: ML service disabled or not configured
-- `"unavailable"`: ML service error or timeout
+- `"not_applied"`: Feature bridge or model serving unavailable; no prediction
+  was emitted
 
 ### Handling Missing Predictions
 
@@ -296,7 +292,7 @@ When `mlStatus !== "applied"`:
 ```javascript
 {
   "status": "not_available",
-  "message": "ML predictions not yet integrated. See Issue #42 (Ranee API).",
+  "message": "ML predictions are unavailable for this candidate.",
   "pairs": []
 }
 ```
@@ -304,7 +300,6 @@ When `mlStatus !== "applied"`:
 Display in UI:
 ```
 ML Predictions: Not Available
-Note: ML integration in progress (Issue #42).
 Graph evidence and safety rules remain available.
 ```
 
@@ -327,16 +322,14 @@ Graph evidence and safety rules remain available.
 - ✅ Feature contract and preprocessing pipeline
 - ✅ Evaluation metrics and reporting
 
-### In Progress (Sprint 5)
-- 🔄 **Issue #42 (Ranee)**: Model serving API integration
-- 🔄 **Issue #41 (Jared)**: Graph evidence/provenance handoff
-- 🔄 **Issue #43 (Pamela - This Task)**: Explainability integration
+### Completed On Integration Branch (Sprint 5)
+- Issue #42 (Ranee): Model serving API integration
+- Issue #41 (Jared): Graph evidence/provenance handoff
+- Issue #43 (Pamela): Explainability integration
 
 ### Future Work
-- ⏳ Frontend UI implementation with visual separation
-- ⏳ Interactive graph visualization
-- ⏳ Comparative analysis across candidates
-- ⏳ Evidence path exploration
+- Evidence path explorer
+- Additional comparative analysis tools
 
 ## Testing Recommendations
 
@@ -366,7 +359,7 @@ Graph evidence and safety rules remain available.
    - Retrieve explainability payload
    - Verify structure matches specification
 
-### Frontend Tests (When Implemented)
+### Frontend Tests
 
 1. **Visual Separation**
    - Verify distinct colors for each channel
@@ -401,11 +394,11 @@ frontend/
 ## Definition of Done
 
 - [x] Candidate comparison fields defined
-- [x] Predicted DDI severity structure prepared (awaiting Ranee's API)
+- [x] Predicted DDI severity structure integrated with Ranee's API
 - [x] Model/version metadata fields added
 - [x] Deterministic rejection reasons separated
 - [x] Graph treatment coverage separated
-- [x] Graph evidence/provenance separated (awaiting Jared's handoff)
+- [x] Graph evidence/provenance separated
 - [x] Evidence-path presentation structure created
 - [x] Graph visualization plan documented
 - [x] Multi-drug candidate set comparison preserved
@@ -413,19 +406,18 @@ frontend/
 - [x] Generic "safety score" avoided
 - [x] Research-use wording added
 - [x] Explainability fields documented
-- [ ] Frontend tests (blocked on UI implementation)
+- [x] Frontend/static tests verify main-app wiring
 - [x] Explainability payload aligns with backend contract
 
 ## Next Steps
 
-1. **Ranee (Issue #42)**: Implement ML serving API to populate `predictions` array
-2. **Jared (Issue #41)**: Enhance graph evidence with detailed provenance
-3. **Frontend Team**: Implement UI with visual channel separation
-4. **Testing**: Add integration and frontend tests once dependencies complete
+1. Review repaired temporary Sprint 5 integration branch for #39 closeout.
+2. Preserve the three-channel contract during Sprint 6 deployment work.
+3. Expand UI tests if the static frontend becomes a richer application.
 
 ---
 
-**Document Version**: 1.0  
-**Last Updated**: 2026-09-30  
-**Status**: Structure complete, awaiting API integrations  
+**Document Version**: 1.0
+**Last Updated**: 2026-10-01
+**Status**: Integrated on temporary Sprint 5 branch
 **Issue**: #43

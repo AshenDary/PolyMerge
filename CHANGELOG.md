@@ -15,19 +15,23 @@ semantic software releases.
   provenance through Issue #41 / PR #45.
 - Treatment, gene-context, and side-effect path semantics with per-drug path
   references in candidate comparisons.
+- Runtime Random Forest serving with checksum, version, feature-schema,
+  unavailable-model, and corrupt-artifact protections.
+- Candidate-set pair predictions through the reviewed 55-feature bridge when a
+  graph candidate pair can be represented without fabricating features.
+- Canonical explainability payloads and frontend wiring for graph evidence,
+  deterministic rules, and ML prediction channels.
 
 ### Changed
 
 - Candidate-set graph evidence now preserves a deterministic, deduplicated union
   of member-drug paths.
-- Sprint 5 documentation distinguishes finalized model evaluation from active
-  runtime serving.
+- Sprint 5 documentation distinguishes finalized model evaluation from runtime
+  serving and candidate-pair inference.
 
 ### Pending
 
-- Issue #42 selected-model serving and API integration.
-- Issue #43 candidate comparison and explainability integration; PR #46 is open.
-- Issue #39 integrated regression audit and Sprint 5 closeout.
+- Issue #39 final review, integration PR, and Sprint 5 closeout.
 
 ## Sprint 4 - Model Comparison Complete
 

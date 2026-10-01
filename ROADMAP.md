@@ -88,7 +88,7 @@ Important: Hetionet `CrC` is compound resemblance and must not be treated as a D
 
 ## Sprint 5 — Final Evaluation & Integration
 
-### Status: In Progress
+### Status: Integration Branch Repaired
 
 Completed:
 
@@ -100,17 +100,18 @@ Completed:
   gene-context, and side-effect relationships.
 - Preserved graph provenance, stable entity IDs, deterministic path IDs, and
   per-drug path references through multi-drug candidate sets.
-- Kept graph evidence, deterministic hard-rule outcomes, and future runtime ML
+- Kept graph evidence, deterministic hard-rule outcomes, and runtime ML
   predictions as separate response channels.
+- Integrated selected-model serving, candidate-pair feature bridging, and
+  fail-closed active/unavailable inference behavior.
+- Integrated candidate explainability and frontend wiring for graph, rule, and
+  ML channels.
 
-In progress / remaining:
+Remaining:
 
-- Issue #42: selected-model loading, runtime inference, API integration, and
-  unavailable-model behavior.
-- Issue #43: candidate comparison and explainability integration using the
-  merged graph contract and final #42 prediction contract.
-- Issue #39: integrated regression audit and Sprint 5 closeout.
-- Sprint 6 handoff after the serving and explainability work is integrated.
+- Issue #39: final review of the repaired temporary integration branch and
+  Sprint 5 closeout.
+- Sprint 6 handoff after #39 acceptance.
 
 ## Sprint 6 — Deployment, Documentation & Academic Submission
 
