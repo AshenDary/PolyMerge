@@ -27,7 +27,7 @@ GET /api/candidate-sets/:queryId/explain?format=detailed
 <script src="/frontend/explainability.js"></script>
 
 <!-- Container for rendering -->
-<div id="explainability-container"></div>
+<div id="explainability"></div>
 
 <script>
   // Load and render explainability
@@ -76,12 +76,9 @@ GET /api/candidate-sets/:queryId/explain?format=detailed
 {
   drugPair: [string, string],
   predictedSeverity: "Major" | "Moderate" | "Minor",
-  severityProbabilities: { Major, Moderate, Minor },
-  confidence: number,  // 0-1
   modelName: string,
   modelVersion: string,
-  datasetVersion: string,
-  mlStatus: "applied" | "not_applied" | "unavailable"
+  inferenceStatus: "applied"
 }
 ```
 
@@ -100,7 +97,7 @@ const candidateSet = {
   drugs: ['lisinopril', 'metformin'],
   treatedDiseaseIds: ['hypertension', 'type-2-diabetes'],
   coverage: 1.0,
-  evidence: [ /* treatment paths */ ],
+  graphEvidence: { source, graphVersion, paths },
   rejectionReasons: [],
   status: 'accepted',
   dataStatus: 'real_graph',
@@ -111,8 +108,8 @@ const comparison = buildCandidateComparison(candidateSet);
 
 // comparison now has separate channels:
 // - comparison.graphEvidence
-// - comparison.rules
-// - comparison.predictions
+// - comparison.deterministicRules
+// - comparison.mlPrediction
 ```
 
 ### Example 2: Create Explainability Response
@@ -160,7 +157,7 @@ Each candidate card should have three visually distinct sections:
 ```
 ┌─────────────────────────────────────────┐
 │ Candidate #1: [Drugs]                   │
-│ Status: ✓ Accepted                      │
+│ Status: Accepted                        │
 ├─────────────────────────────────────────┤
 │ Graph Evidence (Blue Border)            │
 │ • Coverage: 100%                         │
@@ -168,12 +165,13 @@ Each candidate card should have three visually distinct sections:
 │ Disclaimer: KG representation only       │
 ├─────────────────────────────────────────┤
 │ Safety Rules (Green Border)              │
-│ • ✓ No contraindications detected        │
+│ • No configured deterministic hard-rule  │
+│   violation detected                     │
 │ Disclaimer: Hard-coded checks only       │
 ├─────────────────────────────────────────┤
 │ ML Predictions (Purple Border)           │
-│ • Drug A ↔ Drug B: Minor (80%)          │
-│ • Model: RandomForest v1.0               │
+│ • Drug A to Drug B: Moderate             │
+│ • Model: RandomForestClassifier          │
 │ Disclaimer: Statistical estimates only   │
 └─────────────────────────────────────────┘
 ```
@@ -188,14 +186,9 @@ Each candidate card should have three visually distinct sections:
 - ✅ Visual styles
 - ✅ Tests
 
-### In Progress
-- 🔄 **Issue #42 (Ranee)**: ML serving API for actual predictions
-- 🔄 **Issue #41 (Jared)**: Enhanced graph provenance
-
 ### Future
-- ⏳ Interactive graph visualization
-- ⏳ Evidence path explorer
-- ⏳ Comparative analysis tools
+- Evidence path explorer
+- Additional comparative analysis tools
 
 ## Testing
 
@@ -219,7 +212,9 @@ npm test backend/tests/explainability.test.js
 
 **Cause**: `mlStatus` is "not_applied" or "unavailable"
 
-**Solution**: This is expected until Issue #42 (Ranee's API) is complete. Graph evidence and rules still work.
+**Solution**: This is expected when the candidate pair cannot be represented by
+the reviewed feature bridge or when model serving is unavailable. Graph evidence
+and rules still work.
 
 ### Issue: Graph evidence is minimal
 
@@ -235,7 +230,7 @@ npm test backend/tests/explainability.test.js
 
 ## Best Practices
 
-### DO ✅
+### DO
 
 - Keep three channels visually separate in UI
 - Include channel-specific disclaimers
@@ -243,7 +238,7 @@ npm test backend/tests/explainability.test.js
 - Handle missing ML predictions gracefully
 - Test with various `mlStatus` values
 
-### DON'T ❌
+### DON'T
 
 - Combine channels into single "safety score"
 - Mix graph evidence with ML predictions
@@ -254,9 +249,10 @@ npm test backend/tests/explainability.test.js
 ## Documentation
 
 - **Full Spec**: `docs/sprint5-explainability-integration.md`
-- **API Docs**: `docs/api.md` (to be updated)
-- **Issue**: #43
+- **API Docs**: `docs/api.md`
+- **Issue**: #43 / Sprint 5 integration branch
 
 ## Contact
 
-For questions or issues with explainability integration, refer to Issue #43.
+For questions or issues with explainability integration, refer to Issue #43 and
+the Sprint 5 integration branch notes.

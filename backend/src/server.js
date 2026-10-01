@@ -440,8 +440,28 @@ export function validateCandidateSetResult(payload) {
       && (candidateSet.interactionRisk != null || candidateSet.synergyScore != null)) {
       throw new Error('ML engine returned prediction scores while mlStatus is not_applied');
     }
-    if (candidateSet.dataStatus !== payload.metadata.dataStatus
-      || candidateSet.mlStatus !== payload.metadata.mlStatus) {
+    if (candidateSet.mlStatus === 'applied') {
+      const prediction = candidateSet.mlPrediction;
+      if (prediction === null || typeof prediction !== 'object' || Array.isArray(prediction)
+        || prediction.status !== 'applied' || !Array.isArray(prediction.pairs)
+        || prediction.pairs.length === 0
+        || prediction.pairs.some((pair) => pair === null || typeof pair !== 'object'
+          || !Array.isArray(pair.drugPair) || pair.drugPair.length !== 2
+          || pair.drugPair.some((drugId) => typeof drugId !== 'string')
+          || !DDI_CLASSES.has(pair.predictedSeverity)
+          || pair.inferenceStatus !== 'applied'
+          || pair.model === null || typeof pair.model !== 'object'
+          || typeof pair.model.name !== 'string'
+          || typeof pair.model.version !== 'string')) {
+        throw new Error('ML candidate-set response has malformed pair prediction data');
+      }
+      if (prediction.pairs.some((pair) => (
+        Object.hasOwn(pair, 'probabilities') || Object.hasOwn(pair, 'confidence')
+      ))) {
+        throw new Error('ML candidate-set response included unsupported probability or confidence fields');
+      }
+    }
+    if (candidateSet.dataStatus !== payload.metadata.dataStatus) {
       throw new Error('ML candidate-set provenance does not match response metadata');
     }
   }
@@ -495,28 +515,6 @@ async function fetchCandidateSetResult(
     options.logger?.warn({ error: error.message }, 'ML candidate-set request failed; using empty fallback');
     return createCandidateSetFallback(options.resolvedDiseases ?? diseaseIds, error.message);
   }
-}
-
-function buildExplainability(candidate) {
-  return {
-    candidateId: candidate.rank,
-    status: candidate.status,
-    graph: {
-      nodes: candidate.drugs.map((drug) => ({ id: drug, kind: 'Drug' })),
-      edges: candidate.drugs.map((drug, index) => ({
-        source: drug,
-        target: candidate.drugs[(index + 1) % candidate.drugs.length],
-        relationship: index % 2 === 0 ? 'known relationship' : 'predicted relationship',
-        evidenceType: index % 2 === 0 ? 'known' : 'predicted',
-      })),
-    },
-    explanation: [
-      'The candidate covers the requested disease cluster using treatment relationships represented in the knowledge graph.',
-      'Predicted interaction risk and synergy are research-only model estimates and should be reviewed by experts.',
-      'A hard contraindication rule is applied independently of model predictions and can reject the candidate outright.',
-    ],
-    reasons: candidate.reasons ?? [],
-  };
 }
 
 export const app = Fastify({ logger: process.env.NODE_ENV !== 'test' });
@@ -614,7 +612,6 @@ app.get('/api/drugs/:id/interactions', async (request, reply) => {
         score: 0.18,
         evidenceType: 'predicted',
         source: 'PolyMerge Demo Pipeline',
-        confidence: 'medium',
       },
     ],
   };
@@ -848,12 +845,15 @@ app.get('/api/combinations/:id/explain', async (request, reply) => {
     return reply.code(404).send({ error: 'Combination result not found' });
   }
 
-  const explainability = result.candidates.map((candidate) => buildExplainability(candidate));
-
   return {
-    queryId: result.queryId,
-    diseases: result.diseases,
-    candidates: explainability,
+    ...buildExplainabilityResponse(
+      result.queryId,
+      result.diseaseIds ?? result.diseases ?? [],
+      result.candidateSets ?? result.candidates ?? [],
+      'structured',
+    ),
+    legacyRoute: true,
+    compatibilityNote: 'Legacy combinations explain route uses canonical evidence channels where represented data is available and does not synthesize graph relationships.',
   };
 });
 
