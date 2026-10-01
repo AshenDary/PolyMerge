@@ -115,6 +115,19 @@ def test_checksum_mismatch_blocks_deserialization(tmp_path):
         service.load()
 
 
+def test_corrupt_joblib_artifact_fails_closed_after_integrity_metadata_matches(tmp_path):
+    service = _installed_model(tmp_path)
+    corrupt_bytes = b"not a valid joblib artifact"
+    service.artifact_path.write_bytes(corrupt_bytes)
+    metadata = json.loads(service.metadata_path.read_text(encoding="utf-8"))
+    metadata["artifact_sha256"] = sha256_file(service.artifact_path)
+    metadata["artifact_size_bytes"] = len(corrupt_bytes)
+    service.metadata_path.write_text(json.dumps(metadata), encoding="utf-8")
+
+    with pytest.raises(ModelUnavailableError):
+        service.load()
+
+
 def test_model_version_must_match_provenance_inputs(tmp_path):
     service = _installed_model(tmp_path)
     metadata = json.loads(service.metadata_path.read_text(encoding="utf-8"))

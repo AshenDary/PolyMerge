@@ -472,6 +472,133 @@ test('candidate-set endpoint preserves structured rejection reasons from the ML 
   }]);
 });
 
+test('candidate-set endpoint preserves real pair-level ML prediction shape', async () => {
+  globalThis.fetch = async (url) => {
+    if (String(url).endsWith('/api/diseases')) {
+      return jsonResponse({ diseases: graphDiseases });
+    }
+    return jsonResponse({
+      queryId: 'active-ml-candidate-set',
+      diseaseIds: ['Disease::DOID:10763', 'Disease::DOID:9352'],
+      diseases: graphDiseases,
+      candidateSets: [{
+        candidateSetId: 'candidate-set:Compound::DB00177+Compound::DB00331',
+        rank: 1,
+        drugs: ['Compound::DB00177', 'Compound::DB00331'],
+        drugNames: ['Valsartan', 'Metformin'],
+        treatedDiseaseIds: ['Disease::DOID:10763', 'Disease::DOID:9352'],
+        uncoveredDiseaseIds: [],
+        coverage: 1,
+        drugCount: 2,
+        status: 'accepted',
+        rejectionReasons: [],
+        evidence: [{ source: 'Hetionet', relationship: 'CtD' }],
+        graphEvidence: {
+          source: 'Hetionet',
+          graphVersion: 'Hetionet v1.0 filtered PolyMerge fragment',
+          paths: [],
+        },
+        dataStatus: 'real_graph',
+        mlStatus: 'applied',
+        mlPrediction: {
+          status: 'applied',
+          pairs: [{
+            drugPair: ['Compound::DB00177', 'Compound::DB00331'],
+            predictedSeverity: 'Moderate',
+            inferenceStatus: 'applied',
+            model: {
+              name: 'RandomForestClassifier',
+              version: 'RandomForestClassifier-sprint5-v1-65e9834666ad19c5',
+              artifactSha256: 'a'.repeat(64),
+              featureContractSha256: 'b'.repeat(64),
+            },
+          }],
+        },
+        interactionRisk: null,
+        synergyScore: null,
+      }],
+      metadata: {
+        dataStatus: 'real_graph',
+        mlStatus: 'applied',
+        model: 'RandomForestClassifier',
+        modelVersion: 'RandomForestClassifier-sprint5-v1-65e9834666ad19c5',
+      },
+    });
+  };
+
+  const response = await app.inject({
+    method: 'POST',
+    url: '/api/candidate-sets/search',
+    payload: { diseaseIds: ['Disease::DOID:10763', 'Disease::DOID:9352'] },
+  });
+
+  assert.equal(response.statusCode, 200);
+  const [candidateSet] = response.json().candidateSets;
+  assert.equal(candidateSet.mlStatus, 'applied');
+  assert.equal(candidateSet.mlPrediction.pairs[0].predictedSeverity, 'Moderate');
+  assert.equal(candidateSet.mlPrediction.pairs[0].model.version, 'RandomForestClassifier-sprint5-v1-65e9834666ad19c5');
+  assert.equal(Object.hasOwn(candidateSet.mlPrediction.pairs[0], 'probabilities'), false);
+  assert.equal(Object.hasOwn(candidateSet.mlPrediction.pairs[0], 'confidence'), false);
+  assert.equal(Object.hasOwn(candidateSet, 'safetyScore'), false);
+});
+
+test('candidate-set endpoint fails closed on unsupported fabricated probability fields', async () => {
+  globalThis.fetch = async (url) => {
+    if (String(url).endsWith('/api/diseases')) {
+      return jsonResponse({ diseases: graphDiseases });
+    }
+    return jsonResponse({
+      queryId: 'fabricated-probability',
+      diseaseIds: ['Disease::DOID:10763'],
+      diseases: [graphDiseases[0]],
+      candidateSets: [{
+        candidateSetId: 'candidate-set:Compound::DB00177+Compound::DB00331',
+        rank: 1,
+        drugs: ['Compound::DB00177', 'Compound::DB00331'],
+        drugNames: ['Valsartan', 'Metformin'],
+        treatedDiseaseIds: ['Disease::DOID:10763'],
+        uncoveredDiseaseIds: [],
+        coverage: 1,
+        drugCount: 2,
+        status: 'accepted',
+        rejectionReasons: [],
+        evidence: [],
+        dataStatus: 'real_graph',
+        mlStatus: 'applied',
+        mlPrediction: {
+          status: 'applied',
+          pairs: [{
+            drugPair: ['Compound::DB00177', 'Compound::DB00331'],
+            predictedSeverity: 'Moderate',
+            inferenceStatus: 'applied',
+            probabilities: { Moderate: 1 },
+            model: {
+              name: 'RandomForestClassifier',
+              version: 'RandomForestClassifier-sprint5-v1-65e9834666ad19c5',
+            },
+          }],
+        },
+        interactionRisk: null,
+        synergyScore: null,
+      }],
+      metadata: {
+        dataStatus: 'real_graph',
+        mlStatus: 'applied',
+      },
+    });
+  };
+
+  const response = await app.inject({
+    method: 'POST',
+    url: '/api/candidate-sets/search',
+    payload: { diseaseIds: ['Disease::DOID:10763'] },
+  });
+
+  assert.equal(response.statusCode, 200);
+  assert.equal(response.json().metadata.mlStatus, 'not_applied');
+  assert.match(response.json().metadata.warning, /unsupported probability or confidence/);
+});
+
 test('candidate-set endpoint rejects invalid IDs and configuration before prediction', async () => {
   const calls = [];
   globalThis.fetch = async (url) => {
@@ -529,6 +656,85 @@ test('candidate-set endpoint preserves an empty valid result', async () => {
   assert.equal(response.statusCode, 200);
   assert.deepEqual(response.json().candidateSets, []);
   assert.equal(response.json().metadata.dataStatus, 'real_graph');
+});
+
+test('candidate-set explain endpoint supports formats and rejects invalid or unknown queries', async () => {
+  globalThis.fetch = async (url) => {
+    if (String(url).endsWith('/api/diseases')) {
+      return jsonResponse({ diseases: graphDiseases });
+    }
+    return jsonResponse({
+      queryId: 'explain-query',
+      diseaseIds: ['Disease::DOID:10763'],
+      diseases: [graphDiseases[0]],
+      candidateSets: [{
+        candidateSetId: 'candidate-set:Compound::DB00177',
+        rank: 1,
+        drugs: ['Compound::DB00177'],
+        drugNames: ['Valsartan'],
+        treatedDiseaseIds: ['Disease::DOID:10763'],
+        uncoveredDiseaseIds: [],
+        coverage: 1,
+        drugCount: 1,
+        status: 'accepted',
+        rejectionReasons: [],
+        evidence: [{ source: 'Hetionet', relationship: 'CtD' }],
+        graphEvidence: {
+          source: 'Hetionet',
+          graphVersion: 'Hetionet v1.0 filtered PolyMerge fragment',
+          paths: [{
+            pathId: 'graph-path:treatment',
+            semanticType: 'treatment',
+            sourceEntity: { id: 'Compound::DB00177', name: 'Valsartan', kind: 'Compound' },
+            relationship: { type: 'CtD', metaedge: 'CtD' },
+            targetEntity: { id: 'Disease::DOID:10763', name: 'hypertension', kind: 'Disease' },
+            provenance: {
+              source: 'Hetionet',
+              graphVersion: 'Hetionet v1.0 filtered PolyMerge fragment',
+              evidenceType: 'known',
+            },
+          }],
+        },
+        dataStatus: 'real_graph',
+        mlStatus: 'not_applied',
+        mlPrediction: { status: 'not_applied', pairs: [], reason: 'single-drug candidate' },
+        interactionRisk: null,
+        synergyScore: null,
+      }],
+      metadata: {
+        dataStatus: 'real_graph',
+        mlStatus: 'not_applied',
+      },
+    });
+  };
+
+  const search = await app.inject({
+    method: 'POST',
+    url: '/api/candidate-sets/search',
+    payload: { diseaseIds: ['Disease::DOID:10763'] },
+  });
+  assert.equal(search.statusCode, 200);
+
+  for (const format of ['detailed', 'comparison', 'visualization', 'structured']) {
+    const explain = await app.inject({
+      method: 'GET',
+      url: `/api/candidate-sets/explain-query/explain?format=${format}`,
+    });
+    assert.equal(explain.statusCode, 200);
+    assert.equal(explain.json().queryId, 'explain-query');
+  }
+
+  const invalidFormat = await app.inject({
+    method: 'GET',
+    url: '/api/candidate-sets/explain-query/explain?format=invalid',
+  });
+  assert.equal(invalidFormat.statusCode, 400);
+
+  const unknown = await app.inject({
+    method: 'GET',
+    url: '/api/candidate-sets/missing-query/explain',
+  });
+  assert.equal(unknown.statusCode, 404);
 });
 
 test('candidate-set endpoint returns an explicit empty fallback on upstream failure', async () => {
