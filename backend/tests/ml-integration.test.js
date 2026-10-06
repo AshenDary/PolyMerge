@@ -368,6 +368,80 @@ test('candidate-set endpoint preserves structured rejection reasons from the ML 
   }]);
 });
 
+test('canonical explainability returns separated graph, rule, and real ML evidence', async () => {
+  globalThis.fetch = async (url) => {
+    if (String(url).endsWith('/api/diseases')) {
+      return jsonResponse({ diseases: graphDiseases });
+    }
+    return jsonResponse({
+      queryId: 'explainability-query',
+      diseaseIds: ['Disease::DOID:10763'],
+      diseases: [graphDiseases[0]],
+      candidateSets: [
+        {
+          candidateSetId: 'accepted-set',
+          rank: 1,
+          drugs: ['lisinopril', 'amlodipine'],
+          drugNames: ['Lisinopril', 'Amlodipine'],
+          drugCount: 2,
+          treatedDiseaseIds: ['Disease::DOID:10763'],
+          uncoveredDiseaseIds: [],
+          coverage: 1,
+          status: 'accepted',
+          rejectionReasons: [],
+          evidence: [
+            { drugId: 'lisinopril', drugName: 'Lisinopril', diseaseId: 'Disease::DOID:10763', diseaseName: 'Hypertension', relationship: 'treats', pathId: 'path:ctd' },
+            { drugId: 'lisinopril', entityType: 'gene', geneId: 'Gene::1', relationship: 'CbG', pathId: 'path:gene' },
+            { drugId: 'lisinopril', entityType: 'side_effect', sideEffectId: 'SideEffect::1', relationship: 'CcSE', pathId: 'path:side-effect' },
+            { drugId: 'lisinopril', entityType: 'gene', geneId: 'Gene::2', relationship: 'CrC', pathId: 'path:unsupported' },
+          ],
+          predictions: [{ drugPair: ['lisinopril', 'amlodipine'], predictedSeverity: 'Moderate', severityProbabilities: { Major: 0.1, Moderate: 0.7, Minor: 0.2 }, modelName: 'RandomForestClassifier', modelVersion: '1.0' }],
+          dataStatus: 'real_graph',
+          mlStatus: 'applied',
+        },
+        {
+          candidateSetId: 'rejected-set',
+          rank: 2,
+          drugs: ['maoi', 'ssri'],
+          drugNames: ['MAOI', 'SSRI'],
+          drugCount: 2,
+          treatedDiseaseIds: [],
+          uncoveredDiseaseIds: ['Disease::DOID:10763'],
+          coverage: 0,
+          status: 'rejected',
+          rejectionReasons: [{ type: 'hard_contraindication', message: 'Blocked pair', pair: ['maoi', 'ssri'], stage: 'pre_optimization' }],
+          evidence: [],
+          dataStatus: 'real_graph',
+          mlStatus: 'applied',
+        },
+      ],
+      metadata: { dataStatus: 'real_graph', mlStatus: 'applied' },
+    });
+  };
+
+  const search = await app.inject({
+    method: 'POST',
+    url: '/api/candidate-sets/search',
+    payload: { diseaseIds: ['Disease::DOID:10763'] },
+  });
+  assert.equal(search.statusCode, 200);
+
+  const explain = await app.inject({
+    method: 'GET',
+    url: `/api/candidate-sets/${search.json().queryId}/explain?format=structured`,
+  });
+  assert.equal(explain.statusCode, 200);
+  const [accepted, rejected] = explain.json().candidates;
+  assert.equal(accepted.status, 'accepted');
+  assert.equal(accepted.graphEvidence.treatmentPaths.length, 1);
+  assert.equal(accepted.graphEvidence.geneContext.length, 1);
+  assert.equal(accepted.graphEvidence.sideEffectContext.length, 1);
+  assert.equal(accepted.predictions[0].predictedSeverity, 'Moderate');
+  assert.equal(accepted.predictions[0].modelVersion, '1.0');
+  assert.equal(rejected.status, 'rejected');
+  assert.equal(rejected.rules.some((rule) => rule.status === 'rejected'), true);
+});
+
 test('candidate-set endpoint rejects invalid IDs and configuration before prediction', async () => {
   const calls = [];
   globalThis.fetch = async (url) => {

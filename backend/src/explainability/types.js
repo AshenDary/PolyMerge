@@ -1,3 +1,5 @@
+import { checkHardContraindications } from '../rules/contraindications.js';
+
 /**
  * Sprint 5 Explainability Types and Structures
  * 
@@ -75,36 +77,48 @@
  * Create a structured graph evidence object
  */
 export function createGraphEvidence(candidateSet) {
+  const relationshipOf = (evidence) => evidence.metaedge ?? evidence.relationship;
   return {
     treatedDiseaseIds: candidateSet.treatedDiseaseIds ?? [],
     uncoveredDiseaseIds: candidateSet.uncoveredDiseaseIds ?? [],
     coverage: candidateSet.coverage ?? 0,
     coverageDescription: `${Math.round((candidateSet.coverage ?? 0) * 100)}% of requested diseases`,
     treatmentPaths: candidateSet.evidence
-      ?.filter((e) => e.relationship === 'treats')
+      ?.filter((e) => ['treats', 'CtD'].includes(relationshipOf(e)))
       .map((e) => ({
         drugId: e.drugId,
+        drugName: e.drugName,
         diseaseId: e.diseaseId,
-        relationship: e.relationship,
+        diseaseName: e.diseaseName,
+        relationship: relationshipOf(e),
+        pathId: e.pathId,
         source: e.source ?? 'Hetionet',
         evidenceType: e.evidenceType ?? 'known',
         metapath: e.metapath,
       })) ?? [],
     geneContext: candidateSet.evidence
-      ?.filter((e) => e.entityType === 'gene')
+      ?.filter((e) => e.entityType === 'gene' && ['CbG', 'CuG', 'CdG'].includes(relationshipOf(e)))
       .map((e) => ({
         drugId: e.drugId,
+        drugName: e.drugName,
         geneId: e.geneId,
-        relationship: e.relationship,
+        geneName: e.geneName,
+        relationship: relationshipOf(e),
+        pathId: e.pathId,
         source: e.source ?? 'Hetionet',
+        evidenceType: e.evidenceType ?? 'known',
       })) ?? [],
     sideEffectContext: candidateSet.evidence
-      ?.filter((e) => e.entityType === 'side_effect')
+      ?.filter((e) => e.entityType === 'side_effect' && relationshipOf(e) === 'CcSE')
       .map((e) => ({
         drugId: e.drugId,
+        drugName: e.drugName,
         sideEffectId: e.sideEffectId,
-        relationship: e.relationship,
+        sideEffectName: e.sideEffectName,
+        relationship: relationshipOf(e),
+        pathId: e.pathId,
         source: e.source ?? 'Hetionet',
+        evidenceType: e.evidenceType ?? 'known',
       })) ?? [],
     provenance: {
       source: candidateSet.graphSource ?? 'Hetionet',
@@ -166,47 +180,12 @@ export function createRuleResults(candidateSet, additionalViolation = null) {
 }
 
 /**
- * Create ML prediction structure (placeholder for Ranee's API)
+ * Preserve only real pairwise model results in the explainability response.
+ * An applied model without returned pairwise results remains an empty list.
  */
 export function createMLPredictions(candidateSet) {
-  const predictions = [];
-  
-  // Check if ML predictions are available
-  if (candidateSet.mlStatus === 'not_applied' || candidateSet.mlStatus === 'unavailable') {
-    return predictions;
-  }
-  
-  // Placeholder: In Sprint 5, Ranee will provide actual predictions
-  // For now, document the expected structure
-  if (candidateSet.interactionRisk != null || candidateSet.predictions) {
-    const drugs = candidateSet.drugs ?? [];
-    
-    // Generate pair-wise predictions for all drug pairs
-    for (let i = 0; i < drugs.length; i++) {
-      for (let j = i + 1; j < drugs.length; j++) {
-        predictions.push({
-          drugPair: [drugs[i], drugs[j]],
-          predictedSeverity: null, // Will be filled by Ranee's API
-          severityProbabilities: {
-            Major: null,
-            Moderate: null,
-            Minor: null,
-          },
-          confidence: null,
-          modelName: candidateSet.modelName ?? null,
-          modelVersion: candidateSet.modelVersion ?? null,
-          datasetVersion: candidateSet.datasetVersion ?? null,
-          predictionTimestamp: candidateSet.timestamp ?? new Date().toISOString(),
-          mlStatus: candidateSet.mlStatus,
-          metadata: {
-            note: 'ML predictions depend on Ranee API integration (Issue #42)',
-          },
-        });
-      }
-    }
-  }
-  
-  return predictions;
+  if (candidateSet.mlStatus !== 'applied' || !Array.isArray(candidateSet.predictions)) return [];
+  return candidateSet.predictions;
 }
 
 /**
@@ -265,7 +244,6 @@ export function buildExplainabilityPayload(queryId, diseaseIds, candidateSets) {
     diseaseIds,
     candidates: candidateSets.map((cs, index) => {
       // Re-check hard contraindications at explainability stage
-      const { checkHardContraindications } = require('../rules/contraindications.js');
       const violation = checkHardContraindications(cs.drugs ?? []);
       return buildCandidateComparison(cs, violation);
     }),

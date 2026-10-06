@@ -125,19 +125,23 @@ describe('Explainability Types', () => {
       assert.equal(predictions.length, 0);
     });
     
-    it('should create prediction placeholders for all drug pairs', () => {
+    it('should preserve real predictions and never synthesize missing pairwise results', () => {
+      const prediction = {
+        drugPair: ['drug1', 'drug2'],
+        predictedSeverity: 'Moderate',
+        modelName: 'RandomForestClassifier',
+      };
       const candidateSet = {
         drugs: ['drug1', 'drug2', 'drug3'],
         mlStatus: 'applied',
         interactionRisk: 0.5,
+        predictions: [prediction],
       };
       
       const predictions = createMLPredictions(candidateSet);
       
-      // 3 drugs = 3 pairs: (1,2), (1,3), (2,3)
-      assert.equal(predictions.length, 3);
-      assert.deepEqual(predictions[0].drugPair, ['drug1', 'drug2']);
-      assert.equal(predictions[0].mlStatus, 'applied');
+      assert.deepEqual(predictions, [prediction]);
+      assert.deepEqual(createMLPredictions({ ...candidateSet, predictions: undefined }), []);
     });
   });
   

@@ -28,6 +28,7 @@ const resultsContainer = document.getElementById('results');
 const explainability   = document.getElementById('explainability');
 const mlStatusLabel    = document.getElementById('ml-status-label');
 const mlStatusNote     = document.getElementById('ml-status-note');
+const mlStatusDot      = document.getElementById('ml-status-dot');
 
 /* ─────────────────────────────────────────────
    State
@@ -36,7 +37,6 @@ const selectedDiseases = new Set();
 let allDiseases        = [];
 let lastQueryId        = null;
 let lastCandidates     = [];
-
 /* ─────────────────────────────────────────────
    Helpers — UI state
 ───────────────────────────────────────────── */
@@ -49,13 +49,13 @@ function showState(id) {
 
 function setStatusTag(text, modifier) {
   statusTag.textContent = text;
-  statusTag.className   = 'status-tag' + (modifier ? ' ' + modifier : '');
+  statusTag.className   = 'status-pill' + (modifier ? ' ' + modifier : '');
 }
 
 function setWorkflowStep(stepId, state) {
   const el = document.getElementById(stepId);
   if (!el) return;
-  el.className = 'step ' + state;
+  el.className = 'pipe-step ' + state;
 }
 
 function setWorkflowRunning() {
@@ -87,26 +87,30 @@ function setWorkflowError() {
 }
 
 function updateMlStatusNote(mlStatus) {
-  const dot = mlStatusNote.querySelector('.status-dot');
-  dot.className = 'status-dot';
+  if (!mlStatusDot) return;
+  mlStatusDot.className = 'status-dot';
   if (mlStatus === 'applied') {
-    dot.classList.add('status-dot--green');
-    mlStatusLabel.textContent = 'applied';
+    mlStatusDot.classList.add('status-dot--green');
+    mlStatusLabel.textContent = 'ML predictions: applied';
   } else if (mlStatus === 'unavailable') {
-    dot.classList.add('status-dot--red');
-    mlStatusLabel.textContent = 'unavailable';
+    mlStatusDot.classList.add('status-dot--red');
+    mlStatusLabel.textContent = 'ML predictions: unavailable';
   } else {
-    dot.classList.add('status-dot--grey');
-    mlStatusLabel.textContent = 'not applied (graph-only mode)';
+    mlStatusDot.classList.add('status-dot--grey');
+    mlStatusLabel.textContent = 'ML predictions: not applied';
   }
 }
+
 
 /* ─────────────────────────────────────────────
    Disease selection
 ───────────────────────────────────────────── */
 function renderDiseases(diseases) {
   if (!diseases.length) {
-    diseaseList.innerHTML = '<p class="muted skeleton-text">No diseases match your search.</p>';
+    const message = allDiseases.length
+      ? 'No diseases match this search. Try a different name or ID.'
+      : 'The disease catalog is empty.';
+    diseaseList.innerHTML = `<p class="catalog-empty">${message}</p>`;
     return;
   }
   diseaseList.innerHTML = diseases
@@ -196,7 +200,7 @@ function renderResults(response) {
   renderSummaryCards(response);
 
   if (!candidateSets.length) {
-    resultsContainer.innerHTML = '<p class="muted">No candidates returned for the selected diseases.</p>';
+    resultsContainer.innerHTML = '<p class="results-empty">No candidate sets were found for these diseases. Try changing your selection and search again.</p>';
     return;
   }
 
@@ -208,7 +212,7 @@ function renderResults(response) {
     button.addEventListener('click', () => {
       const rank = Number(button.dataset.explainCandidate);
       const candidate = candidateSets.find((s) => s.rank === rank);
-      if (candidate) renderExplainability(candidate, response);
+      if (candidate) loadExplainability(candidate, response);
     });
   });
 }
@@ -251,7 +255,7 @@ function buildCandidateCard(c, response) {
     ? buildRejectionBox(c)
     : '';
 
-  const mlRowHtml = buildMlStatusRow(mlStatus);
+  const mlRowHtml = buildMlStatusRow(mlStatus, c);
 
   return `
     <article class="result-card ${isRejected ? 'rejected' : 'accepted'}">
@@ -263,7 +267,7 @@ function buildCandidateCard(c, response) {
         </div>
         <div class="result-header-right">
           <button class="secondary" data-explain-candidate="${c.rank}">
-            🔍 View Explainability
+            🔍 View evidence
           </button>
         </div>
       </div>
@@ -289,28 +293,68 @@ function buildRejectionBox(c) {
   return `<div class="rejection-box">${lines || '<p>No specific reason provided.</p>'}</div>`;
 }
 
-function buildMlStatusRow(mlStatus) {
-  if (mlStatus === 'applied') return '';   // rendered in explainability only
+function buildMlStatusRow(mlStatus, candidate) {
+  if (mlStatus === 'applied') {
+    const predictions = candidate.predictions ?? [];
+    const summary = predictions.length
+      ? predictions.map((prediction) => {
+          const severity = prediction.severity ?? prediction.predictedSeverity ?? 'No class returned';
+          const pair = prediction.drugs ?? prediction.drugPair ?? [];
+          const model = prediction.model ?? {};
+          const modelName = model.name ?? prediction.modelName;
+          const version = model.version ?? prediction.modelVersion;
+          return `<div class="ml-result-line"><strong>${escHtml(pair.join(' ↔ ') || 'Drug pair')}</strong><span class="severity-badge severity-${escHtml(String(severity).toLowerCase())}">${escHtml(severity)}</span>${modelName ? `<small>${escHtml(modelName)}${version ? ` · ${escHtml(version)}` : ''}</small>` : ''}</div>`;
+        }).join('')
+      : '<span>ML applied; no pairwise severity details returned.</span>';
+    return `<div class="ml-not-applied-row ml-applied-row"><strong>ML prediction</strong><div>${summary}</div><small>Research prediction only; not a clinical safety determination.</small></div>`;
+  }
   const msg =
     mlStatus === 'unavailable'
       ? '🧠 ML DDI prediction unavailable — graph evidence and safety rules remain active.'
-      : '🧠 ML DDI prediction not applied in this build — graph-only mode.';
+      : '🧠 ML predictions were not applied to this search. Graph evidence and deterministic rules remain available.';
   return `<div class="ml-not-applied-row">${escHtml(msg)}</div>`;
 }
 
 /* ─────────────────────────────────────────────
    Explainability — three-channel render (Screen 4)
 ───────────────────────────────────────────── */
-function renderExplainability(candidate, response) {
+async function loadExplainability(candidate, response) {
+  explainability.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  if (!lastQueryId) {
+    renderExplainability(candidate, response);
+    return;
+  }
+  explainability.setAttribute('aria-busy', 'true');
+  explainability.innerHTML = '<div class="state-box" role="status"><div class="loader-ring" aria-hidden="true"></div><p>Loading evidence channels…</p></div>';
+  try {
+    const data = await window.PolyMergeExplainability.fetchStructured(lastQueryId);
+    const structured = (data.candidates ?? []).find((item) => item.rank === candidate.rank);
+    if (!structured) throw new Error('No explanation was returned for this candidate.');
+    renderExplainability(candidate, response, structured);
+  } catch (error) {
+    explainability.innerHTML = `<div class="state-box state-error" role="alert"><p>Unable to load explainability: ${escHtml(error.message)}</p></div>`;
+  } finally {
+    explainability.removeAttribute('aria-busy');
+  }
+}
+
+function renderExplainability(candidate, response, structured = null) {
+  const evidenceCandidate = structured ? {
+    ...candidate,
+    ...structured,
+    // The explainability route supplies the channel structure; retain concrete
+    // pairwise outputs from the search response when the structured view is a stub.
+    predictions: candidate.predictions?.length ? candidate.predictions : structured.predictions,
+  } : candidate;
   const isRejected = candidate.status === 'rejected';
-  const mlStatus   = candidate.mlStatus ?? response.metadata?.mlStatus ?? 'not_applied';
+  const mlStatus   = evidenceCandidate.mlStatus ?? response.metadata?.mlStatus ?? 'not_applied';
   const drugNames  = candidate.drugNames ?? candidate.drugs ?? [];
   const drugIds    = candidate.drugs ?? [];
 
-  const headerHtml = buildExplainHeader(candidate, drugNames, drugIds, isRejected);
-  const graphHtml  = buildGraphSection(candidate, response);
-  const rulesHtml  = buildRulesSection(candidate, isRejected);
-  const mlHtml     = buildMlSection(candidate, mlStatus);
+  const headerHtml = buildExplainHeader(evidenceCandidate, drugNames, drugIds, isRejected);
+  const graphHtml  = buildGraphSection(evidenceCandidate, response);
+  const rulesHtml  = buildRulesSection(evidenceCandidate, isRejected);
+  const mlHtml     = buildMlSection(evidenceCandidate, mlStatus);
 
   const overallDisclaimer = `
     <div class="candidate-disclaimer">
@@ -364,12 +408,12 @@ function buildExplainHeader(candidate, drugNames, drugIds, isRejected) {
 /* ── Graph Evidence channel ── */
 function buildGraphSection(candidate, response) {
   const graphEvidence = candidate.graphEvidence ?? {};
-  const paths         = graphEvidence.paths ?? [];
-  const source        = graphEvidence.source ?? 'Hetionet';
-  const graphVersion  = graphEvidence.graphVersion ?? response.metadata?.graph ?? 'Hetionet v1.0';
+  const paths = normalizeGraphPaths(graphEvidence);
+  const source        = graphEvidence.source ?? graphEvidence.provenance?.source ?? 'Hetionet';
+  const graphVersion  = graphEvidence.graphVersion ?? graphEvidence.provenance?.version ?? response.metadata?.graph ?? 'Hetionet v1.0';
   const coverage      = candidate.coverage ?? 0;
-  const treated       = (candidate.treatedDiseaseIds ?? []).length;
-  const uncovered     = (candidate.uncoveredDiseaseIds ?? []).length;
+  const treated       = (graphEvidence.treatedDiseaseIds ?? candidate.treatedDiseaseIds ?? []).length;
+  const uncovered     = (graphEvidence.uncoveredDiseaseIds ?? candidate.uncoveredDiseaseIds ?? []).length;
   const dataStatus    = candidate.dataStatus ?? 'real_graph';
 
   const metricsHtml = `
@@ -412,6 +456,35 @@ function buildGraphSection(candidate, response) {
         Coverage measures knowledge-graph representation, not clinical efficacy.
       </div>
     </div>`;
+}
+
+function normalizeGraphPaths(evidence) {
+  const paths = [...(evidence.paths ?? [])];
+  for (const path of evidence.treatmentPaths ?? []) paths.push({
+    semanticType: 'treatment', pathId: path.pathId,
+    sourceEntity: { name: path.drugName ?? path.drugId },
+    relationship: { type: path.relationship ?? 'CtD', metaedge: 'CtD' },
+    targetEntity: { name: path.diseaseName ?? path.diseaseId, kind: 'Disease' },
+    provenance: { source: path.source, evidenceType: path.evidenceType },
+  });
+  for (const path of evidence.geneContext ?? []) paths.push({
+    semanticType: 'gene_context', pathId: path.pathId,
+    sourceEntity: { name: path.drugName ?? path.drugId },
+    relationship: { type: path.relationship, metaedge: path.relationship },
+    targetEntity: { name: path.geneName ?? path.geneId, kind: 'Gene' },
+    provenance: { source: path.source, evidenceType: path.evidenceType },
+  });
+  for (const path of evidence.sideEffectContext ?? []) paths.push({
+    semanticType: 'side_effect_context', pathId: path.pathId,
+    sourceEntity: { name: path.drugName ?? path.drugId },
+    relationship: { type: path.relationship, metaedge: path.relationship },
+    targetEntity: { name: path.sideEffectName ?? path.sideEffectId, kind: 'Side Effect' },
+    provenance: { source: path.source, evidenceType: path.evidenceType },
+  });
+  return paths.filter((path) => {
+    const rel = String(path.relationship?.metaedge ?? path.relationship?.type ?? '');
+    return ['CtD', 'treats', 'CbG', 'CuG', 'CdG', 'CcSE'].includes(rel);
+  });
 }
 
 function buildPathItem(path) {
@@ -457,7 +530,9 @@ function buildPathItem(path) {
 
 /* ── Deterministic Rules channel ── */
 function buildRulesSection(candidate, isRejected) {
-  const rejectionReasons = candidate.rejectionReasons ?? (candidate.reason ? [candidate.reason] : []);
+  const rejectionReasons = candidate.rejectionReasons ?? (candidate.rules ?? []).filter((rule) => rule.status === 'rejected').map((rule) => ({
+    ...rule, pair: rule.pair ?? rule.affectedDrugs,
+  })) ?? (candidate.reason ? [candidate.reason] : []);
   const channelClass = isRejected ? 'channel-rejected' : '';
 
   let contentHtml;
@@ -528,11 +603,13 @@ function buildMlSection(candidate, mlStatus) {
       <div class="predictions-list">
         ${predictions.map((pred) => buildPredictionItem(pred)).join('')}
       </div>`;
+  } else if (mlStatus === 'applied') {
+    contentHtml = '<div class="ml-unavailable-box"><p>The service reported ML as applied but returned no pairwise predictions.</p></div>';
   } else {
     const mlMsg =
       mlStatus === 'unavailable'
         ? 'ML DDI prediction service is currently unavailable. Graph evidence and safety rules remain active.'
-        : 'ML DDI predictions are not applied in this build. The pipeline is running in graph-only mode.';
+        : 'ML predictions were not applied to this search. Graph evidence and deterministic rules remain available.';
     contentHtml = `
       <div class="ml-unavailable-box">
         <p>🧠 ${escHtml(mlMsg)}</p>
@@ -551,22 +628,26 @@ function buildMlSection(candidate, mlStatus) {
       <div class="section-disclaimer">
         ML predictions are statistical estimates from research models — not clinical validation.
         Do not use predicted severity as a clinical safety determination.
-        ${mlStatus === 'applied' ? `Model: ${escHtml(candidate.predictions?.[0]?.model?.name ?? 'N/A')}` : ''}
+        ${mlStatus === 'applied' ? `Model: ${escHtml(candidate.predictions?.[0]?.model?.name ?? candidate.predictions?.[0]?.modelName ?? 'Not reported')} · Version: ${escHtml(candidate.predictions?.[0]?.model?.version ?? candidate.predictions?.[0]?.modelVersion ?? 'Not reported')}` : ''}
       </div>
     </div>`;
 }
 
 function buildPredictionItem(pred) {
-  const drugs    = pred.drugs ?? [];
-  const severity = pred.severity ?? pred.predictedSeverity ?? 'Unknown';
+  const drugs    = pred.drugs ?? pred.drugPair ?? [];
+  const rawSeverity = pred.severity ?? pred.predictedSeverity;
+  const severity = rawSeverity ?? 'No class returned';
   const probs    = pred.probabilities ?? pred.severityProbabilities ?? {};
-  const model    = pred.model ?? {};
-  const visualStyle = pred.visualStyle ?? severity.toLowerCase();
+  const model    = pred.model ?? { name: pred.modelName, version: pred.modelVersion };
+  const severityClass = ['major', 'moderate', 'minor'].includes(String(severity).toLowerCase())
+    ? String(severity).toLowerCase()
+    : 'unknown';
+  const knownProbabilities = Object.entries(probs).filter(([, value]) => value != null && Number.isFinite(Number(value)));
 
-  const probBars = Object.keys(probs).length
+  const probBars = knownProbabilities.length
     ? `
       <div class="prob-bars">
-        ${Object.entries(probs)
+        ${knownProbabilities
           .map(
             ([label, val]) => `
               <div class="prob-bar">
@@ -585,11 +666,12 @@ function buildPredictionItem(pred) {
     <div class="prediction-item">
       <div class="prediction-header">
         <strong>${drugs.map(escHtml).join(' ↔ ')}</strong>
-        <span class="severity-badge severity-${escHtml(severity.toLowerCase())}">${escHtml(severity)}</span>
+        <span class="severity-badge severity-${severityClass}">${escHtml(severity)}</span>
       </div>
       ${probBars}
       <div class="prediction-meta">
         Model: ${escHtml(model.name ?? 'N/A')} ${escHtml(model.version ?? '')}
+        ${pred.datasetVersion ? ` · Dataset: ${escHtml(pred.datasetVersion)}` : ''}
         ${pred.confidence != null ? ` · Confidence: ${(Number(pred.confidence) * 100).toFixed(0)}%` : ''}
       </div>
     </div>`;
@@ -599,34 +681,50 @@ function buildPredictionItem(pred) {
    API calls
 ───────────────────────────────────────────── */
 async function loadDiseases() {
+  setStatusTag('Loading catalog', 'running');
+  diseaseSearch.disabled = true;
+  diseaseList.innerHTML = '<div class="chip-skeleton"></div><div class="chip-skeleton" style="width:100px"></div><div class="chip-skeleton" style="width:130px"></div>';
   try {
     const response = await fetch('/api/diseases');
     const data     = await response.json();
 
     if (!response.ok) {
-      diseaseList.innerHTML = `<p class="muted">Unable to load disease catalog: ${escHtml(data.error ?? 'unknown error')}</p>`;
-      setStatusTag('Catalog error', 'error');
+      renderCatalogError(response.status === 503
+        ? 'The knowledge graph service is unavailable, so the disease list could not load.'
+        : 'The disease list could not load. Check the service and try again.');
       return;
     }
 
     allDiseases = data.diseases ?? [];
+    diseaseSearch.disabled = false;
     renderDiseases(allDiseases);
+    setStatusTag('Catalog ready', 'complete');
   } catch (err) {
-    diseaseList.innerHTML = `<p class="muted">Cannot reach server: ${escHtml(err.message)}</p>`;
-    setStatusTag('Offline', 'error');
+    renderCatalogError('The dashboard could not connect to the disease catalog. Check the service and try again.');
   }
+}
+
+function renderCatalogError(message) {
+  diseaseList.innerHTML = '<div class="catalog-error" role="alert">' +
+    '<div class="catalog-error-copy"><strong>Disease catalog unavailable</strong>' +
+    '<p>' + escHtml(message) + '</p>' +
+    '<small>Candidate search will be available when the graph service responds.</small></div>' +
+    '<button class="retry-btn" id="retry-diseases" type="button">Try again</button></div>';
+  setStatusTag('Catalog unavailable', 'error');
+  document.getElementById('retry-diseases')?.addEventListener('click', loadDiseases);
 }
 
 async function analyzeCombination() {
   if (!selectedDiseases.size) return;
 
   // Reset UI
+  document.getElementById('screen-results')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   showState('state-loading');
   setStatusTag('Running…', 'running');
   setWorkflowRunning();
   summaryCards.hidden = true;
   resultsContainer.innerHTML = '';
-  explainability.innerHTML = '<div class="state-card state-empty"><p class="muted">Running analysis…</p></div>';
+  explainability.innerHTML = '<div class="state-box" role="status"><div class="loader-ring" aria-hidden="true"></div><p>Preparing graph evidence and channel summaries…</p></div>';
   lastQueryId  = null;
   lastCandidates = [];
   analyzeBtn.disabled = true;
@@ -646,6 +744,16 @@ async function analyzeCombination() {
       setStatusTag('Graph offline', 'error');
       setWorkflowError();
       analyzeBtn.disabled = false;
+      return;
+    }
+
+    // The canonical candidate-set route can return an explicit empty fallback
+    // with HTTP 200 when its graph dependency is unavailable.
+    if (data.metadata?.dataStatus === 'graph_unavailable') {
+      showState('state-graph-unavailable');
+      setStatusTag('Graph offline', 'error');
+      updateMlStatusNote(data.metadata.mlStatus ?? 'unavailable');
+      setWorkflowError();
       return;
     }
 
@@ -673,8 +781,8 @@ async function analyzeCombination() {
 
     // Reset explainability prompt
     explainability.innerHTML = `
-      <div class="state-card state-empty">
-        <p class="muted">Click <strong>View Explainability</strong> on any candidate above to inspect its three evidence channels.</p>
+      <div class="state-box">
+        <p class="muted">Choose <strong>View evidence</strong> on a candidate to inspect graph evidence, safety rules, and any ML predictions.</p>
       </div>`;
 
   } catch (err) {
@@ -704,6 +812,7 @@ function escHtml(str) {
    Event wiring
 ───────────────────────────────────────────── */
 analyzeBtn.addEventListener('click', analyzeCombination);
+document.getElementById('retry-graph-search')?.addEventListener('click', analyzeCombination);
 
 clearBtn.addEventListener('click', () => {
   selectedDiseases.clear();
@@ -714,6 +823,44 @@ clearBtn.addEventListener('click', () => {
 diseaseSearch.addEventListener('input', () => {
   renderDiseases(getFilteredDiseases(diseaseSearch.value));
 });
+
+document.querySelectorAll('.nav-item[data-panel]').forEach((button) => {
+  button.addEventListener('click', () => {
+    const targetId = {
+      disease: 'screen-disease',
+      workflow: 'screen-workflow',
+      results: 'screen-results',
+      explain: 'screen-explainability',
+    }[button.dataset.panel];
+    const target = targetId && document.getElementById(targetId);
+    if (!target) return;
+    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    document.querySelectorAll('.nav-item[data-panel]').forEach((item) => {
+      item.classList.toggle('active', item === button);
+      if (item === button) item.setAttribute('aria-current', 'location');
+      else item.removeAttribute('aria-current');
+    });
+  });
+});
+
+const sidebarToggle = document.querySelector('.sidebar-toggle');
+function setSidebarExpanded(expanded) {
+  const shouldExpand = expanded && window.innerWidth > 700;
+  document.body.classList.toggle('sidebar-expanded', shouldExpand);
+  if (!sidebarToggle) return;
+  const label = shouldExpand ? 'Collapse navigation' : 'Expand navigation';
+  sidebarToggle.setAttribute('aria-expanded', String(shouldExpand));
+  sidebarToggle.setAttribute('aria-label', label);
+  sidebarToggle.title = label;
+}
+
+sidebarToggle?.addEventListener('click', () => {
+  setSidebarExpanded(sidebarToggle.getAttribute('aria-expanded') !== 'true');
+});
+window.addEventListener('resize', () => {
+  if (window.innerWidth <= 700) setSidebarExpanded(false);
+});
+if (window.innerWidth <= 700) setSidebarExpanded(false);
 
 /* ─────────────────────────────────────────────
    Init

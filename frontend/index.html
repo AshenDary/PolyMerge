@@ -3,140 +3,232 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>PolyMerge Research Dashboard</title>
+    <title>PolyMerge — Research Dashboard</title>
     <link rel="stylesheet" href="/frontend/styles.css" />
     <link rel="stylesheet" href="/frontend/explainability.css" />
   </head>
-  <body>
+  <body class="sidebar-expanded">
+
+    <!-- ── Sidebar ── -->
+    <nav class="sidebar" id="main-navigation" aria-label="Main navigation">
+      <div class="sidebar-top">
+        <div class="sidebar-logo" aria-hidden="true">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+            <defs>
+              <clipPath id="capsule-mark-clip"><rect x="7" y="3" width="14" height="22" rx="7" /></clipPath>
+            </defs>
+            <g transform="rotate(34 14 14)">
+              <rect x="7" y="3" width="14" height="22" rx="7" fill="currentColor" />
+              <path d="M7 14h14v11H7z" fill="#A9D8BA" clip-path="url(#capsule-mark-clip)" />
+              <path d="M7 14h14" stroke="#173827" stroke-opacity=".45" stroke-width="1.2" />
+              <path d="M10 8h8" stroke="#fff" stroke-opacity=".55" stroke-linecap="round" stroke-width="1.2" />
+            </g>
+          </svg>
+        </div>
+        <span class="sidebar-brand">PolyMerge</span>
+        <div class="sidebar-nav" id="dashboard-nav" aria-label="Dashboard sections">
+          <button class="nav-item active" type="button" data-panel="disease" aria-label="Disease Selection" title="Disease Selection">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <span class="nav-label">Disease Selection</span>
+          </button>
+          <button class="nav-item" type="button" data-panel="workflow" aria-label="Workflow" title="Analysis Workflow">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            <span class="nav-label">Workflow</span>
+          </button>
+          <button class="nav-item" type="button" data-panel="results" aria-label="Candidates" title="Polypill Candidates">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg>
+            <span class="nav-label">Candidates</span>
+          </button>
+          <button class="nav-item" type="button" data-panel="explain" aria-label="Explainability" title="Explainability">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/><circle cx="12" cy="12" r="10"/></svg>
+            <span class="nav-label">Explainability</span>
+          </button>
+        </div>
+      </div>
+      <div class="sidebar-bottom">
+        <div class="sidebar-disclaimer-icon" title="Research use only — not clinical guidance">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>
+        </div>
+      </div>
+      <button class="sidebar-toggle" type="button" aria-label="Collapse navigation" aria-expanded="true" aria-controls="dashboard-nav" title="Collapse navigation">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+    </nav>
+
+    <!-- ── Main content ── -->
     <div class="page-shell">
 
-      <!-- ── Top bar ── -->
+      <!-- Top header -->
       <header class="topbar">
-        <div class="topbar-brand">
-          <p class="eyebrow">PolyMerge</p>
+        <div class="topbar-left">
+          <p class="page-eyebrow">PolyMerge</p>
           <h1>Research Dashboard</h1>
+          <p class="page-subtitle">Explore ranked candidate sets using traceable knowledge-graph evidence.</p>
         </div>
-        <div class="pill disclaimer-pill">
-          ⚠️ Research decision-support only — not clinical guidance
+        <div class="topbar-right">
+          <div class="disclaimer-badge">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>
+            Research use only · Not clinical guidance
+          </div>
+          <div class="ml-badge" id="ml-status-note">
+            <span class="status-dot status-dot--grey" id="ml-status-dot"></span>
+            <span id="ml-status-label">ML predictions: not applied</span>
+          </div>
         </div>
       </header>
 
-      <!-- ── Research disclaimer banner ── -->
-      <div class="global-disclaimer-banner" role="alert">
-        <strong>Research Use Only:</strong> PolyMerge does not provide medical advice, prescriptions, or clinically
-        validated safety guarantees. Graph coverage measures knowledge-graph representation, not clinical efficacy.
-        All outputs require expert review and appropriate clinical/regulatory validation.
-      </div>
+      <!-- Bento grid -->
+      <main class="bento">
 
-      <main class="layout">
-
-        <!-- ── Screen 1 · Disease Selection ── -->
-        <section class="panel" id="screen-disease">
-          <div class="section-label">
-            <span class="screen-badge">Screen 1</span>
-            <h2>Disease Selection</h2>
-          </div>
-          <p class="muted">Select one or more target diseases for research candidate generation.</p>
-
-          <div class="search-row">
-            <input
-              id="disease-search"
-              type="text"
-              placeholder="Search diseases…"
-              class="search-input"
-              aria-label="Search diseases"
-            />
+        <!-- ── Card A: Disease Selection ── -->
+        <section class="bcard bcard-disease" id="screen-disease">
+          <div class="bcard-header">
+            <div class="bcard-title-group">
+              <span class="bcard-label">01</span>
+              <h2>Choose Target Diseases</h2>
+            </div>
+            <div id="status-tag" class="status-pill" aria-live="polite">Loading catalog</div>
           </div>
 
-          <div id="disease-list" class="disease-list" aria-label="Available diseases" role="list">
-            <p class="muted skeleton-text">Loading disease catalog…</p>
+          <p class="card-intro">Select one or more conditions for the candidate search.</p>
+
+          <div class="search-wrap">
+            <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <input id="disease-search" type="text" placeholder="Search by disease name or ID" class="search-input" aria-label="Search diseases by name or ID" disabled />
           </div>
 
-          <div class="selected-summary" id="selected-summary" hidden>
-            <span id="selected-count">0</span> disease(s) selected
-            <button class="link-btn" id="clear-btn">Clear</button>
+          <div id="disease-list" class="disease-grid" aria-label="Available diseases" role="list">
+            <div class="chip-skeleton"></div>
+            <div class="chip-skeleton" style="width:90px"></div>
+            <div class="chip-skeleton" style="width:130px"></div>
+            <div class="chip-skeleton" style="width:80px"></div>
+            <div class="chip-skeleton" style="width:110px"></div>
           </div>
 
-          <div class="action-row">
-            <button id="analyze-btn" class="primary" disabled>
-              <span class="btn-icon">🔬</span> Search Candidates
-            </button>
+          <div class="selection-bar" id="selected-summary" hidden>
+            <span class="selection-count"><strong id="selected-count">0</strong> selected</span>
+            <button class="link-btn" id="clear-btn">Clear all</button>
           </div>
+
+          <button id="analyze-btn" class="cta-btn" disabled>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2V9M9 21H5a2 2 0 0 1-2-2V9m0 0h18"/></svg>
+            Search Candidate Sets
+          </button>
         </section>
 
-        <!-- ── Screen 2 · Workflow ── -->
-        <section class="panel workflow-panel" id="screen-workflow">
-          <h2>Analysis Workflow</h2>
-          <ol class="workflow" id="workflow-steps" aria-live="polite">
-            <li class="step done"     id="step-graph">Knowledge Graph Retrieval</li>
-            <li class="step done"     id="step-mapping">Candidate Drug Mapping</li>
-            <li class="step pending"  id="step-ranking">Candidate Ranking</li>
-            <li class="step pending"  id="step-rules">Deterministic Safety Filtering</li>
-            <li class="step pending"  id="step-setcover">Greedy Set-Cover Baseline</li>
-            <li class="step pending"  id="step-ml">ML DDI Prediction</li>
-            <li class="step pending"  id="step-explain">Explainability</li>
+        <!-- ── Card B: Workflow ── -->
+        <section class="bcard bcard-workflow" id="screen-workflow">
+          <div class="bcard-header">
+            <div class="bcard-title-group">
+              <span class="bcard-label">02</span>
+              <h2>Analysis Workflow</h2>
+            </div>
+          </div>
+
+          <ol class="pipeline" id="workflow-steps" aria-live="polite">
+            <li class="pipe-step pending" id="step-graph">
+              <span class="pipe-dot"></span>
+              <span class="pipe-name">Knowledge graph retrieval</span>
+            </li>
+            <li class="pipe-step pending" id="step-mapping">
+              <span class="pipe-dot"></span>
+              <span class="pipe-name">Drug mapping</span>
+            </li>
+            <li class="pipe-step pending" id="step-ranking">
+              <span class="pipe-dot"></span>
+              <span class="pipe-name">Candidate ranking</span>
+            </li>
+            <li class="pipe-step pending" id="step-rules">
+              <span class="pipe-dot"></span>
+              <span class="pipe-name">Rule-based safety filter</span>
+            </li>
+            <li class="pipe-step pending" id="step-setcover">
+              <span class="pipe-dot"></span>
+              <span class="pipe-name">Coverage optimization</span>
+            </li>
+            <li class="pipe-step pending" id="step-ml">
+              <span class="pipe-dot"></span>
+              <span class="pipe-name">ML interaction predictions</span>
+            </li>
+            <li class="pipe-step pending" id="step-explain">
+              <span class="pipe-dot"></span>
+              <span class="pipe-name">Evidence summary</span>
+            </li>
           </ol>
 
-          <div class="ml-status-note" id="ml-status-note">
-            <span class="status-dot status-dot--grey"></span>
-            <small>ML DDI predictions: <strong id="ml-status-label">not applied</strong></small>
+          <div class="pipe-footer">
+            <div class="channel-chips">
+              <span class="ch-chip ch-graph">Graph</span>
+              <span class="ch-chip ch-rules">Rules</span>
+              <span class="ch-chip ch-ml">ML</span>
+            </div>
           </div>
         </section>
 
-        <!-- ── Screen 3 · Candidate Results ── -->
-        <section class="panel results-panel" id="screen-results">
-          <div class="results-header">
-            <div>
-              <span class="screen-badge">Screen 3</span>
-              <h2>Polypill Candidates</h2>
-            </div>
-            <div class="header-right">
-              <div id="status-tag" class="status-tag" aria-live="polite">Waiting</div>
+        <!-- ── Card C: Results ── -->
+        <section class="bcard bcard-results" id="screen-results">
+          <div class="bcard-header">
+            <div class="bcard-title-group">
+              <span class="bcard-label">03</span>
+              <h2>Candidate Sets</h2>
             </div>
           </div>
 
-          <!-- Empty / loading / error states -->
-          <div id="state-empty" class="state-card state-empty">
-            <p class="muted">Select diseases and click <strong>Search Candidates</strong> to begin.</p>
+          <!-- States -->
+          <div id="state-empty" class="state-box">
+            <div class="state-icon-wrap">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2V9M9 21H5a2 2 0 0 1-2-2V9m0 0h18"/></svg>
+            </div>
+            <p>Choose one or more target diseases, then search to see ranked candidate sets.</p>
           </div>
-          <div id="state-loading" class="state-card state-loading" hidden aria-live="polite" aria-busy="true">
-            <div class="spinner" aria-hidden="true"></div>
-            <p>Running candidate search…</p>
+
+          <div id="state-loading" class="state-box" hidden aria-live="polite" aria-busy="true">
+            <div class="loader-ring" aria-hidden="true"></div>
+            <p>Searching the knowledge graph and building candidate sets…</p>
           </div>
-          <div id="state-error" class="state-card state-error" hidden role="alert">
-            <span class="state-icon">⚠️</span>
+
+          <div id="state-error" class="state-box state-error" hidden role="alert">
+            <div class="state-icon-wrap state-icon-err">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>
+            </div>
             <p id="error-message">An error occurred.</p>
           </div>
-          <div id="state-graph-unavailable" class="state-card state-unavailable" hidden role="alert">
-            <span class="state-icon">🔌</span>
-            <p>Graph service is currently unavailable. Please try again later.</p>
-            <small class="muted">Graph evidence and ML predictions require a live knowledge graph connection.</small>
+
+          <div id="state-graph-unavailable" class="state-box state-warn" hidden role="alert">
+            <div class="state-icon-wrap state-icon-warn">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" x2="6" y1="1" y2="4"/><line x1="10" x2="10" y1="1" y2="4"/><line x1="14" x2="14" y1="1" y2="4"/></svg>
+            </div>
+            <p>The knowledge graph service is unavailable. Candidate generation needs a graph connection. Try again when the service is back online.</p>
+            <button id="retry-graph-search" class="secondary" type="button">Retry candidate search</button>
           </div>
 
-          <!-- Summary cards -->
-          <div id="summary-cards" class="summary-cards" hidden></div>
+          <!-- Summary stat strip -->
+          <div id="summary-cards" class="stat-strip" hidden></div>
 
-          <!-- Candidate list -->
+          <!-- Candidate cards -->
           <div id="results" class="results-list" aria-live="polite"></div>
         </section>
 
-        <!-- ── Screen 4 · Explainability ── -->
-        <section class="panel explainability-panel" id="screen-explainability">
-          <div class="results-header">
-            <div>
-              <span class="screen-badge">Screen 4</span>
+        <!-- ── Card D: Explainability ── -->
+        <section class="bcard bcard-explain" id="screen-explainability">
+          <div class="bcard-header">
+            <div class="bcard-title-group">
+              <span class="bcard-label">04</span>
               <h2>Explainability</h2>
             </div>
             <div class="channel-legend" aria-label="Evidence channel legend">
-              <span class="legend-item legend-graph">🗄️ Graph Evidence</span>
-              <span class="legend-item legend-rules">🛡️ Safety Rules</span>
-              <span class="legend-item legend-ml">🧠 ML Prediction</span>
+              <span class="ch-chip ch-graph">🗄 Graph</span>
+              <span class="ch-chip ch-rules">🛡 Rules</span>
+              <span class="ch-chip ch-ml">🧠 ML</span>
             </div>
           </div>
 
-          <div id="explainability" class="explainability-container">
-            <div class="state-card state-empty">
-              <p class="muted">Click <strong>View Explainability</strong> on any candidate to inspect its three evidence channels.</p>
+          <div id="explainability" class="explain-container">
+            <div class="state-box">
+              <div class="state-icon-wrap">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/><circle cx="12" cy="12" r="10"/></svg>
+              </div>
+              <p>After a search, choose <strong>View evidence</strong> on a candidate to inspect its graph evidence, safety rules, and any ML predictions.</p>
             </div>
           </div>
         </section>
@@ -144,13 +236,11 @@
       </main>
 
       <footer class="page-footer">
-        <small>
-          PolyMerge Research Dashboard — sprint6/pamela/final-frontend-demo —
-          Data: Hetionet v1.0 fragment — ML: Not applied in this build
-        </small>
+        Research workspace · Graph coverage reflects knowledge-graph representation, not treatment effectiveness.
       </footer>
     </div>
 
+    <script src="/frontend/explainability.js"></script>
     <script src="/frontend/app.js"></script>
   </body>
 </html>
