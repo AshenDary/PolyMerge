@@ -5,62 +5,150 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>PolyMerge Research Dashboard</title>
     <link rel="stylesheet" href="/frontend/styles.css" />
+    <link rel="stylesheet" href="/frontend/explainability.css" />
   </head>
   <body>
     <div class="page-shell">
+
+      <!-- ── Top bar ── -->
       <header class="topbar">
-        <div>
+        <div class="topbar-brand">
           <p class="eyebrow">PolyMerge</p>
-          <h1>Create Formulation Candidate</h1>
+          <h1>Research Dashboard</h1>
         </div>
-        <div class="pill">Research decision-support only</div>
+        <div class="pill disclaimer-pill">
+          ⚠️ Research decision-support only — not clinical guidance
+        </div>
       </header>
 
+      <!-- ── Research disclaimer banner ── -->
+      <div class="global-disclaimer-banner" role="alert">
+        <strong>Research Use Only:</strong> PolyMerge does not provide medical advice, prescriptions, or clinically
+        validated safety guarantees. Graph coverage measures knowledge-graph representation, not clinical efficacy.
+        All outputs require expert review and appropriate clinical/regulatory validation.
+      </div>
+
       <main class="layout">
-        <section class="panel">
-          <h2>Disease Selection</h2>
-          <p class="muted">Select the target disease cluster for research candidate generation.</p>
 
-          <div id="disease-list" class="disease-list"></div>
+        <!-- ── Screen 1 · Disease Selection ── -->
+        <section class="panel" id="screen-disease">
+          <div class="section-label">
+            <span class="screen-badge">Screen 1</span>
+            <h2>Disease Selection</h2>
+          </div>
+          <p class="muted">Select one or more target diseases for research candidate generation.</p>
 
-          <button id="analyze-btn" class="primary">Analyze Combination</button>
+          <div class="search-row">
+            <input
+              id="disease-search"
+              type="text"
+              placeholder="Search diseases…"
+              class="search-input"
+              aria-label="Search diseases"
+            />
+          </div>
+
+          <div id="disease-list" class="disease-list" aria-label="Available diseases" role="list">
+            <p class="muted skeleton-text">Loading disease catalog…</p>
+          </div>
+
+          <div class="selected-summary" id="selected-summary" hidden>
+            <span id="selected-count">0</span> disease(s) selected
+            <button class="link-btn" id="clear-btn">Clear</button>
+          </div>
+
+          <div class="action-row">
+            <button id="analyze-btn" class="primary" disabled>
+              <span class="btn-icon">🔬</span> Search Candidates
+            </button>
+          </div>
         </section>
 
-        <section class="panel workflow-panel">
+        <!-- ── Screen 2 · Workflow ── -->
+        <section class="panel workflow-panel" id="screen-workflow">
           <h2>Analysis Workflow</h2>
-          <ol class="workflow">
-            <li class="done">Knowledge Graph Retrieval</li>
-            <li class="done">Candidate Drug Mapping</li>
-            <li class="pending">ML DDI Prediction — Not Applied</li>
-            <li class="active">Safety Filtering</li>
-            <li class="active">Greedy Set-Cover Baseline</li>
-            <li class="pending">Explainability</li>
+          <ol class="workflow" id="workflow-steps" aria-live="polite">
+            <li class="step done"     id="step-graph">Knowledge Graph Retrieval</li>
+            <li class="step done"     id="step-mapping">Candidate Drug Mapping</li>
+            <li class="step pending"  id="step-ranking">Candidate Ranking</li>
+            <li class="step pending"  id="step-rules">Deterministic Safety Filtering</li>
+            <li class="step pending"  id="step-setcover">Greedy Set-Cover Baseline</li>
+            <li class="step pending"  id="step-ml">ML DDI Prediction</li>
+            <li class="step pending"  id="step-explain">Explainability</li>
           </ol>
+
+          <div class="ml-status-note" id="ml-status-note">
+            <span class="status-dot status-dot--grey"></span>
+            <small>ML DDI predictions: <strong id="ml-status-label">not applied</strong></small>
+          </div>
         </section>
 
-        <section class="panel results-panel">
+        <!-- ── Screen 3 · Candidate Results ── -->
+        <section class="panel results-panel" id="screen-results">
           <div class="results-header">
             <div>
-              <p class="eyebrow">Screen 3</p>
+              <span class="screen-badge">Screen 3</span>
               <h2>Polypill Candidates</h2>
             </div>
-            <div id="status-tag" class="status-tag">Waiting</div>
-          </div>
-
-          <div id="summary-cards" class="summary-cards"></div>
-          <div id="results" class="results-list"></div>
-        </section>
-
-        <section class="panel explainability-panel">
-          <div class="results-header">
-            <div>
-              <p class="eyebrow">Screen 4</p>
-              <h2>Explainability</h2>
+            <div class="header-right">
+              <div id="status-tag" class="status-tag" aria-live="polite">Waiting</div>
             </div>
           </div>
-          <div id="explainability" class="explainability"></div>
+
+          <!-- Empty / loading / error states -->
+          <div id="state-empty" class="state-card state-empty">
+            <p class="muted">Select diseases and click <strong>Search Candidates</strong> to begin.</p>
+          </div>
+          <div id="state-loading" class="state-card state-loading" hidden aria-live="polite" aria-busy="true">
+            <div class="spinner" aria-hidden="true"></div>
+            <p>Running candidate search…</p>
+          </div>
+          <div id="state-error" class="state-card state-error" hidden role="alert">
+            <span class="state-icon">⚠️</span>
+            <p id="error-message">An error occurred.</p>
+          </div>
+          <div id="state-graph-unavailable" class="state-card state-unavailable" hidden role="alert">
+            <span class="state-icon">🔌</span>
+            <p>Graph service is currently unavailable. Please try again later.</p>
+            <small class="muted">Graph evidence and ML predictions require a live knowledge graph connection.</small>
+          </div>
+
+          <!-- Summary cards -->
+          <div id="summary-cards" class="summary-cards" hidden></div>
+
+          <!-- Candidate list -->
+          <div id="results" class="results-list" aria-live="polite"></div>
         </section>
+
+        <!-- ── Screen 4 · Explainability ── -->
+        <section class="panel explainability-panel" id="screen-explainability">
+          <div class="results-header">
+            <div>
+              <span class="screen-badge">Screen 4</span>
+              <h2>Explainability</h2>
+            </div>
+            <div class="channel-legend" aria-label="Evidence channel legend">
+              <span class="legend-item legend-graph">🗄️ Graph Evidence</span>
+              <span class="legend-item legend-rules">🛡️ Safety Rules</span>
+              <span class="legend-item legend-ml">🧠 ML Prediction</span>
+            </div>
+          </div>
+
+          <div id="explainability" class="explainability-container">
+            <div class="state-card state-empty">
+              <p class="muted">Click <strong>View Explainability</strong> on any candidate to inspect its three evidence channels.</p>
+            </div>
+          </div>
+        </section>
+
       </main>
+
+      <footer class="page-footer">
+        <small>
+          PolyMerge Research Dashboard — sprint6/pamela/final-frontend-demo —
+          Data: Hetionet v1.0 fragment — ML: Not applied in this build
+        </small>
+      </footer>
     </div>
 
     <script src="/frontend/app.js"></script>
