@@ -18,14 +18,21 @@ export function formatGraphEvidence(graphEvidence) {
       uncoveredCount: graphEvidence.uncoveredDiseaseIds.length,
     },
     treatmentPaths: graphEvidence.treatmentPaths.map((path) => ({
-      description: `${path.drugId} treats ${path.diseaseId}`,
+      description: `${path.drugName ?? path.drugId} ${path.relationship} ${path.diseaseName ?? path.diseaseId}`,
+      pathId: path.pathId,
+      drugId: path.drugId,
+      diseaseId: path.diseaseId,
       relationship: path.relationship,
       evidenceType: path.evidenceType,
       source: path.source,
+      graphVersion: path.graphVersion,
     })),
     context: {
-      genes: graphEvidence.geneContext.length,
-      sideEffects: graphEvidence.sideEffectContext.length,
+      genes: graphEvidence.geneContext,
+      sideEffects: graphEvidence.sideEffectContext,
+      geneCount: graphEvidence.geneContext.length,
+      sideEffectCount: graphEvidence.sideEffectContext.length,
+      perDrugPathReferences: graphEvidence.perDrugPathReferences,
     },
     provenance: {
       source: graphEvidence.provenance.source,
@@ -53,25 +60,24 @@ export function formatRules(rules) {
  * Format ML predictions for display
  */
 export function formatMLPredictions(predictions) {
-  if (predictions.length === 0) {
+  if (!predictions || predictions.status !== 'applied' || predictions.pairs.length === 0) {
     return {
       status: 'not_available',
-      message: 'ML predictions not yet integrated. See Issue #42 (Ranee API).',
+      message: predictions?.reason ?? 'ML predictions are unavailable for this candidate.',
       pairs: [],
     };
   }
   
   return {
     status: 'available',
-    pairs: predictions.map((pred) => ({
+    pairs: predictions.pairs.map((pred) => ({
       drugs: pred.drugPair,
       severity: pred.predictedSeverity,
-      probabilities: pred.severityProbabilities,
-      confidence: pred.confidence,
       model: {
         name: pred.modelName,
         version: pred.modelVersion,
       },
+      inferenceStatus: pred.inferenceStatus,
       visualStyle: pred.predictedSeverity === 'Major' ? 'warning' 
         : pred.predictedSeverity === 'Moderate' ? 'caution' 
         : 'info',
@@ -91,7 +97,7 @@ export function createComparisonView(candidates) {
         drugs: candidate.drugs.join(', '),
         coverage: `${Math.round((candidate.graphEvidence?.coverage ?? 0) * 100)}%`,
         status: candidate.status,
-        rulesStatus: candidate.rules.some((r) => r.status === 'rejected') ? 'Rejected' : 'Accepted',
+        rulesStatus: candidate.deterministicRules.some((r) => r.status === 'rejected') ? 'Rejected' : 'Accepted',
         mlStatus: candidate.mlStatus,
         visualStyle: candidate.status === 'accepted' ? 'success' : 'error',
       })),
@@ -128,16 +134,16 @@ export function createDetailedExplanation(candidate) {
         type: 'rules',
         icon: 'shield',
         color: candidate.status === 'rejected' ? 'red' : 'green',
-        content: formatRules(candidate.rules),
-        disclaimer: 'Hard-coded safety checks. Not a comprehensive drug interaction database.',
+        content: formatRules(candidate.deterministicRules),
+        disclaimer: 'Configured deterministic safety checks. Not a comprehensive drug interaction database.',
       },
       {
         title: 'ML Predictions',
         type: 'predictions',
         icon: 'cpu',
         color: 'purple',
-        content: formatMLPredictions(candidate.predictions),
-        disclaimer: 'Statistical estimates from research models. Not clinical validation. Depends on Issue #42 integration.',
+        content: formatMLPredictions(candidate.mlPrediction),
+        disclaimer: 'Statistical estimates from research models. Not clinical validation.',
       },
     ],
     
@@ -151,7 +157,7 @@ export function createDetailedExplanation(candidate) {
  * Create rejection explanation
  */
 export function createRejectionExplanation(candidate) {
-  const rejectionRules = candidate.rules.filter((r) => r.status === 'rejected');
+  const rejectionRules = candidate.deterministicRules.filter((r) => r.status === 'rejected');
   
   return {
     candidateId: candidate.candidateSetId,
@@ -248,6 +254,27 @@ export function createEvidencePathVisualization(candidate) {
       style: 'dotted',
     });
   }
+
+  for (const sideEffect of candidate.graphEvidence.sideEffectContext.slice(0, 10)) {
+    if (!nodeIds.has(sideEffect.sideEffectId)) {
+      nodes.push({
+        id: sideEffect.sideEffectId,
+        label: sideEffect.sideEffectName ?? sideEffect.sideEffectId,
+        type: 'side_effect',
+        color: '#FF9800',
+      });
+      nodeIds.add(sideEffect.sideEffectId);
+    }
+
+    edges.push({
+      source: sideEffect.drugId,
+      target: sideEffect.sideEffectId,
+      label: sideEffect.relationship,
+      type: 'context',
+      color: '#FF9800',
+      style: 'dotted',
+    });
+  }
   
   return {
     nodes,
@@ -257,6 +284,7 @@ export function createEvidencePathVisualization(candidate) {
       { label: 'Drug', color: '#4CAF50', shape: 'circle' },
       { label: 'Disease', color: '#2196F3', shape: 'circle' },
       { label: 'Gene', color: '#9C27B0', shape: 'circle' },
+      { label: 'Side Effect', color: '#FF9800', shape: 'circle' },
       { label: 'Known Evidence', style: 'solid' },
       { label: 'Inferred Evidence', style: 'dashed' },
       { label: 'Context', style: 'dotted' },

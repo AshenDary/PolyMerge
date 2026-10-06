@@ -2,23 +2,32 @@
 
 ## Goal
 
-Evaluate the selected traditional model once on the untouched test set and integrate outputs with PolyMerge without mixing predictions with graph evidence.
+Complete final evaluation and integrate model predictions with PolyMerge without
+mixing predictions, graph evidence, or deterministic rule outcomes.
+
+## Status
+
+Repaired on the temporary Sprint 5 integration branch under master Issue #39.
+Issues #40 and #41 are complete; #42 and #43 are integrated on this branch for
+final review.
 
 ## Shared Tasks
 
-- [ ] Evaluate selected model exactly once on untouched test data
-- [ ] Save preprocessing pipeline
-- [ ] Save selected model
-- [ ] Expose model metadata
-- [ ] Integrate predictions with PolyMerge candidate scoring where appropriate
-- [ ] Keep deterministic safety rules independent
-- [ ] Preserve graph evidence/provenance separately from ML prediction
-- [ ] Add candidate comparison and rejection reason presentation
-- [ ] Add evidence paths and graph visualization where useful
+- [x] Evaluate selected model exactly once on the primary test split (#40)
+- [x] Freeze the preprocessing/classifier pipeline contract (#40)
+- [x] Record model artifact checksum, version, and reproducibility metadata (#40)
+- [x] Expose traceable graph evidence and provenance paths (#41)
+- [x] Integrate predictions with PolyMerge candidate scoring where appropriate
+- [x] Keep deterministic safety rules independent
+- [x] Preserve graph evidence/provenance separately from ML prediction
+- [x] Add candidate comparison and rejection reason presentation
+- [x] Add deterministic treatment, gene-context, and side-effect evidence paths
+- [x] Complete graph evidence presentation and visualization where useful
+- [x] Run the #42/#43 integration and Sprint 5 master regression audit
 
 ## Definition of Done
 
-- [ ] Candidate results include explainability payloads
-- [ ] Rejection reasons are structured
-- [ ] Predictions remain clearly labeled as model outputs
-- [ ] No clinical validation claims are introduced
+- [x] Candidate results include explainability payloads
+- [x] Rejection reasons are structured independently from graph evidence
+- [x] Predictions remain clearly labeled as model outputs
+- [x] No clinical validation claims are introduced

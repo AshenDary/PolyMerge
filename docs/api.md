@@ -8,7 +8,8 @@ implemented behavior only.
 Graph-backed candidate responses use:
 
 - `dataStatus: "real_graph"`
-- `mlStatus: "not_applied"`
+- `mlStatus: "applied"` only when real pair-level DDI inference succeeds;
+  otherwise `mlStatus: "not_applied"`
 
 Candidate-set fallback responses use:
 
@@ -17,12 +18,21 @@ Candidate-set fallback responses use:
 - `upstreamStatus: "fallback"`
 - `candidateSets: []`
 
-No trained traditional supervised ML model is applied to current candidate
-sets. Graph-backed candidate sets therefore retain `mlStatus: "not_applied"`,
-and `interactionRisk` / `synergyScore` remain `null`. Neural-network,
-deep-learning, graph-embedding, GNN, transformer, large-language-model,
-foundation-model, and AutoML models are not part of the planned academic ML
-solution.
+The final `RandomForestClassifier` is evaluated, frozen, and available for
+runtime inference when the reviewed artifact is installed and verified.
+Candidate-set inference is pair-level: every unique unordered drug pair is
+bridged through the frozen 55-feature contract and sent to the serving layer.
+If feature construction or model serving fails, no severity is fabricated.
+`interactionRisk` / `synergyScore` remain `null`; the canonical ML field is
+`mlPrediction`. Neural-network, deep-learning, graph-embedding, GNN,
+transformer, large-language-model, foundation-model, and AutoML models are not
+part of the planned academic ML solution.
+
+The frozen Random Forest is exposed through a separate DDI-severity endpoint.
+Only a successful, checksum-verified inference uses `mlStatus: "applied"`.
+Missing/tampered artifacts and inference failures use `mlStatus: "not_applied"`,
+return no predicted class, and never substitute graph evidence or deterministic
+safety rules for a model prediction.
 
 The legacy `POST /api/combinations/search` compatibility endpoint retains its
 Sprint 1 demo fallback (`dataStatus: "demo"`, `mlStatus: "demo"`).
@@ -59,6 +69,67 @@ Success response:
 ```
 
 If the ML/Graph service is unavailable, this endpoint returns HTTP 503 and reports `mlEngine: "unavailable"`.
+
+### `POST /api/ddi-severity/predict`
+
+Purpose: validates and forwards one already-derived DDInter drug-pair feature
+record to the frozen Sprint 5 Random Forest. This endpoint is predictive ML
+only. It does not query graph evidence, declare a contraindication, or override
+the independent deterministic safety layer.
+
+Request:
+
+```json
+{
+  "features": {
+    "hetionet_available_count": 2,
+    "both_hetionet_available": 1,
+    "graph_ctd_disease_count_mean": 4.5,
+    "... all remaining approved fields ...": 0
+  }
+}
+```
+
+`features` must contain exactly the 55 fields, in the contract documented by
+`data/interim/sprint4/feature_contract.json`. Each value is a finite JSON number
+or `null`; `null` represents a missing value handled by the fitted preprocessing
+inside the frozen pipeline. Missing fields, extra fields, strings, booleans,
+NaN, and infinity are rejected before the ML service is called.
+
+Successful response (HTTP 200):
+
+```json
+{
+  "predictedClass": "Moderate",
+  "inferenceStatus": "applied",
+  "mlStatus": "applied",
+  "model": {
+    "name": "RandomForestClassifier",
+    "version": "RandomForestClassifier-sprint5-v1-65e9834666ad19c5",
+    "artifactSha256": "2b9ed9ca9a57a3eed256eb28d369df89403666a1c5ea1231c47ebe1e053ccc6d",
+    "featureContractSha256": "a3adc02c91e1af0cf47d978c3c87d47b22f696edc7f797dc24a14ad246328efa"
+  }
+}
+```
+
+Unavailable response (HTTP 503):
+
+```json
+{
+  "predictedClass": null,
+  "inferenceStatus": "unavailable",
+  "mlStatus": "not_applied",
+  "model": {
+    "name": "RandomForestClassifier",
+    "version": "RandomForestClassifier-sprint5-v1-65e9834666ad19c5",
+    "artifactSha256": "2b9ed9ca9a57a3eed256eb28d369df89403666a1c5ea1231c47ebe1e053ccc6d",
+    "featureContractSha256": "a3adc02c91e1af0cf47d978c3c87d47b22f696edc7f797dc24a14ad246328efa"
+  },
+  "error": "Frozen model artifact is not installed ..."
+}
+```
+
+No score or fallback severity is emitted when inference is unavailable.
 
 ### `GET /api/diseases`
 
@@ -328,8 +399,33 @@ payload.
 Paths are deduplicated by `pathId` and returned in ascending `pathId` order.
 
 `graphEvidence` is independent of `rejectionReasons` and predictive ML output.
-It does not populate `interactionRisk` or `synergyScore`; while ML inference is
-not applied, those fields remain `null` and `mlStatus` remains `not_applied`.
+It does not populate `interactionRisk` or `synergyScore`; those fields remain
+`null`. Predictive output, when available, is reported separately in
+`mlPrediction`:
+
+```json
+{
+  "mlStatus": "applied",
+  "mlPrediction": {
+    "status": "applied",
+    "pairs": [
+      {
+        "drugPair": ["Compound::DB00177", "Compound::DB00331"],
+        "predictedSeverity": "Moderate",
+        "model": {
+          "name": "RandomForestClassifier",
+          "version": "RandomForestClassifier-sprint5-v1-65e9834666ad19c5"
+        },
+        "inferenceStatus": "applied"
+      }
+    ]
+  }
+}
+```
+
+If the candidate pair cannot be represented by the reviewed runtime feature
+bridge or the model is unavailable, `mlStatus` is `not_applied` and
+`mlPrediction.pairs` is empty.
 `CrC` is resemblance context only and is never emitted as treatment, DDI,
 severity, contraindication, or safety evidence.
 
@@ -341,8 +437,8 @@ include corresponding treatment evidence where:
 - `source`, `graphVersion`, `metaedge`, `targetName`, and `evidenceType`
   preserve graph provenance.
 
-`interactionRisk` and `synergyScore` are not applied for real graph-backed
-candidates.
+`interactionRisk`, `synergyScore`, confidence, probabilities, and a combined
+safety score are not emitted for real graph-backed candidates.
 
 An empty context array means no corresponding relationship is represented in
 the current graph fragment. It is not a known negative biomedical fact. See
@@ -354,7 +450,26 @@ Returns an in-memory candidate-search result from the current backend process.
 
 ### `GET /api/combinations/:id/explain`
 
-Returns the current limited explainability payload for a stored in-memory result. Advanced explainability and graph visualization are future work.
+Compatibility route. It returns the canonical explainability channels for a
+stored in-memory result where represented evidence is available and does not
+synthesize graph relationships.
+
+### `GET /api/candidate-sets/:id/explain`
+
+Returns explainability for a stored candidate-set search result produced by
+`POST /api/candidate-sets/search`. Supported `format` query values are:
+
+- `detailed`
+- `comparison`
+- `visualization`
+- `structured`
+
+Unknown query IDs return HTTP 404. Invalid formats return HTTP 400. The response
+keeps these channels structurally separate:
+
+- `graphEvidence`
+- `deterministicRules`
+- `mlPrediction`
 
 ### `GET /api/drugs/:id`
 
@@ -372,6 +487,30 @@ of an interaction record must not be interpreted as proof of safety.
 ### `GET /health`
 
 Returns ML/Graph service liveness.
+
+### `GET /health/model`
+
+Returns HTTP 200 with `inferenceStatus: "ready"` only after the artifact,
+feature contract, pipeline shape, and class schema pass verification. Returns
+HTTP 503 with `inferenceStatus: "unavailable"` and `mlStatus: "not_applied"`
+when the model is not ready. This does not change the liveness result from
+`GET /health`.
+
+### `POST /predict/ddi-severity`
+
+Direct ML-service form of `POST /api/ddi-severity/predict`, with the same exact
+55-feature request and applied/unavailable response contracts.
+
+At first readiness check or prediction, the service loads the artifact once.
+Before deserializing it, the service verifies the feature-contract SHA-256
+(with JSON line endings normalized to LF for cross-platform Git checkouts),
+artifact byte size, and artifact SHA-256 from
+`data/interim/sprint5/final_model_evaluation.json`. It then verifies the frozen
+pipeline steps, selected Random Forest parameters, and output classes. The
+default artifact path is `models/sprint5/random_forest_ddi_pipeline.joblib`;
+deployments may point to the reviewed artifact with
+`POLYMERGE_DDI_MODEL_PATH`. Because joblib deserialization is pickle-based,
+only the reviewed artifact with the documented checksum should be installed.
 
 ### `GET /api/diseases`
 
@@ -401,6 +540,6 @@ diseases, retrieves `CtD` compound candidates, attaches graph
 evidence/provenance, generates candidate sets, runs deterministic safety checks,
 ranks candidates, and runs the greedy candidate-set optimization baseline.
 
-No trained predictive model is run for current graph-backed responses. Future
-model fields should represent traditional supervised ML predictions and remain
-separate from known graph evidence and deterministic rule outcomes.
+The compatibility route preserves graph evidence and deterministic rule
+channels. Candidate-set pair prediction is exposed through the canonical
+`/predict/candidate-sets` and backend `/api/candidate-sets/search` flow.

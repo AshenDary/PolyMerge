@@ -81,24 +81,41 @@
 - Kept the Sprint 3 test split untouched for Sprint 5 final evaluation.
 - Kept model persistence, serving, and candidate scoring inactive.
 
+The test split was untouched throughout Sprint 4 and was subsequently used once
+for the final Sprint 5 evaluation.
+
 Important: Hetionet `CrC` is compound resemblance and must not be treated as a DDI label.
 
 ## Sprint 5 — Final Evaluation & Integration
 
-### Status: Planned
+### Status: Integration Branch Repaired
 
-- Evaluate the selected model exactly once on the untouched test set.
-- Save the leakage-safe preprocessing pipeline and selected model.
-- Expose model metadata and training-data provenance.
-- Integrate traditional ML predictions with candidate scoring where appropriate.
-- Keep deterministic safety rules independent from model scores.
-- Preserve graph evidence/provenance separately from ML prediction output.
-- Continue candidate comparison, rejection reasons, evidence paths, and graph
-  visualization as research explainability aids.
+Completed:
+
+- Issue #40: evaluated the selected `RandomForestClassifier` exactly once on the
+  primary test split and recorded final Macro F1 of `0.524630`.
+- Froze the leakage-safe preprocessing/classifier pipeline contract and recorded
+  its model version, artifact checksum, data hashes, environment, and metrics.
+- Issue #41: added traceable `graphEvidence.paths` for represented treatment,
+  gene-context, and side-effect relationships.
+- Preserved graph provenance, stable entity IDs, deterministic path IDs, and
+  per-drug path references through multi-drug candidate sets.
+- Kept graph evidence, deterministic hard-rule outcomes, and runtime ML
+  predictions as separate response channels.
+- Integrated selected-model serving, candidate-pair feature bridging, and
+  fail-closed active/unavailable inference behavior.
+- Integrated candidate explainability and frontend wiring for graph, rule, and
+  ML channels.
+
+Remaining:
+
+- Issue #39: final review of the repaired temporary integration branch and
+  Sprint 5 closeout.
+- Sprint 6 handoff after #39 acceptance.
 
 ## Sprint 6 — Deployment, Documentation & Academic Submission
 
-### Status: Planned
+### Status: Planned / Blocked on Sprint 5 Closeout
 
 - Deploy with Streamlit unless the instructor approves the existing frontend.
 - Finalize README, setup instructions, data dictionary, and requirements.

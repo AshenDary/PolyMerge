@@ -17,6 +17,12 @@ const PORT = Number(process.env.PORT) || 3000;
 const HOST = process.env.HOST || '0.0.0.0';
 const ML_SERVICE_URL = process.env.ML_SERVICE_URL || 'http://localhost:8000';
 const ML_SERVICE_TIMEOUT_MS = Number(process.env.ML_SERVICE_TIMEOUT_MS) || 15000;
+const ddiFeatureContract = JSON.parse(await fs.readFile(
+  path.resolve(__dirname, '../../data/interim/sprint4/feature_contract.json'),
+  'utf8',
+));
+export const DDI_FEATURE_NAMES = Object.freeze([...ddiFeatureContract.features]);
+const DDI_CLASSES = new Set(ddiFeatureContract.classes);
 
 const DRUGS = {
   lisinopril: {
@@ -220,6 +226,53 @@ export function normalizeCandidateSetConfig(config) {
   return { candidateSetConfig: normalized };
 }
 
+export function normalizeDdiFeatures(features) {
+  if (features === null || typeof features !== 'object' || Array.isArray(features)) {
+    return { error: 'features must be a JSON object' };
+  }
+  const expected = new Set(DDI_FEATURE_NAMES);
+  const supplied = Object.keys(features);
+  const missing = DDI_FEATURE_NAMES.filter((name) => !Object.hasOwn(features, name));
+  const unexpected = supplied.filter((name) => !expected.has(name)).sort();
+  if (missing.length > 0 || unexpected.length > 0) {
+    return {
+      error: 'features must match the approved 55-column contract',
+      missingFeatures: missing,
+      unexpectedFeatures: unexpected,
+    };
+  }
+  for (const name of DDI_FEATURE_NAMES) {
+    const value = features[name];
+    if (value !== null && (typeof value !== 'number' || !Number.isFinite(value))) {
+      return { error: `feature ${name} must be a finite number or null` };
+    }
+  }
+  return {
+    features: Object.fromEntries(DDI_FEATURE_NAMES.map((name) => [name, features[name]])),
+  };
+}
+
+export function validateDdiPrediction(payload, expectedStatus) {
+  if (payload === null || typeof payload !== 'object' || Array.isArray(payload)
+    || payload.model === null || typeof payload.model !== 'object' || Array.isArray(payload.model)) {
+    throw new Error('ML engine returned an invalid DDI prediction response');
+  }
+  if (expectedStatus === 'applied') {
+    if (payload.inferenceStatus !== 'applied' || payload.mlStatus !== 'applied'
+      || !DDI_CLASSES.has(payload.predictedClass)
+      || typeof payload.model.name !== 'string'
+      || typeof payload.model.version !== 'string'
+      || typeof payload.model.artifactSha256 !== 'string'
+      || typeof payload.model.featureContractSha256 !== 'string') {
+      throw new Error('ML engine returned malformed applied-inference provenance');
+    }
+  } else if (payload.inferenceStatus !== 'unavailable'
+    || payload.mlStatus !== 'not_applied' || payload.predictedClass !== null) {
+    throw new Error('ML engine returned a prediction while inference was unavailable');
+  }
+  return payload;
+}
+
 function createDemoSearchResult(inputDiseases, warning = 'ML engine unavailable; returning explicitly labeled demo output.') {
   const orderedDiseases = inputDiseases.map((disease) => (
     typeof disease === 'string' ? { id: disease, name: disease } : disease
@@ -387,8 +440,28 @@ export function validateCandidateSetResult(payload) {
       && (candidateSet.interactionRisk != null || candidateSet.synergyScore != null)) {
       throw new Error('ML engine returned prediction scores while mlStatus is not_applied');
     }
-    if (candidateSet.dataStatus !== payload.metadata.dataStatus
-      || candidateSet.mlStatus !== payload.metadata.mlStatus) {
+    if (candidateSet.mlStatus === 'applied') {
+      const prediction = candidateSet.mlPrediction;
+      if (prediction === null || typeof prediction !== 'object' || Array.isArray(prediction)
+        || prediction.status !== 'applied' || !Array.isArray(prediction.pairs)
+        || prediction.pairs.length === 0
+        || prediction.pairs.some((pair) => pair === null || typeof pair !== 'object'
+          || !Array.isArray(pair.drugPair) || pair.drugPair.length !== 2
+          || pair.drugPair.some((drugId) => typeof drugId !== 'string')
+          || !DDI_CLASSES.has(pair.predictedSeverity)
+          || pair.inferenceStatus !== 'applied'
+          || pair.model === null || typeof pair.model !== 'object'
+          || typeof pair.model.name !== 'string'
+          || typeof pair.model.version !== 'string')) {
+        throw new Error('ML candidate-set response has malformed pair prediction data');
+      }
+      if (prediction.pairs.some((pair) => (
+        Object.hasOwn(pair, 'probabilities') || Object.hasOwn(pair, 'confidence')
+      ))) {
+        throw new Error('ML candidate-set response included unsupported probability or confidence fields');
+      }
+    }
+    if (candidateSet.dataStatus !== payload.metadata.dataStatus) {
       throw new Error('ML candidate-set provenance does not match response metadata');
     }
   }
@@ -442,28 +515,6 @@ async function fetchCandidateSetResult(
     options.logger?.warn({ error: error.message }, 'ML candidate-set request failed; using empty fallback');
     return createCandidateSetFallback(options.resolvedDiseases ?? diseaseIds, error.message);
   }
-}
-
-function buildExplainability(candidate) {
-  return {
-    candidateId: candidate.rank,
-    status: candidate.status,
-    graph: {
-      nodes: candidate.drugs.map((drug) => ({ id: drug, kind: 'Drug' })),
-      edges: candidate.drugs.map((drug, index) => ({
-        source: drug,
-        target: candidate.drugs[(index + 1) % candidate.drugs.length],
-        relationship: index % 2 === 0 ? 'known relationship' : 'predicted relationship',
-        evidenceType: index % 2 === 0 ? 'known' : 'predicted',
-      })),
-    },
-    explanation: [
-      'The candidate covers the requested disease cluster using treatment relationships represented in the knowledge graph.',
-      'Predicted interaction risk and synergy are research-only model estimates and should be reviewed by experts.',
-      'A hard contraindication rule is applied independently of model predictions and can reject the candidate outright.',
-    ],
-    reasons: candidate.reasons ?? [],
-  };
 }
 
 export const app = Fastify({ logger: process.env.NODE_ENV !== 'test' });
@@ -561,10 +612,50 @@ app.get('/api/drugs/:id/interactions', async (request, reply) => {
         score: 0.18,
         evidenceType: 'predicted',
         source: 'PolyMerge Demo Pipeline',
-        confidence: 'medium',
       },
     ],
   };
+});
+
+app.post('/api/ddi-severity/predict', async (request, reply) => {
+  if (request.body === null || typeof request.body !== 'object' || Array.isArray(request.body)) {
+    return reply.code(400).send({ error: 'Request body must be a JSON object' });
+  }
+  const normalized = normalizeDdiFeatures(request.body.features);
+  if (normalized.error) {
+    return reply.code(400).send(normalized);
+  }
+
+  try {
+    const response = await fetch(`${ML_SERVICE_URL}/predict/ddi-severity`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ features: normalized.features }),
+      signal: AbortSignal.timeout(ML_SERVICE_TIMEOUT_MS),
+    });
+    const payload = await response.json();
+    if (response.ok) {
+      return validateDdiPrediction(payload, 'applied');
+    }
+    if (response.status === 503) {
+      return reply.code(503).send(validateDdiPrediction(payload, 'unavailable'));
+    }
+    throw new Error(`ML DDI service responded ${response.status}`);
+  } catch (error) {
+    request.log?.warn?.({ error: error.message }, 'ML DDI prediction request failed');
+    return reply.code(503).send({
+      predictedClass: null,
+      inferenceStatus: 'unavailable',
+      mlStatus: 'not_applied',
+      model: {
+        name: null,
+        version: null,
+        artifactSha256: null,
+        featureContractSha256: null,
+      },
+      error: error.message,
+    });
+  }
 });
 
 app.post('/api/candidate-sets/search', async (request, reply) => {
@@ -754,12 +845,15 @@ app.get('/api/combinations/:id/explain', async (request, reply) => {
     return reply.code(404).send({ error: 'Combination result not found' });
   }
 
-  const explainability = result.candidates.map((candidate) => buildExplainability(candidate));
-
   return {
-    queryId: result.queryId,
-    diseases: result.diseases,
-    candidates: explainability,
+    ...buildExplainabilityResponse(
+      result.queryId,
+      result.diseaseIds ?? result.diseases ?? [],
+      result.candidateSets ?? result.candidates ?? [],
+      'structured',
+    ),
+    legacyRoute: true,
+    compatibilityNote: 'Legacy combinations explain route uses canonical evidence channels where represented data is available and does not synthesize graph relationships.',
   };
 });
 

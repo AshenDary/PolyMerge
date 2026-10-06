@@ -1,7 +1,3 @@
-/**
- * Sprint 5 Explainability Integration Tests
- */
-
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 
@@ -12,303 +8,232 @@ import {
   buildCandidateComparison,
   buildExplainabilityPayload,
 } from '../src/explainability/types.js';
+import {
+  buildExplainabilityResponse,
+  createEvidencePathVisualization,
+} from '../src/explainability/presentation.js';
 
-describe('Explainability Types', () => {
-  describe('createGraphEvidence', () => {
-    it('should create structured graph evidence from candidate set', () => {
-      const candidateSet = {
-        treatedDiseaseIds: ['hypertension', 'type-2-diabetes'],
-        uncoveredDiseaseIds: [],
-        coverage: 1.0,
-        evidence: [
-          {
-            drugId: 'lisinopril',
-            diseaseId: 'hypertension',
-            relationship: 'treats',
-            source: 'Hetionet',
-            evidenceType: 'known',
-          },
-        ],
-        dataStatus: 'real_graph',
-      };
-      
-      const graphEvidence = createGraphEvidence(candidateSet);
-      
-      assert.equal(graphEvidence.coverage, 1.0);
-      assert.equal(graphEvidence.coverageDescription, '100% of requested diseases');
-      assert.equal(graphEvidence.treatedDiseaseIds.length, 2);
-      assert.equal(graphEvidence.treatmentPaths.length, 1);
-      assert.equal(graphEvidence.provenance.dataStatus, 'real_graph');
-    });
-    
-    it('should handle missing evidence gracefully', () => {
-      const candidateSet = {
-        treatedDiseaseIds: [],
-        uncoveredDiseaseIds: ['disease1'],
-        coverage: 0,
-      };
-      
-      const graphEvidence = createGraphEvidence(candidateSet);
-      
-      assert.equal(graphEvidence.coverage, 0);
-      assert.equal(graphEvidence.treatmentPaths.length, 0);
-      assert.equal(graphEvidence.geneContext.length, 0);
-      assert.equal(graphEvidence.sideEffectContext.length, 0);
-    });
-  });
-  
-  describe('createRuleResults', () => {
-    it('should create acceptance rule when no violations', () => {
-      const candidateSet = {
-        status: 'accepted',
-        rejectionReasons: [],
-      };
-      
-      const rules = createRuleResults(candidateSet);
-      
-      assert.equal(rules.length, 1);
-      assert.equal(rules[0].type, 'accepted');
-      assert.equal(rules[0].status, 'accepted');
-      assert.equal(rules[0].message, 'No contraindications detected');
-    });
-    
-    it('should include backend violation as rule', () => {
-      const candidateSet = {
-        status: 'accepted',
-        rejectionReasons: [],
-      };
-      
-      const violation = {
-        type: 'hard_contraindication',
-        message: 'MAOI + SSRI interaction',
-        pair: ['maoi', 'ssri'],
-        stage: 'backend_validation',
-      };
-      
-      const rules = createRuleResults(candidateSet, violation);
-      
-      assert.equal(rules.length, 1);
-      assert.equal(rules[0].type, 'hard_contraindication');
-      assert.equal(rules[0].status, 'rejected');
-      assert.equal(rules[0].affectedDrugs.length, 2);
-    });
-    
-    it('should include ML engine rejection reasons', () => {
-      const candidateSet = {
-        status: 'rejected',
-        rejectionReasons: [
-          {
-            type: 'insufficient_coverage',
-            message: 'Coverage below threshold',
-            source: 'ML Engine Rules',
-          },
-        ],
-      };
-      
-      const rules = createRuleResults(candidateSet);
-      
-      assert.equal(rules.length, 1);
-      assert.equal(rules[0].type, 'insufficient_coverage');
-      assert.equal(rules[0].source, 'ML Engine Rules');
-    });
-  });
-  
-  describe('createMLPredictions', () => {
-    it('should return empty array when ML not applied', () => {
-      const candidateSet = {
-        drugs: ['drug1', 'drug2'],
-        mlStatus: 'not_applied',
-      };
-      
-      const predictions = createMLPredictions(candidateSet);
-      
-      assert.equal(predictions.length, 0);
-    });
-    
-    it('should preserve real predictions and never synthesize missing pairwise results', () => {
-      const prediction = {
-        drugPair: ['drug1', 'drug2'],
+function graphPath(pathId, semanticType, relationship, targetEntity) {
+  return {
+    pathId,
+    semanticType,
+    sourceEntity: {
+      id: 'Compound::DB00177',
+      name: 'Valsartan',
+      kind: 'Compound',
+    },
+    relationship: {
+      type: relationship,
+      metaedge: relationship,
+    },
+    targetEntity,
+    provenance: {
+      source: 'Hetionet',
+      graphVersion: 'Hetionet v1.0 filtered PolyMerge fragment',
+      evidenceType: 'known',
+    },
+  };
+}
+
+function candidateSet(overrides = {}) {
+  return {
+    candidateSetId: 'candidate-set:Compound::DB00177+Compound::DB00331',
+    rank: 1,
+    drugs: ['Compound::DB00177', 'Compound::DB00331'],
+    drugNames: ['Valsartan', 'Metformin'],
+    drugCount: 2,
+    status: 'accepted',
+    treatedDiseaseIds: ['Disease::DOID:10763', 'Disease::DOID:9352'],
+    uncoveredDiseaseIds: [],
+    coverage: 1,
+    rejectionReasons: [],
+    dataStatus: 'real_graph',
+    mlStatus: 'applied',
+    graphEvidence: {
+      source: 'Hetionet',
+      graphVersion: 'Hetionet v1.0 filtered PolyMerge fragment',
+      paths: [
+        graphPath('graph-path:treatment', 'treatment', 'CtD', {
+          id: 'Disease::DOID:10763',
+          name: 'hypertension',
+          kind: 'Disease',
+        }),
+        graphPath('graph-path:gene', 'gene_context', 'CbG', {
+          id: 'Gene::ENSG000001',
+          name: 'ACE',
+          kind: 'Gene',
+        }),
+        graphPath('graph-path:side-effect', 'side_effect_context', 'CcSE', {
+          id: 'Side Effect::C0018681',
+          name: 'headache',
+          kind: 'Side Effect',
+        }),
+      ],
+    },
+    comparison: {
+      drugs: [{
+        drugId: 'Compound::DB00177',
+        drugName: 'Valsartan',
+        evidencePathIds: ['graph-path:treatment', 'graph-path:gene', 'graph-path:side-effect'],
+      }],
+    },
+    mlPrediction: {
+      status: 'applied',
+      pairs: [{
+        drugPair: ['Compound::DB00177', 'Compound::DB00331'],
         predictedSeverity: 'Moderate',
-        modelName: 'RandomForestClassifier',
-      };
-      const candidateSet = {
-        drugs: ['drug1', 'drug2', 'drug3'],
-        mlStatus: 'applied',
-        interactionRisk: 0.5,
-        predictions: [prediction],
-      };
-      
-      const predictions = createMLPredictions(candidateSet);
-      
-      assert.deepEqual(predictions, [prediction]);
-      assert.deepEqual(createMLPredictions({ ...candidateSet, predictions: undefined }), []);
-    });
+        model: {
+          name: 'RandomForestClassifier',
+          version: 'RandomForestClassifier-sprint5-v1-65e9834666ad19c5',
+          artifactSha256: 'a'.repeat(64),
+          featureContractSha256: 'b'.repeat(64),
+        },
+        inferenceStatus: 'applied',
+      }],
+    },
+    ...overrides,
+  };
+}
+
+describe('Sprint 5 explainability adapters', () => {
+  it('consumes CtD treatment paths from graphEvidence.paths', () => {
+    const graphEvidence = createGraphEvidence(candidateSet());
+
+    assert.equal(graphEvidence.treatmentPaths.length, 1);
+    assert.equal(graphEvidence.treatmentPaths[0].relationship, 'CtD');
+    assert.equal(graphEvidence.treatmentPaths[0].pathId, 'graph-path:treatment');
+    assert.equal(graphEvidence.treatmentPaths[0].drugId, 'Compound::DB00177');
+    assert.equal(graphEvidence.treatmentPaths[0].diseaseId, 'Disease::DOID:10763');
+    assert.equal(graphEvidence.provenance.source, 'Hetionet');
   });
-  
-  describe('buildCandidateComparison', () => {
-    it('should build complete comparison structure with all channels', () => {
-      const candidateSet = {
-        candidateSetId: 'candidate-001',
-        rank: 1,
-        drugs: ['drug1', 'drug2'],
-        drugCount: 2,
-        status: 'accepted',
-        treatedDiseaseIds: ['disease1'],
-        uncoveredDiseaseIds: [],
-        coverage: 1.0,
-        evidence: [],
-        rejectionReasons: [],
-        dataStatus: 'real_graph',
-        mlStatus: 'applied',
-      };
-      
-      const comparison = buildCandidateComparison(candidateSet);
-      
-      assert.equal(comparison.candidateSetId, 'candidate-001');
-      assert.equal(comparison.rank, 1);
-      assert.equal(comparison.status, 'accepted');
-      
-      // Check separate channels exist
-      assert.ok(comparison.graphEvidence);
-      assert.ok(Array.isArray(comparison.rules));
-      assert.ok(Array.isArray(comparison.predictions));
-      assert.ok(comparison.presentation);
-      
-      // Verify channel separation
-      assert.notEqual(comparison.graphEvidence, comparison.rules);
-      assert.notEqual(comparison.rules, comparison.predictions);
+
+  it('separates gene and side-effect context by semanticType', () => {
+    const graphEvidence = createGraphEvidence(candidateSet());
+
+    assert.equal(graphEvidence.geneContext.length, 1);
+    assert.equal(graphEvidence.geneContext[0].relationship, 'CbG');
+    assert.equal(graphEvidence.geneContext[0].geneId, 'Gene::ENSG000001');
+    assert.equal(graphEvidence.sideEffectContext.length, 1);
+    assert.equal(graphEvidence.sideEffectContext[0].relationship, 'CcSE');
+    assert.equal(graphEvidence.sideEffectContext[0].sideEffectId, 'Side Effect::C0018681');
+  });
+
+  it('preserves per-drug evidencePathIds', () => {
+    const graphEvidence = createGraphEvidence(candidateSet());
+
+    assert.deepEqual(graphEvidence.perDrugPathReferences[0].evidencePathIds, [
+      'graph-path:treatment',
+      'graph-path:gene',
+      'graph-path:side-effect',
+    ]);
+  });
+
+  it('uses precomputed deterministic rule state without rerunning hard rules', () => {
+    const acceptedDespiteNames = candidateSet({
+      drugs: ['maoi', 'ssri'],
+      status: 'accepted',
+      rejectionReasons: [],
+      mlStatus: 'not_applied',
+      mlPrediction: { status: 'not_applied', pairs: [] },
     });
-    
-    it('should override status when additional violation provided', () => {
-      const candidateSet = {
-        candidateSetId: 'candidate-002',
-        rank: 2,
-        drugs: ['drug1', 'drug2'],
-        status: 'accepted',
-        treatedDiseaseIds: [],
-        uncoveredDiseaseIds: [],
-        coverage: 0,
-        rejectionReasons: [],
-        dataStatus: 'real_graph',
-        mlStatus: 'not_applied',
-      };
-      
-      const violation = {
+
+    const comparison = buildCandidateComparison(acceptedDespiteNames);
+
+    assert.equal(comparison.status, 'accepted');
+    assert.equal(comparison.deterministicRules[0].message, 'No configured deterministic hard-rule violation detected');
+  });
+
+  it('presents rejected candidate reasons as deterministic rules', () => {
+    const rules = createRuleResults(candidateSet({
+      status: 'rejected',
+      rejectionReasons: [{
         type: 'hard_contraindication',
-        message: 'Test violation',
-        pair: ['drug1', 'drug2'],
-      };
-      
-      const comparison = buildCandidateComparison(candidateSet, violation);
-      
-      assert.equal(comparison.status, 'rejected');
-      assert.equal(comparison.rules.length, 1);
-      assert.equal(comparison.rules[0].type, 'hard_contraindication');
-    });
+        message: 'Absolute contraindication: maoi + ssri',
+        pair: ['maoi', 'ssri'],
+        stage: 'pre_optimization',
+      }],
+    }));
+
+    assert.equal(rules.length, 1);
+    assert.equal(rules[0].status, 'rejected');
+    assert.deepEqual(rules[0].affectedDrugs, ['maoi', 'ssri']);
   });
-  
-  describe('buildExplainabilityPayload', () => {
-    it('should build complete payload with metadata', () => {
-      const queryId = 'query-123';
-      const diseaseIds = ['disease1', 'disease2'];
-      const candidateSets = [
-        {
-          candidateSetId: 'candidate-001',
-          rank: 1,
-          drugs: ['drug1', 'drug2'],
-          status: 'accepted',
-          treatedDiseaseIds: ['disease1', 'disease2'],
-          uncoveredDiseaseIds: [],
-          coverage: 1.0,
-          evidence: [],
-          rejectionReasons: [],
-          dataStatus: 'real_graph',
-          mlStatus: 'applied',
-        },
-        {
-          candidateSetId: 'candidate-002',
-          rank: 2,
-          drugs: ['drug3', 'drug4'],
-          status: 'rejected',
-          treatedDiseaseIds: ['disease1'],
-          uncoveredDiseaseIds: ['disease2'],
-          coverage: 0.5,
-          evidence: [],
-          rejectionReasons: [
-            {
-              type: 'hard_contraindication',
-              message: 'Test rejection',
-            },
-          ],
-          dataStatus: 'real_graph',
-          mlStatus: 'not_applied',
-        },
-      ];
-      
-      const payload = buildExplainabilityPayload(queryId, diseaseIds, candidateSets);
-      
-      assert.equal(payload.queryId, 'query-123');
-      assert.deepEqual(payload.diseaseIds, diseaseIds);
-      assert.equal(payload.candidates.length, 2);
-      
-      // Check metadata
-      assert.equal(payload.metadata.candidateCount, 2);
-      assert.equal(payload.metadata.acceptedCount, 1);
-      assert.equal(payload.metadata.rejectedCount, 1);
-      
-      // Check disclaimer and limitations
-      assert.ok(payload.disclaimer);
-      assert.ok(Array.isArray(payload.limitations));
-      assert.ok(payload.limitations.length > 0);
-      
-      // Verify no mixing message is present
-      assert.ok(payload.disclaimer.includes('separate evidence channels'));
-    });
+
+  it('preserves real model prediction fields without fabricating confidence or probabilities', () => {
+    const predictions = createMLPredictions(candidateSet());
+
+    assert.equal(predictions.length, 1);
+    assert.equal(predictions[0].predictedSeverity, 'Moderate');
+    assert.equal(predictions[0].modelVersion, 'RandomForestClassifier-sprint5-v1-65e9834666ad19c5');
+    assert.equal(Object.hasOwn(predictions[0], 'confidence'), false);
+    assert.equal(Object.hasOwn(predictions[0], 'probabilities'), false);
   });
-  
-  describe('Channel Separation', () => {
-    it('should keep graph evidence, rules, and predictions structurally distinct', () => {
-      const candidateSet = {
-        candidateSetId: 'test',
-        rank: 1,
-        drugs: ['drug1', 'drug2'],
-        treatedDiseaseIds: ['disease1'],
-        uncoveredDiseaseIds: [],
-        coverage: 1.0,
-        evidence: [
-          {
-            drugId: 'drug1',
-            diseaseId: 'disease1',
-            relationship: 'treats',
-          },
-        ],
-        rejectionReasons: [],
-        status: 'accepted',
-        dataStatus: 'real_graph',
-        mlStatus: 'applied',
-        interactionRisk: 0.3,
-      };
-      
-      const comparison = buildCandidateComparison(candidateSet);
-      
-      // Verify keys are distinct
-      const graphKeys = Object.keys(comparison.graphEvidence);
-      const ruleKeys = comparison.rules[0] ? Object.keys(comparison.rules[0]) : [];
-      const predKeys = comparison.predictions[0] ? Object.keys(comparison.predictions[0]) : [];
-      
-      // No overlap between channel keys
-      const graphSet = new Set(graphKeys);
-      const ruleSet = new Set(ruleKeys);
-      const predSet = new Set(predKeys);
-      
-      // Verify no shared keys (except possibly timestamp)
-      const graphRuleOverlap = [...graphSet].filter((k) => ruleSet.has(k) && k !== 'timestamp');
-      const graphPredOverlap = [...graphSet].filter((k) => predSet.has(k) && k !== 'timestamp');
-      const rulePredOverlap = [...ruleSet].filter((k) => predSet.has(k) && k !== 'timestamp');
-      
-      assert.equal(graphRuleOverlap.length, 0, 'Graph and rules should not share keys');
-      assert.equal(graphPredOverlap.length, 0, 'Graph and predictions should not share keys');
-      assert.equal(rulePredOverlap.length, 0, 'Rules and predictions should not share keys');
-    });
+
+  it('returns empty array when ML is not applied', () => {
+    const predictions = createMLPredictions(candidateSet({
+      mlStatus: 'not_applied',
+      mlPrediction: { status: 'not_applied', pairs: [] },
+    }));
+
+    assert.equal(predictions.length, 0);
+  });
+
+  it('returns empty array when mlPrediction is missing', () => {
+    const predictions = createMLPredictions(candidateSet({
+      mlStatus: 'applied',
+      mlPrediction: undefined,
+    }));
+
+    assert.deepEqual(predictions, []);
+  });
+
+  it('keeps graph, deterministic rules, and ML prediction channels distinct', () => {
+    const comparison = buildCandidateComparison(candidateSet());
+
+    assert.ok(comparison.graphEvidence);
+    assert.ok(Array.isArray(comparison.deterministicRules));
+    assert.ok(comparison.mlPrediction);
+    assert.equal(Object.hasOwn(comparison, 'safetyScore'), false);
+    assert.equal(Object.hasOwn(comparison, 'clinicalSafety'), false);
+  });
+
+  it('builds detailed, comparison, visualization, and structured responses', () => {
+    const detailed = buildExplainabilityResponse('query-1', ['Disease::DOID:10763'], [candidateSet()], 'detailed');
+    const comparison = buildExplainabilityResponse('query-1', ['Disease::DOID:10763'], [candidateSet()], 'comparison');
+    const visualization = buildExplainabilityResponse('query-1', ['Disease::DOID:10763'], [candidateSet()], 'visualization');
+    const structured = buildExplainabilityResponse('query-1', ['Disease::DOID:10763'], [candidateSet()], 'structured');
+
+    assert.equal(detailed.detailedExplanations.length, 1);
+    assert.equal(comparison.comparisonView.comparisonTable.rows.length, 1);
+    assert.equal(visualization.visualizations[0].evidencePath.edges[0].label, 'CtD');
+    assert.equal(structured.candidates[0].candidateSetId, candidateSet().candidateSetId);
+  });
+
+  it('visualization includes represented CtD, gene, and side-effect context only', () => {
+    const visualization = createEvidencePathVisualization(buildCandidateComparison(candidateSet()));
+
+    assert.ok(visualization.edges.some((edge) => edge.label === 'CtD'));
+    assert.ok(visualization.edges.some((edge) => edge.label === 'CbG'));
+    assert.ok(visualization.edges.some((edge) => edge.label === 'CcSE'));
+    assert.equal(visualization.edges.some((edge) => edge.label === 'CrC'), false);
+    assert.equal(visualization.edges.some((edge) => edge.label === 'predicted graph relationships'), false);
+  });
+
+  it('payload metadata counts accepted and rejected candidates', () => {
+    const payload = buildExplainabilityPayload('query-2', ['Disease::DOID:10763'], [
+      candidateSet(),
+      candidateSet({
+        candidateSetId: 'candidate-set:rejected',
+        rank: 2,
+        status: 'rejected',
+        rejectionReasons: [{ type: 'hard_contraindication', message: 'blocked' }],
+        mlStatus: 'not_applied',
+        mlPrediction: { status: 'not_applied', pairs: [] },
+      }),
+    ]);
+
+    assert.equal(payload.metadata.acceptedCount, 1);
+    assert.equal(payload.metadata.rejectedCount, 1);
+    assert.match(payload.disclaimer, /separate evidence channels/);
   });
 });

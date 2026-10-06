@@ -20,6 +20,12 @@ Neo4j biomedical knowledge graph
 Graph-backed candidate generation / safety filtering / greedy set-cover baseline
 ```
 
+Traditional ML is built from DDInter severity labels plus PubChem, RDKit, and
+Hetionet tabular features. The finalized Random Forest pipeline predicts DDI
+severity. On the Sprint 5 integration branch, candidate-set drug pairs are
+scored only when the reviewed runtime bridge can build the frozen 55-feature
+row; otherwise prediction remains explicitly not applied.
+
 MySQL is used as the application/system data foundation. The biomedical knowledge graph is not duplicated into MySQL.
 
 ## Core Design Principles
@@ -27,8 +33,8 @@ MySQL is used as the application/system data foundation. The biomedical knowledg
 - Decision-support only: outputs are research candidates for expert review.
 - Deterministic safety rules remain independent from model scores.
 - Coverage is a knowledge-graph metric, not a clinical efficacy claim.
-- Evidence/provenance must be explicit for known graph relationships, rule outcomes, and future model outputs.
-- Future model scores must be labeled clearly as predictions and separated from graph evidence.
+- Evidence/provenance must be explicit for known graph relationships, rule outcomes, and model outputs.
+- Model scores must be labeled clearly as predictions and separated from graph evidence.
 
 ## Current Implementation Status
 
@@ -49,13 +55,37 @@ MySQL is used as the application/system data foundation. The biomedical knowledg
 - Sprint 4 compared the three approved traditional classifiers with clean,
   training-only five-fold cross-validation and selected
   `RandomForestClassifier` by mean Macro F1.
+- Sprint 5 Issue #40 completed the one-time final evaluation. Final test Macro
+  F1 is `0.524630`; the test split is not available for further tuning.
+- The complete preprocessing/classifier contract is frozen with model version,
+  artifact checksum, data hashes, environment versions, and evaluation report.
+- Sprint 5 Issue #41 added structured `graphEvidence.paths`, deterministic path
+  IDs, path-level provenance, and per-drug evidence path references.
 
-### Planned Next
+### Current Integration State
 
-- Sprint 5 final evaluation of `RandomForestClassifier` exactly once on the
-  untouched test set.
-- Save the selected preprocessing pipeline and model only after final evaluation.
-- Graph visualization.
+- Issue #42 serving is integrated on the temporary branch with checksum,
+  version, feature-schema, unavailable-model, and corrupt-artifact protections.
+- Candidate-set pair inference uses the same frozen 55-feature contract and
+  fails closed when a graph candidate pair cannot be deterministically bridged.
+- Issue #43 explainability consumes `graphEvidence.paths`, precomputed
+  deterministic rule state, and real ML prediction output without mixing the
+  channels.
+- Issue #39 remains pending final branch review and closeout before the Sprint
+  6 handoff.
+
+### Three Independent Result Channels
+
+1. Knowledge-graph evidence: represented `CtD`, gene-context, and side-effect
+   paths with source and graph-version provenance.
+2. Deterministic rules: accepted/rejected status and structured hard-rule
+   reasons.
+3. ML prediction: pair-level predicted DDInter severity, model version, and
+   inference metadata only when the frozen model actually runs.
+
+These channels must not be collapsed into a single safety score. Graph coverage
+is not clinical efficacy, and predicted severity is not a clinical safety
+determination.
 
 ## Data Reality and Current Limitations
 
@@ -71,9 +101,13 @@ MySQL is used as the application/system data foundation. The biomedical knowledg
   deterministic interpretable descriptors. Official PUG REST enrichment produced
   1,315 validated mappings and 67.818% distinct-drug structure coverage; missing
   coverage is explicit.
-- Current graph-backed candidates use `mlStatus: "not_applied"`.
-- Current predictive ML output remains inactive until the selected traditional
-  model is finally evaluated, persisted, and integrated in Sprint 5.
+- Current graph-backed candidates use `mlStatus: "applied"` only for successful
+  pair-level Random Forest inference; unsupported pairs remain
+  `mlStatus: "not_applied"`.
+- The selected model is finalized, evaluated, and served from the verified
+  joblib artifact without rerunning final evaluation.
+- The joblib pipeline is approximately 240 MB and intentionally ignored by Git;
+  its metadata and final evaluation report are tracked for reproducibility.
 - The optimizer is a greedy baseline, not a production-grade optimizer.
 
 ## Scope Boundaries
@@ -93,4 +127,5 @@ MySQL is used as the application/system data foundation. The biomedical knowledg
 - Dosage recommendations.
 - Clinical validation or regulatory approval.
 - Chemical stability/formulation guarantees.
-- Predictive DDI severity output until a trained model is validated and integrated.
+- Predictive DDI severity output for graph pairs that cannot be represented by
+  the frozen 55-feature contract.
