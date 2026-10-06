@@ -307,11 +307,12 @@ def test_index_html_loads_explainability_css():
     assert "explainability.css" in html
 
 
-def test_index_html_has_three_channel_legend():
-    """index.html must have visual markers for all three evidence channels."""
-    html = (FRONTEND_DIR / "index.html").read_text(encoding="utf-8")
-    assert "Graph Evidence"  in html
-    assert "Safety Rules"    in html or "ML Prediction" in html
+def test_dashboard_renderer_has_three_channel_legend():
+    """Dashboard-rendered evidence UI must name all three evidence channels."""
+    js = (FRONTEND_DIR / "app.js").read_text(encoding="utf-8")
+    assert "Graph Evidence" in js
+    assert "Deterministic Safety Rules" in js
+    assert "ML Prediction" in js
 
 
 def test_index_html_has_research_disclaimer():

@@ -180,9 +180,9 @@ function renderSummaryCards(response) {
   summaryCards.innerHTML = cards
     .map(
       (c) => `
-        <div class="card${c.highlight ? ' highlight' : ''}">
-          <div class="label">${escHtml(String(c.label))}</div>
-          <div class="value">${escHtml(String(c.value))}</div>
+        <div class="stat-card${c.highlight ? ' stat-accent' : ''}">
+          <div class="s-label">${escHtml(String(c.label))}</div>
+          <div class="s-value">${escHtml(String(c.value))}</div>
         </div>
       `,
     )
@@ -306,7 +306,7 @@ function buildMlStatusRow(mlStatus, candidate) {
           return `<div class="ml-result-line"><strong>${escHtml(pair.join(' ↔ ') || 'Drug pair')}</strong><span class="severity-badge severity-${escHtml(String(severity).toLowerCase())}">${escHtml(severity)}</span>${modelName ? `<small>${escHtml(modelName)}${version ? ` · ${escHtml(version)}` : ''}</small>` : ''}</div>`;
         }).join('')
       : '<span>ML applied; no pairwise severity details returned.</span>';
-    return `<div class="ml-not-applied-row ml-applied-row"><strong>ML prediction</strong><div>${summary}</div><small>Research prediction only; not a clinical safety determination.</small></div>`;
+    return `<div class="ml-applied-row"><strong>ML prediction</strong><div>${summary}</div><small>Research prediction only; not a clinical safety determination.</small></div>`;
   }
   const msg =
     mlStatus === 'unavailable'
@@ -328,7 +328,7 @@ async function loadExplainability(candidate, response) {
   explainability.innerHTML = '<div class="state-box" role="status"><div class="loader-ring" aria-hidden="true"></div><p>Loading evidence channels…</p></div>';
   try {
     const data = await window.PolyMergeExplainability.fetchStructured(lastQueryId);
-    const structured = (data.candidates ?? []).find((item) => item.rank === candidate.rank);
+    const structured = (data.candidateSets ?? []).find((item) => item.rank === candidate.rank);
     if (!structured) throw new Error('No explanation was returned for this candidate.');
     renderExplainability(candidate, response, structured);
   } catch (error) {
@@ -778,6 +778,7 @@ async function analyzeCombination() {
     setWorkflowComplete(mlStatus === 'applied');
     updateMlStatusNote(mlStatus);
     renderResults(data);
+    analyzeBtn.disabled = false;
 
     // Reset explainability prompt
     explainability.innerHTML = `
@@ -791,7 +792,6 @@ async function analyzeCombination() {
     showState('state-error');
     setStatusTag('Error', 'error');
     setWorkflowError();
-  } finally {
     analyzeBtn.disabled = selectedDiseases.size === 0;
   }
 }
