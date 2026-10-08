@@ -4,67 +4,84 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>PolyMerge Research Dashboard</title>
-    <link rel="stylesheet" href="/frontend/styles.css" />
-    <link rel="stylesheet" href="/frontend/explainability.css" />
+    <link rel="stylesheet" href="/frontend/styles.css?v=20261008-model-tab" />
+    <link rel="stylesheet" href="/frontend/explainability.css?v=20261008-model-tab" />
   </head>
   <body>
+    <aside class="sidebar" aria-label="Main navigation">
+      <a class="brand" href="#top" aria-label="PolyMerge home"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32"><rect x="10" y="4" width="12" height="24" rx="6" transform="rotate(31 16 16)" fill="#dcefe4"/></svg></span><strong>PolyMerge</strong></a>
+      <nav>
+        <a href="#disease-selection" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.2"/><path d="m15.4 15.4 4.2 4.2"/></svg><span>Disease Selection</span></a>
+        <a href="#workflow"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12h3l2.1-5.4 4.1 11 3.2-8 1.8 2.4H22"/></svg><span>Workflow</span></a>
+        <a href="#candidate-sets"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5.5" y="5" width="13" height="16" rx="2"/><path d="M9 5V3.8A1.8 1.8 0 0 1 10.8 2h2.4A1.8 1.8 0 0 1 15 3.8V5"/></svg><span>Candidates</span></a>
+        <a href="#explainability-panel"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.7 9a2.4 2.4 0 1 1 4.1 1.7c-1.1 1.1-1.8 1.5-1.8 3"/><path d="M12 17.2v.1"/></svg><span>Explainability</span></a>
+        <a href="#model-comparison"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V5m0 14h16"/><path d="m7 15 4-4 3 2 5-6"/></svg><span>Model Comparison</span></a>
+      </nav>
+      <a class="sidebar-help" href="#research-note" aria-label="Research use information"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4 21 20H3L12 4Z"/><path d="M12 9v5m0 2.5v.1"/></svg></a>
+      <button type="button" id="sidebar-toggle" class="sidebar-toggle" aria-label="Collapse navigation" aria-expanded="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14.5 6-6 6 6 6"/></svg></button>
+    </aside>
     <div class="page-shell">
-      <header class="topbar">
+      <header class="topbar" id="top">
         <div>
           <p class="eyebrow">PolyMerge</p>
-          <h1>Create Formulation Candidate</h1>
+          <h1>Research Dashboard</h1>
+          <p class="muted page-subtitle">Explore ranked candidate sets using traceable knowledge-graph evidence.</p>
         </div>
-        <div class="pill">Research decision-support only</div>
+        <div class="topbar-pills"><div class="pill warning-pill">△ Research use only · Not clinical guidance</div><div id="ml-tag" class="pill ml-pill">● ML predictions: not applied</div></div>
       </header>
 
       <main class="layout">
-        <section class="panel">
-          <h2>Disease Selection</h2>
+        <section class="panel selection-panel" id="disease-selection">
+          <div class="section-title"><span class="step-number">01</span><h2>Choose Target Diseases</h2><div id="catalog-tag" class="status-tag">Loading catalog</div></div>
           <p class="muted">Select the target disease cluster for research candidate generation.</p>
-
+          <label class="search-wrap"><span aria-hidden="true">⌕</span><input id="disease-search" type="search" placeholder="Search by disease name or ID" aria-label="Search diseases by name or ID" /></label>
+          <div id="catalog-message" class="catalog-message" hidden></div>
           <div id="disease-list" class="disease-list"></div>
-
-          <button id="analyze-btn" class="primary">Analyze Combination</button>
+          <p id="selection-count" class="selection-count" aria-live="polite">0 diseases selected</p>
+          <button id="analyze-btn" class="primary" disabled>▦ &nbsp; Search Candidate Sets</button>
         </section>
 
-        <section class="panel workflow-panel">
-          <h2>Analysis Workflow</h2>
+        <section class="panel workflow-panel" id="workflow" aria-label="Analysis workflow">
+          <div class="section-title"><span class="step-number">02</span><h2>Analysis Workflow</h2></div>
           <ol class="workflow">
-            <li class="done">Knowledge Graph Retrieval</li>
-            <li class="done">Candidate Drug Mapping</li>
-            <li class="active">ML DDI Prediction</li>
-            <li class="active">Safety Filtering</li>
-            <li class="active">Greedy Set-Cover Baseline</li>
-            <li class="active">Explainability</li>
+            <li>Knowledge graph retrieval</li>
+            <li>Drug mapping</li>
+            <li>Candidate ranking</li>
+            <li>Rule-based safety filter</li>
+            <li>Coverage optimization</li>
+            <li>ML interaction predictions</li>
+            <li>Evidence summary</li>
           </ol>
+          <div class="channel-pills"><span class="graph-label">Graph</span><span class="rules-label">Rules</span><span class="ml-label">ML</span></div>
         </section>
 
-        <section class="panel results-panel">
+        <section class="panel results-panel" id="candidate-sets">
           <div class="results-header">
-            <div>
-              <p class="eyebrow">Screen 3</p>
-              <h2>Polypill Candidates</h2>
-            </div>
-            <div id="status-tag" class="status-tag">Waiting</div>
+            <div class="section-title"><span class="step-number">03</span><h2>Candidate Sets</h2></div>
           </div>
 
           <div id="summary-cards" class="summary-cards"></div>
-          <div id="results" class="results-list"></div>
+          <div id="results" class="results-list"><div class="empty-state"><span class="empty-icon">▦</span><p>Choose one or more target diseases, then search to see ranked candidate sets.</p></div></div>
         </section>
 
-        <section class="panel explainability-panel">
+        <section class="panel explainability-panel" id="explainability-panel">
           <div class="results-header">
-            <div>
-              <p class="eyebrow">Screen 4</p>
-              <h2>Explainability</h2>
-            </div>
+            <div class="section-title"><span class="step-number">04</span><h2>Explainability</h2></div>
+            <div class="channel-pills"><span class="graph-label">▧ Graph</span><span class="rules-label">◉ Rules</span><span class="ml-label">● ML</span></div>
           </div>
-          <div id="explainability" class="explainability"></div>
+          <div id="explainability" class="explainability"><div class="empty-state"><span class="empty-icon">ⓘ</span><p>After a search, choose <strong>View explanation</strong> on a candidate to inspect its graph evidence, deterministic rules, and any ML predictions.</p></div></div>
+        </section>
+
+        <section class="panel comparison-panel" id="model-comparison">
+          <div class="section-title"><span class="step-number">05</span><h2>Model Comparison</h2></div>
+          <p class="muted">The preserved three-model comparison, read directly from the Sprint 4 report.</p>
+          <div id="model-comparison-content" class="comparison-content"><p class="state-message">Open this tab to load the comparison report…</p></div>
         </section>
       </main>
+      <footer class="research-note" id="research-note">Research predictions and graph coverage are informational outputs. They are not clinical recommendations or evidence of safety or efficacy.</footer>
     </div>
 
-    <script src="/frontend/explainability.js"></script>
-    <script src="/frontend/app.js"></script>
+    <script src="/frontend/explainability.js?v=20261008-model-tab"></script>
+    <script src="/frontend/app.js?v=20261008-model-tab"></script>
   </body>
 </html>

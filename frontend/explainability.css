@@ -438,3 +438,33 @@
     grid-template-columns: 70px 1fr 40px;
   }
 }
+
+.candidate-explanation { border-color: var(--line); box-shadow: none; }
+.candidate-header > div:first-child { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.candidate-header .status-badge { margin-left: auto; }
+.evidence-section { min-width: 0; overflow-wrap: anywhere; }
+.section-graph { border-left: 4px solid #2196f3; }
+.section-rules { border-left: 4px solid #d97706; background: #fffaf1; }
+.section-predictions { border-left: 4px solid #8b5bb5; background: #faf7fd; }
+.path-list li, .rule-item, .prediction-item { padding: 10px 12px; margin: 8px 0; border-radius: 8px; background: rgba(255,255,255,.82); overflow-wrap: anywhere; }
+.path-list li small, .rule-item small, .prediction-item small { display: block; margin-top: 6px; color: #586677; line-height: 1.45; }
+.relationship-arrow { color: #176a87; white-space: nowrap; }
+.graph-summary { display: flex; flex-wrap: wrap; gap: 8px 18px; }
+.provenance { color: #586677; overflow-wrap: anywhere; }
+.section-disclaimer { display: block; margin-top: 12px; color: #586677; line-height: 1.5; }
+.overall-disclaimer { margin-top: 18px; padding: 12px; background: #f6f8fa; border-radius: 8px; line-height: 1.5; }
+.graph-visualization { margin-top: 12px; padding: 12px; background: white; border: 1px solid #d9e2ec; border-radius: 8px; }
+.graph-path-list { display: grid; gap: 8px; margin: 10px 0; }
+.graph-path-row { display: grid; grid-template-columns: minmax(100px, 1fr) minmax(76px, auto) minmax(100px, 1fr); align-items: center; gap: 10px; }
+.graph-node { min-width: 0; padding: 10px 12px; border: 1px solid #cad8e2; border-radius: 10px; background: #f6fafc; color: #243746; font-weight: 600; text-align: center; overflow-wrap: anywhere; }
+.graph-node-drug { border-color: #a9c7b6; background: #edf6f0; }
+.graph-node-disease { border-color: #a9c7e2; background: #eef5fb; }
+.graph-node-gene { border-color: #c7b5da; background: #f5f0fa; }
+.graph-node-side_effect { border-color: #e5c39e; background: #fff7ed; }
+.graph-edge { display: flex; align-items: center; gap: 6px; color: #176a87; font-size: 12px; font-weight: 700; white-space: nowrap; }
+.graph-edge-label { padding: 4px 8px; border: 1px solid #c9dce5; border-radius: 999px; background: #f4fafc; }
+.graph-edge-arrow { font-size: 18px; }
+@media (max-width: 520px) { .graph-path-row { grid-template-columns: minmax(0, 1fr); gap: 4px; } .graph-edge { justify-content: center; } .graph-edge-arrow { transform: rotate(90deg); } }
+.predictions-unavailable { text-align: left; border-left-color: #8b5bb5; }
+.prediction-item > div { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.explanation-button { margin-top: 6px; }
