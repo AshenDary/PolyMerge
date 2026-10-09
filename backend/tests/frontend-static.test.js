@@ -19,6 +19,6 @@ test('frontend uses candidate-set search and canonical explainability endpoint',
 
   assert.match(app, /\/api\/candidate-sets\/search/);
   assert.match(app, /window\.PolyMergeExplainability\?\.loadExplainability/);
-  assert.match(explainability, /\/api\/candidate-sets\/\$\{queryId\}\/explain/);
-  assert.match(explainability, /ML predictions not available/);
+  assert.match(explainability, /\/api\/candidate-sets\/\$\{encodeURIComponent\(queryId\)\}\/explain/);
+  assert.match(explainability, /ML not applied \/ unavailable/);
 });

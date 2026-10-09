@@ -24,6 +24,53 @@ const ddiFeatureContract = JSON.parse(await fs.readFile(
 export const DDI_FEATURE_NAMES = Object.freeze([...ddiFeatureContract.features]);
 const DDI_CLASSES = new Set(ddiFeatureContract.classes);
 
+function parseMarkdownTable(report, headerText) {
+  const lines = report.split(/\r?\n/);
+  const headerIndex = lines.findIndex((line) => line.startsWith(headerText));
+  if (headerIndex < 0) return [];
+  const headers = lines[headerIndex].trim().replace(/^\||\|$/g, '').split('|').map((cell) => cell.trim());
+  const rows = [];
+  for (const line of lines.slice(headerIndex + 2)) {
+    if (!line.startsWith('|')) break;
+    const cells = line.trim().replace(/^\||\|$/g, '').split('|').map((cell) => cell.trim().replace(/`/g, ''));
+    rows.push(Object.fromEntries(headers.map((header, index) => [header, cells[index] ?? ''])));
+  }
+  return rows;
+}
+
+function extractMarkdownSection(report, heading, nextHeading) {
+  const startAt = report.indexOf(heading);
+  if (startAt < 0) return '';
+  const contentAt = report.indexOf('\n', startAt) + 1;
+  const endAt = nextHeading ? report.indexOf(nextHeading, contentAt) : -1;
+  return report.slice(contentAt, endAt < 0 ? report.length : endAt).trim();
+}
+
+export function createModelComparisonHandler(readReport = (reportPath) => fs.readFile(reportPath, 'utf8')) {
+  return async (request, reply) => {
+    try {
+      const reportPath = path.resolve(__dirname, '../../docs/sprint4-model-comparison.md');
+      const report = await readReport(reportPath);
+      const rows = parseMarkdownTable(report, '| Model | Mean Macro F1 |');
+      const parameters = parseMarkdownTable(report, '| Model | Fixed parameters |');
+      if (!rows.length || !parameters.length) {
+        return reply.code(503).send({ error: 'Model comparison report is incomplete' });
+      }
+      return {
+        rows,
+        parameters,
+        experiment: extractMarkdownSection(report, '## Experiment', '## Model Parameters'),
+        limitations: extractMarkdownSection(report, '## Limitations', '## Reproducibility'),
+        source: 'docs/sprint4-model-comparison.md',
+        disclaimer: 'Research classification results only. Not clinical validation or treatment guidance.',
+      };
+    } catch (error) {
+      request.log?.error?.({ error: error.message }, 'Unable to load model comparison report');
+      return reply.code(503).send({ error: 'Model comparison report is unavailable' });
+    }
+  };
+}
+
 const DRUGS = {
   lisinopril: {
     id: 'lisinopril',
@@ -544,6 +591,8 @@ app.get('/health/dependencies', async (request, reply) => {
     });
   }
 });
+
+app.get('/api/model-comparison', createModelComparisonHandler());
 
 app.get('/', async (_, reply) => {
   const html = await fs.readFile(path.join(__dirname, '../../frontend/index.html'), 'utf8');

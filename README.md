@@ -10,8 +10,8 @@ decisions.
 ## Current Architecture
 
 ```text
-Frontend
-  ↓
+Streamlit Frontend
+  ↓ HTTP API
 Fastify Backend
   ↓
 FastAPI ML/Graph Service
@@ -57,7 +57,7 @@ MySQL and Prisma are used for application/system data foundations. Neo4j remains
 - Greedy set-cover baseline that consumes graph-derived candidate-set coverage.
 - Candidate comparison structures that show each drug's contribution to candidate-set disease coverage.
 - Backend to ML/Graph service integration with request validation and dependency health checks.
-- Static frontend disease-selection workflow that loads diseases from the backend and sends stable disease IDs.
+- Streamlit frontend with separate disease selection, workflow, candidate, explainability, and model-comparison views.
 - Frozen Random Forest evaluation metadata, checksums, environment versions,
   and a reproducible preprocessing/classifier pipeline contract.
 
@@ -116,6 +116,24 @@ validated mappings and 67.818% structure coverage across distinct drugs.
   and graph-derived feature engineering.
 - Streamlit is the preferred academic deployment unless another framework is
   instructor-approved.
+
+## Streamlit frontend
+
+The Streamlit app hosts the complete existing frontend, including its design,
+sidebar navigation, disease search, candidate results, Explainability, and
+Model Comparison. The comparison tab reads the preserved Sprint 4 results
+directly from `docs/sprint4-model-comparison.md`; it does not regenerate metrics.
+
+Install its dependencies and run it from the repository root:
+
+```bash
+python -m pip install -r requirements-streamlit.txt
+streamlit run streamlit_app.py
+```
+
+The embedded frontend uses `http://127.0.0.1:3000` by default. Set
+`POLYMERGE_FRONTEND_URL` to override it, or set `POLYMERGE_API_URL` to provide
+the backend origin when both are served from the same host.
 
 If the ML/Graph service is unavailable or violates the response contract, the backend returns an explicitly labeled fallback:
 
