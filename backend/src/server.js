@@ -17,6 +17,10 @@ const PORT = Number(process.env.PORT) || 3000;
 const HOST = process.env.HOST || '0.0.0.0';
 const ML_SERVICE_URL = process.env.ML_SERVICE_URL || 'http://localhost:8000';
 const ML_SERVICE_TIMEOUT_MS = Number(process.env.ML_SERVICE_TIMEOUT_MS) || 15000;
+const ML_CATALOG_TIMEOUT_MS = Number(process.env.ML_CATALOG_TIMEOUT_MS) || ML_SERVICE_TIMEOUT_MS;
+const ML_HEALTH_TIMEOUT_MS = Number(process.env.ML_HEALTH_TIMEOUT_MS) || Math.min(ML_SERVICE_TIMEOUT_MS, 5000);
+const ML_CANDIDATE_TIMEOUT_MS = Number(process.env.ML_CANDIDATE_TIMEOUT_MS)
+  || Math.max(ML_SERVICE_TIMEOUT_MS, 120000);
 const ddiFeatureContract = JSON.parse(await fs.readFile(
   path.resolve(__dirname, '../../data/interim/sprint4/feature_contract.json'),
   'utf8',
@@ -402,7 +406,7 @@ function validateDiseaseCatalog(payload) {
 async function fetchDiseaseCatalog(options = {}) {
   const fetchImpl = options.fetchImpl ?? fetch;
   const mlServiceUrl = options.mlServiceUrl ?? ML_SERVICE_URL;
-  const timeoutMs = options.timeoutMs ?? ML_SERVICE_TIMEOUT_MS;
+  const timeoutMs = options.timeoutMs ?? ML_CATALOG_TIMEOUT_MS;
   const response = await fetchImpl(`${mlServiceUrl}/api/diseases`, {
     signal: AbortSignal.timeout(timeoutMs),
   });
@@ -518,7 +522,7 @@ export function validateCandidateSetResult(payload) {
 async function fetchMlResult(diseases, optimizationConfig = {}, options = {}) {
   const fetchImpl = options.fetchImpl ?? fetch;
   const mlServiceUrl = options.mlServiceUrl ?? ML_SERVICE_URL;
-  const timeoutMs = options.timeoutMs ?? ML_SERVICE_TIMEOUT_MS;
+  const timeoutMs = options.timeoutMs ?? ML_CANDIDATE_TIMEOUT_MS;
   try {
     const response = await fetchImpl(`${mlServiceUrl}/predict/combination`, {
       method: 'POST',
@@ -546,7 +550,7 @@ async function fetchCandidateSetResult(
 ) {
   const fetchImpl = options.fetchImpl ?? fetch;
   const mlServiceUrl = options.mlServiceUrl ?? ML_SERVICE_URL;
-  const timeoutMs = options.timeoutMs ?? ML_SERVICE_TIMEOUT_MS;
+  const timeoutMs = options.timeoutMs ?? ML_CANDIDATE_TIMEOUT_MS;
   try {
     const response = await fetchImpl(`${mlServiceUrl}/predict/candidate-sets`, {
       method: 'POST',
@@ -575,7 +579,7 @@ app.get('/health', async () => ({ status: 'ok', service: 'polymerge-backend' }))
 app.get('/health/dependencies', async (request, reply) => {
   try {
     const response = await fetch(`${ML_SERVICE_URL}/health`, {
-      signal: AbortSignal.timeout(ML_SERVICE_TIMEOUT_MS),
+      signal: AbortSignal.timeout(ML_HEALTH_TIMEOUT_MS),
     });
     const payload = await response.json();
     if (!response.ok || payload?.status !== 'ok') {
@@ -613,6 +617,20 @@ app.get('/frontend/:file', async (request, reply) => {
       '.html': 'text/html',
     };
     return reply.type(types[extension] || 'text/plain').send(contents);
+  } catch {
+    return reply.code(404).send({ error: 'File not found' });
+  }
+});
+
+app.get('/docs/figures/sprint3/:file', async (request, reply) => {
+  const safeFile = path.basename(request.params.file);
+  if (!safeFile.endsWith('.svg')) {
+    return reply.code(404).send({ error: 'File not found' });
+  }
+  const filePath = path.join(__dirname, '../../docs/figures/sprint3', safeFile);
+  try {
+    const contents = await fs.readFile(filePath, 'utf8');
+    return reply.type('image/svg+xml').send(contents);
   } catch {
     return reply.code(404).send({ error: 'File not found' });
   }

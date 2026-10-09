@@ -40,7 +40,7 @@ function renderRulesContent(rules) {
 
 function renderPredictionsContent(content) {
   if (!content || content.status !== 'available' || !content.pairs?.length) {
-    return `<div class="predictions-unavailable"><strong>ML not applied / unavailable</strong>
+    return `<div class="predictions-unavailable"><strong>Interaction prediction unavailable</strong>
       <p>${escapeExplanation(content?.message ?? 'No research prediction was returned for this candidate.')}</p>
       <small>This is not a clinical recommendation. No severity has been inferred.</small></div>`;
   }
@@ -55,7 +55,7 @@ function renderCandidateExplanation(explanation, container) {
   const sections = explanation.sections ?? [];
   const renderers = { graph: renderGraphContent, rules: renderRulesContent, predictions: renderPredictionsContent };
   const sectionMarkup = sections.map((section) => `<section class="evidence-section section-${escapeExplanation(section.type)}">
-    <h4>${section.type === 'rules' ? 'Deterministic Rules' : section.type === 'predictions' ? 'ML Prediction' : escapeExplanation(section.title)}</h4>
+      <h4>${section.type === 'rules' ? 'Deterministic Rules' : section.type === 'predictions' ? 'Interaction Prediction' : escapeExplanation(section.title)}</h4>
     <div>${(renderers[section.type] ?? (() => '<p>Section unavailable.</p>'))(section.content)}</div>
     ${section.disclaimer ? `<small class="section-disclaimer">${escapeExplanation(section.disclaimer)}</small>` : ''}
   </section>`).join('');
@@ -64,7 +64,7 @@ function renderCandidateExplanation(explanation, container) {
     <strong>Candidate explanation</strong><span class="status-badge status-${explanation.status === 'rejected' ? 'rejected' : 'accepted'}">${escapeExplanation(explanation.status)}</span></div>
     <div class="drug-list">${(explanation.drugs ?? []).map((drug) => `<code>${escapeExplanation(drug)}</code>`).join('')}</div></header>
     <div class="evidence-sections">${sectionMarkup}</div>
-    <p class="overall-disclaimer">${escapeExplanation(explanation.overallDisclaimer ?? 'Research use only.')}</p>
+    <p class="overall-disclaimer">${escapeExplanation(explanation.overallDisclaimer ?? 'PolyMerge is a research decision-support prototype and does not provide clinical recommendations.')}</p>
   </article>`;
   const button = container.querySelector('[data-visualization]');
   button.addEventListener('click', async () => {

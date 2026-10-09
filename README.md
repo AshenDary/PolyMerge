@@ -57,7 +57,10 @@ MySQL and Prisma are used for application/system data foundations. Neo4j remains
 - Greedy set-cover baseline that consumes graph-derived candidate-set coverage.
 - Candidate comparison structures that show each drug's contribution to candidate-set disease coverage.
 - Backend to ML/Graph service integration with request validation and dependency health checks.
-- Streamlit frontend with separate disease selection, workflow, candidate, explainability, and model-comparison views.
+- Static frontend with Home, Simulation, Explainability, and Model Analysis
+  views. The Simulation view keeps disease selection, workflow visualization,
+  candidate results, candidate-level graph evidence, deterministic rules, and
+  ML prediction state in one demo flow.
 - Frozen Random Forest evaluation metadata, checksums, environment versions,
   and a reproducible preprocessing/classifier pipeline contract.
 
@@ -120,9 +123,9 @@ validated mappings and 67.818% structure coverage across distinct drugs.
 ## Streamlit frontend
 
 The Streamlit app hosts the complete existing frontend, including its design,
-sidebar navigation, disease search, candidate results, Explainability, and
-Model Comparison. The comparison tab reads the preserved Sprint 4 results
-directly from `docs/sprint4-model-comparison.md`; it does not regenerate metrics.
+sidebar navigation, Home, Simulation, candidate results, Explainability, and
+Model Analysis. Model Analysis reads preserved Sprint 4/Sprint 5 results and
+tracked Sprint 3 EDA figures; it does not regenerate metrics.
 
 Install its dependencies and run it from the repository root:
 
@@ -131,9 +134,33 @@ python -m pip install -r requirements-streamlit.txt
 streamlit run streamlit_app.py
 ```
 
+LOCAL STREAMLIT DEMO is supported when the Fastify frontend is running locally.
 The embedded frontend uses `http://127.0.0.1:3000` by default. Set
 `POLYMERGE_FRONTEND_URL` to override it, or set `POLYMERGE_API_URL` to provide
 the backend origin when both are served from the same host.
+
+REMOTE STREAMLIT requires `POLYMERGE_FRONTEND_URL` to point to a public HTTPS
+frontend. A remote Streamlit deployment cannot automatically reach a user's
+local `127.0.0.1` Fastify process.
+
+## Frontend demo flow
+
+Open the Fastify frontend at `http://127.0.0.1:3000`.
+
+1. Start on Home and choose **Start Simulation**.
+2. Search for `hypertension` and select `Disease::DOID:10763`.
+3. Clear the search; the full catalog returns while the selected disease stays
+   selected.
+4. Search for `type 2 diabetes mellitus` and select `Disease::DOID:9352`.
+5. Run **Search Candidate Sets** and wait for the synchronous research pipeline.
+   Local graph retrieval, candidate generation, optimization, and ML analysis
+   may take about a minute.
+6. Inspect the workflow summaries, candidate cards, and an ML-applied candidate
+   when present.
+7. Open Explainability for the selected candidate to review graph paths,
+   deterministic rules, ML state, and the graph visualization.
+8. Open Model Analysis to review preserved validation metrics, final selected
+   model metrics, limitations, and tracked Sprint 3 EDA figures.
 
 If the ML/Graph service is unavailable or violates the response contract, the backend returns an explicitly labeled fallback:
 
@@ -214,6 +241,18 @@ npx prisma migrate dev
 npm run dev
 ```
 
+The backend uses separate ML/Graph request budgets:
+
+- `ML_CATALOG_TIMEOUT_MS` for disease catalog loading.
+- `ML_HEALTH_TIMEOUT_MS` for dependency health checks.
+- `ML_CANDIDATE_TIMEOUT_MS` for long-running candidate generation.
+
+`ML_SERVICE_TIMEOUT_MS` remains the default for other ML requests and as a
+fallback for the more specific values. Candidate generation should not use the
+short catalog/health timeout because the two-disease local demo can take about
+55-70 seconds and may take longer if another request is already using the local
+ML/Graph worker.
+
 ML/Graph service:
 
 ```bash
@@ -237,9 +276,9 @@ curl http://localhost:8000/api/diseases
 Example graph-backed candidate request:
 
 ```bash
-curl -X POST http://localhost:3000/api/combinations/search \
+curl -X POST http://localhost:3000/api/candidate-sets/search \
   -H "Content-Type: application/json" \
-  -d '{"diseases":["Disease::DOID:10763","Disease::DOID:9352"]}'
+  -d '{"diseaseIds":["Disease::DOID:10763","Disease::DOID:9352"]}'
 ```
 
 ## Tests

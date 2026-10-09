@@ -54,3 +54,14 @@ test('model comparison endpoint reports an unavailable source report as 503', as
     await testApp.close();
   }
 });
+
+test('tracked Sprint 3 EDA figures are served for Model Analysis', async () => {
+  const response = await app.inject({
+    method: 'GET',
+    url: '/docs/figures/sprint3/severity_distribution.svg',
+  });
+
+  assert.equal(response.statusCode, 200);
+  assert.equal(response.headers['content-type'], 'image/svg+xml');
+  assert.match(response.body, /<svg/);
+});
