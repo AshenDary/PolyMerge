@@ -124,7 +124,11 @@ test('frontend exposes Home, Simulation, Explainability, and Model Analysis navi
   assert.match(html, /href="#explainability-panel"/);
   assert.match(html, /href="#model-analysis"/);
   assert.match(html, /Start Simulation/);
-  assert.match(html, /Research Disclaimer/);
+  assert.match(html, /Analysis Pipeline/);
+  assert.doesNotMatch(html, /topbar-pills/);
+  assert.doesNotMatch(html, /ml-tag/);
+  assert.doesNotMatch(html, /Research use only/);
+  assert.doesNotMatch(html, /Agent-assisted/);
 });
 
 test('frontend uses canonical candidate-set APIs and timeout/error copy', () => {
@@ -159,12 +163,32 @@ test('workflow summary is derived from real candidate response data', () => {
   const stages = logic.computeWorkflowStages(candidateResponse, 'candidate-set:rejected-ml');
 
   assert.equal(stages.find((stage) => stage.key === 'graph').status, 'complete');
-  assert.match(stages.find((stage) => stage.key === 'graph').summary, /3 represented evidence paths/);
-  assert.match(stages.find((stage) => stage.key === 'mapping').summary, /2 unique compounds/);
-  assert.match(stages.find((stage) => stage.key === 'rules').summary, /1 accepted; 1 rejected/);
+  assert.match(stages.find((stage) => stage.key === 'graph').summary, /3 evidence paths/);
+  assert.match(stages.find((stage) => stage.key === 'mapping').summary, /2 compounds/);
+  assert.match(stages.find((stage) => stage.key === 'rules').summary, /1 accepted · 1 rejected/);
   assert.equal(stages.find((stage) => stage.key === 'ml').status, 'partial');
-  assert.match(stages.find((stage) => stage.key === 'ml').summary, /1 \/ 2 candidates/);
-  assert.match(stages.find((stage) => stage.key === 'evidence').summary, /2 graph paths, 1 rejection reasons, 1 ML pairs/);
+  assert.match(stages.find((stage) => stage.key === 'ml').summary, /1 of 2 candidates/);
+  assert.match(stages.find((stage) => stage.key === 'evidence').summary, /2 graph paths · 1 rejection reasons · 1 drug-pair prediction/);
+  assert.equal(logic.humanStatus('not_applied'), 'Not applied');
+  assert.equal(logic.humanStatus('not_applicable'), 'Not applicable');
+});
+
+test('single-drug interaction prediction is presented as not applicable', () => {
+  const logic = loadFrontendLogic();
+  const oneDrug = {
+    ...candidateResponse,
+    diseaseIds: ['Disease::DOID:10763'],
+    diseases: [{ id: 'Disease::DOID:10763', name: 'hypertension' }],
+    candidateSets: [candidateResponse.candidateSets[0]],
+  };
+  const stages = logic.computeWorkflowStages(oneDrug, 'candidate-set:accepted');
+  const mlStage = stages.find((stage) => stage.key === 'ml');
+  const presentation = logic.candidateMlPresentation(candidateResponse.candidateSets[0]);
+
+  assert.equal(mlStage.status, 'not_applicable');
+  assert.match(mlStage.summary, /Single-drug candidate; no drug pair to classify/);
+  assert.equal(presentation.label, 'Not applicable');
+  assert.match(presentation.detail, /one drug/);
 });
 
 test('graph rendering contract allows supported relationships and excludes CrC', () => {
@@ -179,6 +203,7 @@ test('graph rendering contract allows supported relationships and excludes CrC',
 
 test('frontend presents mixed ML state without combined safety score', () => {
   const app = readFileSync(path.join(frontendDir, 'app.js'), 'utf8');
+  const html = readFileSync(path.join(frontendDir, 'index.html'), 'utf8');
   const logic = loadFrontendLogic();
 
   assert.deepEqual(JSON.parse(JSON.stringify(logic.mlSummary(candidateResponse.candidateSets))), {
@@ -187,7 +212,9 @@ test('frontend presents mixed ML state without combined safety score', () => {
     pairCount: 1,
     total: 2,
   });
-  assert.match(app, /ML predictions: \$\{ml\.applied\} \/ \$\{ml\.total\} candidates applied/);
+  assert.match(app, /\$\{ml\.applied\} of \$\{ml\.total\} candidates include drug-pair predictions/);
+  assert.doesNotMatch(app, /getElementById\('ml-tag'\)/);
+  assert.doesNotMatch(html, /ml-tag/);
   assert.doesNotMatch(app, /safetyScore/);
   assert.doesNotMatch(app, /combined safety score/i);
 });
@@ -202,5 +229,18 @@ test('Model Analysis references preserved Sprint 3 EDA assets and fixed metric l
   assert.match(app, /pair_structure_coverage\.svg/);
   assert.match(app, /hetionet_mapping_coverage\.svg/);
   assert.match(app, /feature_missingness\.svg/);
+  assert.match(app, /data-analysis-tab/);
+  assert.match(app, /Selected model: Random Forest/);
   assert.doesNotMatch(app, /best hyperparameters/i);
+});
+
+test('polished frontend copy avoids raw status and generic AI wording in visible markup', () => {
+  const html = readFileSync(path.join(frontendDir, 'index.html'), 'utf8');
+  const app = readFileSync(path.join(frontendDir, 'app.js'), 'utf8');
+
+  assert.doesNotMatch(html, /AI-powered|revolutionary|powerful insights|unlock|transform|Agent-assisted/i);
+  assert.doesNotMatch(html, />[^<]*not_applied[^<]*</);
+  assert.match(app, /humanStatus\(stage\.status\)/);
+  assert.match(app, /Interaction Prediction/);
+  assert.match(app, /Configured rule check/);
 });
