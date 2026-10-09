@@ -41,11 +41,7 @@
         <div>
           <p class="eyebrow">PolyMerge</p>
           <h1 id="page-title">Research Dashboard</h1>
-          <p class="muted page-subtitle">Knowledge graph evidence, deterministic rules, candidate optimization, and research DDI predictions.</p>
-        </div>
-        <div class="topbar-pills">
-          <div class="pill warning-pill">Research use only · Not clinical guidance</div>
-          <div id="ml-tag" class="pill ml-pill">ML predictions: waiting for analysis</div>
+          <p class="muted page-subtitle">Research decision support for multi-disease candidate analysis.</p>
         </div>
       </header>
 
@@ -53,36 +49,38 @@
         <section class="view home-view" id="home">
           <div class="home-hero">
             <div>
-              <p class="eyebrow">Agent-assisted polypill research</p>
+              <p class="eyebrow">Biomedical candidate exploration</p>
               <h2>PolyMerge</h2>
-              <p class="hero-copy">PolyMerge helps researchers inspect multi-disease treatment candidates across knowledge-graph evidence, deterministic safety rules, optimization output, and traditional ML interaction severity predictions.</p>
+              <p class="hero-copy">Multi-disease candidate exploration using knowledge graphs and traditional machine learning.</p>
+              <p class="hero-support">PolyMerge brings graph evidence, deterministic rules, candidate optimization, and drug-pair interaction predictions into one research workflow.</p>
               <div class="home-actions">
                 <button type="button" class="primary" id="start-simulation">Start Simulation</button>
-                <a class="secondary-link" href="#model-analysis">Review Model Analysis</a>
+                <a class="secondary-link" href="#model-analysis">View Model Analysis</a>
               </div>
             </div>
-            <div class="research-map" aria-label="PolyMerge evidence flow">
-              <span>Diseases</span><span>Knowledge Graph</span><span>Drug Mapping</span><span>Rules</span><span>Optimization</span><span>ML DDI</span><span>Evidence Summary</span>
+            <div class="research-map" aria-label="PolyMerge workflow">
+              <span>Diseases</span><span>Graph evidence</span><span>Candidate analysis</span><span>Interaction model</span><span>Explanation</span>
             </div>
           </div>
           <div class="home-grid">
             <section>
-              <h3>Problem</h3>
-              <p>Multi-disease treatment research involves many candidate drugs, interactions, and evidence sources that are difficult to inspect together.</p>
+              <h3>Knowledge graph</h3>
+              <p>Represented treatment, gene, and side-effect relationships.</p>
             </section>
             <section>
-              <h3>Purpose</h3>
-              <p>PolyMerge combines knowledge graph evidence, traditional ML DDI severity prediction, deterministic safety rules, candidate generation, optimization, and explainability.</p>
+              <h3>Candidate analysis</h3>
+              <p>Generate and rank candidate drug sets for selected diseases.</p>
             </section>
             <section>
-              <h3>Target User</h3>
-              <p>Researchers, pharmacists, and academic reviewers who need traceable research decision support.</p>
+              <h3>Interaction model</h3>
+              <p>Classify supported drug pairs as Major, Moderate, or Minor.</p>
             </section>
-            <section class="disclaimer-box">
-              <h3>Research Disclaimer</h3>
-              <p>PolyMerge does not provide prescriptions, dosage recommendations, clinical safety guarantees, or clinical efficacy guarantees.</p>
+            <section>
+              <h3>Explainability</h3>
+              <p>Inspect the evidence behind each candidate result.</p>
             </section>
           </div>
+          <p class="home-disclaimer">PolyMerge is a research decision-support prototype and does not provide clinical recommendations.</p>
         </section>
 
         <section class="view simulation-view" id="simulation">
@@ -113,7 +111,7 @@
             <section class="panel workflow-panel" id="workflow" aria-label="Analysis workflow">
               <div class="section-title">
                 <span class="step-number">02</span>
-                <h2>Workflow Visualization</h2>
+                <h2>Analysis Pipeline</h2>
               </div>
               <div id="analysis-running" class="analysis-running" hidden>
                 <strong>Analysis running...</strong>
@@ -144,7 +142,7 @@
               <span class="step-number">04</span>
               <h2>Explainability</h2>
             </div>
-            <div class="channel-pills"><span class="graph-label">Graph</span><span class="rules-label">Rules</span><span class="ml-label">ML</span></div>
+            <div class="channel-pills"><span class="graph-label">Graph evidence</span><span class="rules-label">Rules</span><span class="ml-label">Interaction prediction</span></div>
           </div>
           <div id="explainability" class="explainability">
             <div class="empty-state"><span class="empty-icon">ⓘ</span><p>Run a simulation and choose a candidate to inspect its graph evidence, deterministic rules, ML prediction state, and knowledge graph visualization.</p></div>
@@ -162,7 +160,7 @@
         </section>
       </main>
 
-      <footer class="research-note" id="research-note">Research outputs are informational. They are not clinical recommendations or evidence of safety or efficacy.</footer>
+      <footer class="research-note" id="research-note">PolyMerge is a research decision-support prototype and does not provide clinical recommendations.</footer>
     </div>
 
     <script src="/frontend/explainability.js?v=20261010-flow-repair"></script>
