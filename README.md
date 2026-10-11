@@ -149,18 +149,28 @@ Open the Fastify frontend at `http://127.0.0.1:3000`.
 
 1. Start on Home and choose **Start Simulation**.
 2. Search for `hypertension` and select `Disease::DOID:10763`.
-3. Clear the search; the full catalog returns while the selected disease stays
-   selected.
-4. Search for `type 2 diabetes mellitus` and select `Disease::DOID:9352`.
-5. Run **Search Candidate Sets** and wait for the synchronous research pipeline.
-   Local graph retrieval, candidate generation, optimization, and ML analysis
-   may take about a minute.
-6. Inspect the workflow summaries, candidate cards, and an ML-applied candidate
-   when present.
-7. Open Explainability for the selected candidate to review graph paths,
-   deterministic rules, ML state, and the graph visualization.
-8. Open Model Analysis to review preserved validation metrics, final selected
-   model metrics, limitations, and tracked Sprint 3 EDA figures.
+3. Run **Search Candidate Sets** and wait for the synchronous analysis. No live
+   stage completion is inferred while the request is running.
+4. Read **Your analysis**, **Analysis Summary**, then **Analysis Pipeline**.
+   Counts describe returned candidates, not all combinations considered. Graph
+   paths are deduplicated; pair predictions count occurrences across candidates.
+5. In **Candidate Results**, choose a single-drug result and confirm interaction
+   prediction is **Not applicable**. Select **Inspect candidate**.
+6. In Explainability, read **Why this candidate?** and expand **Why this rank?**.
+   Generation ranks by rule status, graph coverage, fewer drugs, then candidate
+   ID. Backend validation can add rejections without reranking. ML is separate.
+7. Review the graph legend, configured rules, and interaction prediction.
+   Stable IDs, provenance, and model details are available in expandable sections.
+8. Return to Simulation, clear the disease search, and add
+   `type 2 diabetes mellitus` (`Disease::DOID:9352`). Run the two-disease analysis.
+9. Inspect the transformation counts and select an ML-applied candidate. Its
+   severity, graph evidence, and rule details update from the existing response.
+10. Open Model Analysis and review EDA interpretations, preserved comparison
+    metrics, final model results, and limitations.
+
+Demo sequence: Home → Simulation → Disease Selection → Analysis Summary →
+Analysis Pipeline → Candidate Results → Inspect Candidate → Explainability →
+Model Analysis. Sprint 6 remains pending manual presentation review.
 
 If the ML/Graph service is unavailable or violates the response contract, the backend returns an explicitly labeled fallback:
 
