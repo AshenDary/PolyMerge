@@ -24,7 +24,7 @@ function loadFrontendLogic() {
   };
   context.globalThis = context;
   vm.runInNewContext(appSource, context);
-  return context.PolyMergeFrontend;
+  return Object.assign(context.PolyMergeFrontend, { context });
 }
 
 const candidateResponse = {
@@ -164,11 +164,11 @@ test('workflow summary is derived from real candidate response data', () => {
 
   assert.equal(stages.find((stage) => stage.key === 'graph').status, 'complete');
   assert.match(stages.find((stage) => stage.key === 'graph').summary, /3 evidence paths/);
-  assert.match(stages.find((stage) => stage.key === 'mapping').summary, /2 compounds/);
-  assert.match(stages.find((stage) => stage.key === 'rules').summary, /1 accepted · 1 rejected/);
+  assert.match(stages.find((stage) => stage.key === 'mapping').summary, /2 mapped drugs/);
+  assert.match(stages.find((stage) => stage.key === 'rules').summary, /1 passed · 1 rejected/);
   assert.equal(stages.find((stage) => stage.key === 'ml').status, 'partial');
   assert.match(stages.find((stage) => stage.key === 'ml').summary, /1 of 2 candidates/);
-  assert.match(stages.find((stage) => stage.key === 'evidence').summary, /2 graph paths · 1 rejection reasons · 1 drug-pair prediction/);
+  assert.match(stages.find((stage) => stage.key === 'evidence').summary, /2 represented paths · Configured rules: Rejected · Interaction prediction: Moderate/);
   assert.equal(logic.humanStatus('not_applied'), 'Not applied');
   assert.equal(logic.humanStatus('not_applicable'), 'Not applicable');
 });
@@ -243,4 +243,113 @@ test('polished frontend copy avoids raw status and generic AI wording in visible
   assert.match(app, /humanStatus\(stage\.status\)/);
   assert.match(app, /Interaction Prediction/);
   assert.match(app, /Configured rule check/);
+});
+
+function attachDocument(logic) {
+  const elements = new Map();
+  logic.context.document = {
+    getElementById(id) {
+      if (!elements.has(id)) elements.set(id, { innerHTML: '', hidden: true, querySelectorAll: () => [] });
+      return elements.get(id);
+    },
+  };
+  return elements;
+}
+
+test('analysis summary renders response disease names, IDs and actual counts', () => {
+  const logic = loadFrontendLogic();
+  const elements = attachDocument(logic);
+  logic.renderSummary(candidateResponse);
+  assert.equal(elements.get('analysis-summary').hidden, false);
+  assert.match(elements.get('your-analysis').innerHTML, /hypertension/);
+  assert.match(elements.get('your-analysis').innerHTML, /Disease::DOID:9352/);
+  assert.deepEqual(JSON.parse(JSON.stringify(logic.analysisMetrics(candidateResponse))).map((metric) => metric[1]), [2, 2, 2, 1, 1, 1]);
+  assert.match(elements.get('summary-cards').innerHTML, /Returned candidate sets/);
+  assert.match(elements.get('summary-cards').innerHTML, /Pair predictions across results/);
+});
+
+test('returned evidence is deduplicated and no live stage completion is invented', () => {
+  const logic = loadFrontendLogic();
+  const repeated = { ...candidateResponse, candidateSets: [candidateResponse.candidateSets[0], candidateResponse.candidateSets[0]] };
+  assert.match(logic.computeWorkflowStages(repeated)[0].summary, /1 evidence path/);
+  const running = logic.computeWorkflowStages(null, null, true);
+  assert.ok(running.every((stage) => stage.status === 'pending' && stage.summary.includes('after the response')));
+  const stages = logic.computeWorkflowStages(candidateResponse);
+  assert.match(stages.find((stage) => stage.key === 'ranking').detail, /returned list may be capped/);
+  assert.match(stages.find((stage) => stage.key === 'optimization').detail, /Interaction severity does not determine this rank/);
+  assert.match(stages.find((stage) => stage.key === 'graph').detail, /Hetionet/);
+  assert.match(stages.find((stage) => stage.key === 'mapping').detail, /compound-to-disease/);
+});
+
+test('candidate narrative uses real treatment paths and escapes external values', () => {
+  const logic = loadFrontendLogic();
+  const candidate = { ...candidateResponse.candidateSets[0], drugNames: ['<script>bad</script>'] };
+  const narrative = logic.candidateNarrative(candidate, candidateResponse);
+  assert.match(narrative, /Why this candidate\?/);
+  assert.match(narrative, /Why this rank\?/);
+  assert.match(narrative, /Valsartan → hypertension/);
+  assert.match(narrative, /&lt;script&gt;bad/);
+  assert.doesNotMatch(narrative, /<script>/);
+  assert.match(narrative, /Not applicable/);
+  assert.equal(logic.candidateMlPresentation(candidateResponse.candidateSets[1]).label, 'Moderate');
+  assert.equal(logic.candidateMlPresentation({ drugs: ['a', 'b'], mlStatus: 'applied', mlPrediction: { pairs: [] } }).label, 'Not available');
+  assert.equal(logic.candidateMlPresentation({}).label, 'Not available');
+});
+
+test('selection refreshes card highlight, evidence summary and candidate explanation locally', () => {
+  const logic = loadFrontendLogic();
+  const elements = attachDocument(logic);
+  logic.state.currentResult = candidateResponse;
+  logic.selectCandidate('candidate-set:accepted');
+  assert.match(elements.get('explainability').innerHTML, /Why this candidate/);
+  assert.match(elements.get('workflow-list').innerHTML, /Interaction prediction: Not applicable/);
+  logic.selectCandidate('candidate-set:rejected-ml');
+  assert.match(elements.get('workflow-list').innerHTML, /Interaction prediction: Moderate/);
+  assert.match(elements.get('explainability').innerHTML, /Configured blocked pair/);
+  assert.match(elements.get('explainability').innerHTML, /RandomForestClassifier-sprint5-v1/);
+  assert.match(elements.get('results').innerHTML, /data-candidate-id="candidate-set:rejected-ml" aria-pressed="true"/);
+});
+
+test('graph legend and secondary technical detail preserve evidence semantics', () => {
+  const logic = loadFrontendLogic();
+  const graph = logic.renderGraphVisualization(candidateResponse.candidateSets[0]);
+  for (const relation of ['CtD', 'CbG', 'CuG', 'CdG', 'CcSE']) assert.ok(graph.includes(relation));
+  assert.doesNotMatch(graph, /CrC/);
+  const elements = attachDocument(logic);
+  logic.renderSelectedCandidate(candidateResponse.candidateSets[0], candidateResponse);
+  const html = elements.get('explainability').innerHTML;
+  assert.match(html, /<details class="technical-details"><summary>Technical graph details/);
+  assert.match(html, /<details class="technical-details"><summary>Candidate metadata/);
+  assert.match(html, /How to read this result/);
+  assert.doesNotMatch(html, /safety score/i);
+});
+
+test('Model Analysis interprets preserved visuals without new evaluation', () => {
+  const app = readFileSync(path.join(frontendDir, 'app.js'), 'utf8');
+  for (const phrase of ['reviewed structure mapping', 'explicit missingness', 'Macro F1 is the primary metric', 'highest mean validation Macro F1', 'evaluated once after model selection']) assert.ok(app.includes(phrase));
+});
+
+test('missing and unavailable evidence does not become a passed rule or applied prediction', () => {
+  const logic = loadFrontendLogic();
+  const empty = { diseaseIds: ['d'], candidateSets: [] };
+  assert.equal(logic.computeWorkflowStages(empty).find((stage) => stage.key === 'rules').status, 'unavailable');
+  const partial = { drugs: ['a', 'b'], mlStatus: 'applied', mlPrediction: { pairs: [{ inferenceStatus: 'unavailable', predictedSeverity: null }] } };
+  assert.equal(logic.mlSummary([partial]).applied, 0);
+  assert.equal(logic.mlSummary([partial]).pairCount, 0);
+  assert.equal(logic.candidateMlPresentation(partial).label, 'Not available');
+  assert.match(logic.candidateNarrative(partial, empty), /Configured rule check<\/dt><dd>Not available/);
+});
+
+test('graph diagram prioritizes treatment paths and escapes node names and metadata', () => {
+  const logic = loadFrontendLogic();
+  const candidate = { graphEvidence: { paths: [
+    ...candidateResponse.candidateSets[1].graphEvidence.paths,
+    { ...candidateResponse.candidateSets[0].graphEvidence.paths[0], sourceEntity: { id: 'a', name: '<img src=x onerror=alert(1)>' }, pathId: '\" onmouseover=alert(1)' },
+  ] } };
+  const html = logic.renderGraphVisualization(candidate);
+  assert.ok(html.indexOf('node-disease') < html.indexOf('node-gene'));
+  assert.match(html, /&lt;img/);
+  assert.match(html, /&quot; onmouseover/);
+  assert.doesNotMatch(html, /<img/);
+  assert.equal((html.match(/class="evidence-edge"/g) ?? []).length, 3);
 });
