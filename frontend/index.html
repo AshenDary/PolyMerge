@@ -108,6 +108,12 @@
               <button id="analyze-btn" class="primary" disabled>Search Candidate Sets</button>
             </section>
 
+            <section class="analysis-summary" id="analysis-summary" hidden>
+              <div id="your-analysis"></div>
+              <h3>Analysis Summary</h3>
+              <div id="summary-cards" class="summary-cards"></div>
+              <p class="muted">Counts describe returned results. A pair may appear in more than one candidate.</p>
+            </section>
             <section class="panel workflow-panel" id="workflow" aria-label="Analysis workflow">
               <div class="section-title">
                 <span class="step-number">02</span>
@@ -129,7 +135,6 @@
                 <h2>Candidate Results</h2>
               </div>
             </div>
-            <div id="summary-cards" class="summary-cards"></div>
             <div id="results" class="results-list">
               <div class="empty-state"><span class="empty-icon">▦</span><p>Choose one or more target diseases, then search to see ranked candidate sets.</p></div>
             </div>
