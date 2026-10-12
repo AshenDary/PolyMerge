@@ -47,8 +47,37 @@ def test_generate_candidate_sets_builds_multi_drug_coverage_and_comparison():
     assert multi_drug["drugs"] == ["drug-a", "drug-b"]
     assert multi_drug["treatedDiseaseIds"] == ["disease-1", "disease-2"]
     assert multi_drug["coverage"] == 1.0
+    assert multi_drug["coverageCount"] == 2
+    assert multi_drug["targetDiseaseCount"] == 2
+    for candidate in candidates:
+        assert not {"confidence", "probability", "probabilities", "safetyScore", "combinedSafetyScore"} & candidate.keys()
     assert len(multi_drug["evidence"]) == 2
     assert multi_drug["comparison"]["drugCount"] == 2
+
+
+def test_generated_ranking_and_optimization_match_before_confidence_removal():
+    from app.services.candidate_ranker import rank_candidates
+    from app.services.set_cover_optimizer import optimize_candidate_sets
+
+    drugs = [
+        {"drugId": "a", "treatedDiseaseIds": ["d1", "d2"]},
+        {"drugId": "b", "treatedDiseaseIds": ["d1", "d2"]},
+        {"drugId": "maoi", "treatedDiseaseIds": ["d1"]},
+        {"drugId": "ssri", "treatedDiseaseIds": ["d2"]},
+    ]
+    generated = generate_candidate_sets(drugs, ["d1", "d2"], max_drug_count=2)
+    assert generated == generate_candidate_sets(drugs, ["d1", "d2"], max_drug_count=2)
+    # Reproduce the former key with its coverage-derived confidence tie-break.
+    old_order = sorted(generated, key=lambda c: (
+        c["status"] == "rejected", -c["coverage"], c["drugCount"], -c["coverage"], 0.0,
+    ))
+    ranked = rank_candidates(generated)
+    assert [c["candidateSetId"] for c in ranked] == [c["candidateSetId"] for c in old_order]
+    assert [c["rank"] for c in ranked] == list(range(1, len(ranked) + 1))
+    assert [c["candidateSetId"] for c in ranked[:2]] == ["candidate-set:a", "candidate-set:b"]
+    assert ranked[-1]["candidateSetId"] == "candidate-set:maoi+ssri"
+    assert ranked[-1]["status"] == "rejected"
+    assert optimize_candidate_sets(ranked, ["d1", "d2"])["selectedCandidateSetIds"] == ["candidate-set:a"]
 
 
 def test_generate_candidate_sets_marks_hard_safety_rejections_before_optimization():

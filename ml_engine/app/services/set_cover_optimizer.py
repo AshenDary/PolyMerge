@@ -90,7 +90,6 @@ def optimize_candidate_sets(
                 len((set(candidate.get("treatedDiseaseIds", [])) & target_disease_set) - covered),
                 _score(candidate.get("coverage")),
                 -int(candidate.get("drugCount", len(candidate.get("drugs", [])))),
-                _score(candidate.get("confidence")),
             ),
         )
         newly_covered = (

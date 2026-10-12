@@ -487,6 +487,11 @@ export function validateCandidateSetResult(payload) {
       throw new Error('ML engine returned duplicate candidate-set IDs');
     }
     candidateSetIds.add(candidateSet.candidateSetId);
+    if (candidateSet.dataStatus === 'real_graph'
+      && ['confidence', 'probability', 'probabilities', 'safetyScore', 'combinedSafetyScore']
+        .some((field) => Object.hasOwn(candidateSet, field))) {
+      throw new Error('ML candidate-set response included unsupported candidate-level predictive fields');
+    }
     if (candidateSet.mlStatus === 'not_applied'
       && (candidateSet.interactionRisk != null || candidateSet.synergyScore != null)) {
       throw new Error('ML engine returned prediction scores while mlStatus is not_applied');
@@ -507,7 +512,8 @@ export function validateCandidateSetResult(payload) {
         throw new Error('ML candidate-set response has malformed pair prediction data');
       }
       if (prediction.pairs.some((pair) => (
-        Object.hasOwn(pair, 'probabilities') || Object.hasOwn(pair, 'confidence')
+        Object.hasOwn(pair, 'probabilities') || Object.hasOwn(pair, 'probability')
+        || Object.hasOwn(pair, 'confidence')
       ))) {
         throw new Error('ML candidate-set response included unsupported probability or confidence fields');
       }
