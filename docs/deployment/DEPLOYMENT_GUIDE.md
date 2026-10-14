@@ -4,7 +4,7 @@
 
 No hosting account, billing, DNS, database exposure, model publication or public deployment was configured. This is a research prototype, not a clinical product. Fix the audit's public-exposure blockers before enabling external access.
 
-Recommend a paid, always-on multi-service deployment with private ML and graph connectivity, plus an authenticated HTTPS frontend. Keep Streamlit optional. The checked-in Compose/SSH template targets an explicitly provisioned private staging host and does not assume a vendor. A managed container platform is operationally easier; a dedicated host gives direct control over private model mounts and long request timeouts. Jared must approve which tradeoff and budget to use.
+For the first controlled staging release, recommend option C: an explicitly provisioned, paid always-on private container host using the checked-in Compose/SSH template, behind an authenticated HTTPS gateway, with a private graph dependency and optional Streamlit. It gives direct control over the trusted model mount and long request timeouts without publishing images or artifacts. This is a recommendation, not authorization or a selected hosting vendor. Option B is the preferred managed alternative if Jared wants to delegate host operations; it needs provider-specific release configuration. Jared must approve the maintenance/budget tradeoff first.
 
 ## Hosting comparison (official documentation checked 2026-10-15)
 

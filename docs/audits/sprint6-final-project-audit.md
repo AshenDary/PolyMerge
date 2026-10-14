@@ -163,6 +163,7 @@ Backend runtime candidate timeout150000ms, health5000ms, catalog10000ms. Client 
 ## Test and CI evidence
 
 - Base: backend **71 passed**, including **26 frontend tests**; ML **83 passed**, four httpx deprecation warnings.
+- Final local repeat: backend71, frontend26, ML85 and deployment checks5 all PASS; saved one/two-disease real-response ranking and optimizer output remain byte-structure equal after the union guard. Existing live service processes were not restarted; post-fix optimizer behavior was checked in fresh Python imports and CI.
 - After audit test additions and optimizer fix: full local ML **85 passed**, four httpx warnings; fixture checksum/schema and merged-set rule regression added. Clean checkout omits one external-source integration test explicitly; local raw-source integrity test still executes.
 - Sprint4 contract validator PASS; model hash/size PASS; frontend `node --check` both files PASS; whitespace check PASS; five deployment-check unit tests PASS.
 - Streamlit AppTest PASS (configured iframe source); local HTTP smoke and explicit real inference smoke PASS. No model training or test.csv prediction/evaluation.
@@ -193,6 +194,14 @@ Deployment readiness **42/100**, separate operational rubric: reproducible build
 Supervised demo readiness **76/100**, separate rubric: demonstrated core workflow27/30; explanation/scientific boundaries20/25; interaction/visual readiness14/20; latency/recovery10/15; operator setup5/10. This assumes local access, prepared model/graph, one user at a time and explicit disclosure of rule limits. It is not readiness for unattended public clinical use.
 
 ## Priority order and verdict
+
+### Completion evidence
+
+Actual [GitHub run 38613977903](https://github.com/AshenDary/PolyMerge/actions/runs/38613977903), commit `bcb3cc3038525b2157d7f75fd0b168e50a572667`: **regression PASS; backend, ML and Streamlit container builds/liveness PASS; security FAIL; overall FAILURE**. Linux clean-checkout ML suite: 84 passed, one explicitly skipped external-source test. The frozen artifact was absent from CI; container checks establish liveness, not hosted real-model readiness. Local real-model smoke is separately recorded above.
+
+Security failures are the same unresolved dependency advisories, not suppressed checks. Local Python3.9 and hosted Python3.11 resolve different transitive versions, explaining the different advisory counts. Actions also emitted Node20-action-runtime deprecation and upcoming ubuntu-latest migration notices; move to reviewed current action SHAs/fixed runner images in maintenance, and rerun validation. No action failed from those notices in this run.
+
+Commits pushed only to `sprint6/jared/final-audit-cicd`: `4d61992`, `26fc743`, `b457d17`, `f41a47f`, `bcb3cc3`, followed by documentation-only completion evidence. No application or workflow change follows the above tested revision. No model/data artifact was committed or published. Working-tree/push confirmation and final documentation SHA are supplied in the handoff response.
 
 1. Keep public deployment disabled. Review dependency advisories and protect authentication/history/rate limits before exposure.
 2. Resolve canonical drug-ID/class-rule coverage with reviewed biomedical mappings and integration tests; preserve honest unavailable-rule state.
