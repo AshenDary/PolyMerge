@@ -87,6 +87,8 @@ jobs:
           id=$(docker run -d "polymerge-$SERVICE:ci")
           trap 'docker logs "$id"; docker rm -f "$id"' EXIT
           for attempt in $(seq 1 30); do
+            running=$(docker inspect --format '{{.State.Running}}' "$id")
+            if [ "$running" != true ]; then exit 1; fi
             state=$(docker inspect --format '{{.State.Health.Status}}' "$id")
             if [ "$state" = healthy ]; then exit 0; fi
             sleep 5
