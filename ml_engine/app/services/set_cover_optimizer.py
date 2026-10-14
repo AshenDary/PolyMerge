@@ -80,6 +80,9 @@ def optimize_candidate_sets(
             for candidate in remaining
             if len(_merged_drugs(selected_drugs, candidate.get("drugs", [])))
             <= effective_config["maxDrugCount"]
+            and check_hard_contraindications(
+                _merged_drugs(selected_drugs, candidate.get("drugs", []))
+            ) is None
         ]
         if not eligible:
             break
