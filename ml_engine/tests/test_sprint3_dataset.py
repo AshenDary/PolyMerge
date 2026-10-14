@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import hashlib
 from pathlib import Path
 
 import pandas as pd
@@ -40,14 +41,32 @@ def _source_rows() -> pd.DataFrame:
 
 def test_official_manifest_and_downloaded_source_schema_are_valid():
     manifest = json.loads(MANIFEST_PATH.read_text(encoding="utf-8"))
-    valid, malformed, profile = load_ddinter_sources()
-
     assert manifest["dataset"] == "DDInter 2.0"
     assert manifest["license"] == "CC BY-NC-SA 4.0"
     assert len(manifest["files"]) == 8
+    # Licensed raw downloads are intentionally absent from clean checkouts.
+    if not any((MANIFEST_PATH.parent / name).exists() for name in manifest["files"]):
+        pytest.skip("External-data integration: reviewed DDInter raw downloads not installed")
+    valid, malformed, profile = load_ddinter_sources()
     assert REQUIRED_SOURCE_COLUMNS.issubset(valid.columns)
     assert set(valid["Level"]) == {*ALLOWED_LABELS, "Unknown"}
     assert profile["raw_rows"] == len(valid) + len(malformed)
+
+
+def test_source_loader_validates_fixture_checksum_and_schema(tmp_path: Path):
+    source = tmp_path / "ddinter_downloads_code_A.csv"
+    source.write_text("DDInterID_A,Drug_A,DDInterID_B,Drug_B,Level\nDDInter1,A,DDInter2,B,Major\n", encoding="utf-8")
+    manifest = tmp_path / "manifest.json"
+    manifest.write_text(json.dumps({
+        "dataset": "synthetic fixture", "download_page": "https://example.invalid",
+        "license": "synthetic", "retrieved_at": "2026-10-15",
+        "files": {source.name: hashlib.sha256(source.read_bytes()).hexdigest()},
+    }), encoding="utf-8")
+    valid, malformed, profile = load_ddinter_sources(tmp_path, manifest)
+    assert len(valid) == 1 and malformed.empty and profile["raw_rows"] == 1
+    source.write_text(source.read_text() + "DDInter2,B,DDInter3,C,Minor\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="Checksum mismatch"):
+        load_ddinter_sources(tmp_path, manifest)
 
 
 def test_source_schema_validation_rejects_missing_columns(tmp_path: Path):
