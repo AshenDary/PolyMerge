@@ -47,7 +47,8 @@ function renderPredictionsContent(content) {
   return `<ul class="prediction-list">${content.pairs.map((prediction) => `<li class="prediction-item">
     <div><strong>${prediction.drugs?.map(escapeExplanation).join(' + ') ?? 'Drug pair not provided'}</strong>
       <span class="severity-badge severity-${escapeExplanation(prediction.severity).toLowerCase()}">${escapeExplanation(prediction.severity ?? 'Class not provided')}</span></div>
-    <small>Research prediction · ${escapeExplanation(prediction.model?.name ?? 'Model not provided')} · ${escapeExplanation(prediction.model?.version ?? 'Version not provided')} · ${escapeExplanation(prediction.inferenceStatus ?? 'Status not provided')}</small>
+    <small>Research prediction · ${escapeExplanation(prediction.model?.name === 'RandomForestClassifier' ? 'Random Forest' : prediction.model?.name ?? 'Model not provided')}</small>
+    <details><summary>Technical model details</summary><small>${escapeExplanation(prediction.model?.name ?? 'Model not provided')} · ${escapeExplanation(prediction.model?.version ?? 'Version not provided')} · ${escapeExplanation(prediction.inferenceStatus ?? 'Status not provided')}</small></details>
   </li>`).join('')}</ul>`;
 }
 

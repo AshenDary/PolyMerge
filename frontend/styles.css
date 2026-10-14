@@ -99,7 +99,7 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
   padding: 26px 30px 40px;
 }
 
-.topbar { margin-bottom: 24px; }
+.topbar { margin-bottom: 24px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
 .page-subtitle { margin: 5px 0 0; font-size: 0.92rem; max-width: 780px; }
 
 .eyebrow {
@@ -672,3 +672,15 @@ details > summary { cursor: pointer; }
 .node-side-effect { border-color: #a87422; background: #faf7f1; }
 .evidence-connector { text-align: center; font-size: 12px; color: #48574f; }
 .simulation-view > .panel, .simulation-grid > .panel { border: 0; border-bottom: 1px solid var(--line); border-radius: 0; box-shadow: none; }
+#reset-simulation { display: none; flex-shrink: 0; }
+body[data-view="simulation"] #reset-simulation,
+body[data-view="explainability-panel"] #reset-simulation { display: inline-block; }
+#result-display { padding-block: 8px 16px; }
+#result-display p { margin-block: 8px; overflow-wrap: anywhere; }
+#show-all-control { display: inline-flex; align-items: center; gap: 8px; }
+#show-all-control[hidden] { display: none; }
+.result-guide { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(250px, 100%), 1fr)); gap: 14px 24px; }
+.result-guide dt, .result-glossary dt { font-weight: 600; }
+.result-guide dd, .result-glossary dd { margin: 6px 0 12px; line-height: 1.5; overflow-wrap: anywhere; }
+.result-guide ul { margin: 0; padding-left: 18px; }
+.candidate-conclusion { padding-top: 20px; margin-top: 20px; border-top: 1px solid var(--line); }

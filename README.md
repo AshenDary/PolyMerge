@@ -156,17 +156,34 @@ Open the Fastify frontend at `http://127.0.0.1:3000`.
    paths are deduplicated; pair predictions count occurrences across candidates.
 5. In **Candidate Results**, choose a single-drug result and confirm interaction
    prediction is **Not applicable**. Select **Inspect candidate**.
+   The list initially shows only the first 10 returned candidates in backend
+   rank order. Summary and pipeline counts still describe the full response.
+   **Show all returned candidates** reveals the remaining results without
+   another request and preserves the selected candidate.
 6. In Explainability, read **Why this candidate?** and expand **Why this rank?**.
    Generation ranks by rule status, graph coverage, fewer drugs, then candidate
    ID. Backend validation can add rejections without reranking. ML is separate.
 7. Review the graph legend, configured rules, and interaction prediction.
    Stable IDs, provenance, and model details are available in expandable sections.
-8. Return to Simulation, clear the disease search, and add
-   `type 2 diabetes mellitus` (`Disease::DOID:9352`). Run the two-disease analysis.
+   Read **Understanding your result**, expand the glossary, and finish with
+   **What this result tells us**. Predictions remain specific to individual pairs.
+8. Choose **New Simulation** from Simulation or Explainability. It clears
+   selection, search, results, explanations, and timers while keeping the catalog.
+   Select hypertension and `type 2 diabetes mellitus` (`Disease::DOID:9352`),
+   then run the two-disease analysis.
 9. Inspect the transformation counts and select an ML-applied candidate. Its
    severity, graph evidence, and rule details update from the existing response.
 10. Open Model Analysis and review EDA interpretations, preserved comparison
     metrics, final model results, and limitations.
+
+**New Simulation** also works during a request: the browser request is aborted
+and late responses/errors are ignored. This does not cancel server-side graph
+work; a new request may wait for that synchronous work to finish. If catalog
+loading failed, its retry control remains available after reset.
+
+For local Streamlit validation, set `POLYMERGE_FRONTEND_URL` to the actual
+Fastify origin, open Streamlit, and repeat navigation, analysis, and reset.
+HTTP and script checks do not replace manual browser/iframe acceptance.
 
 Demo sequence: Home → Simulation → Disease Selection → Analysis Summary →
 Analysis Pipeline → Candidate Results → Inspect Candidate → Explainability →

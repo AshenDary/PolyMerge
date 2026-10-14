@@ -10,6 +10,7 @@ const WORKFLOW_STAGES = [
 const ALLOWED_GRAPH_RELATIONSHIPS = new Set(['CtD', 'CbG', 'CuG', 'CdG', 'CcSE']);
 const DEFAULT_CATALOG_TIMEOUT_MS = 10000;
 const DEFAULT_CANDIDATE_TIMEOUT_MS = 150000;
+const CANDIDATE_DISPLAY_LIMIT = 10;
 
 const state = {
   selectedDiseases: new Set(),
@@ -21,6 +22,10 @@ const state = {
   comparisonLoaded: false,
   modelAnalysisData: null,
   modelAnalysisTab: 'overview',
+  catalogStatus: 'loading',
+  showAllCandidates: false,
+  requestGeneration: 0,
+  candidateController: null,
 };
 
 function escapeHtml(value) {
@@ -54,10 +59,16 @@ function selectedDiseaseObjects() {
   return Array.from(state.selectedDiseases).map((id) => byId.get(id) ?? { id, name: id });
 }
 
-function withTimeout(ms) {
+function withTimeout(ms, externalSignal) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), ms);
-  return { signal: controller.signal, clear: () => clearTimeout(timeout) };
+  const abort = () => { clearTimeout(timeout); controller.abort(); };
+  if (externalSignal?.aborted) abort();
+  else externalSignal?.addEventListener('abort', abort, { once: true });
+  return { signal: controller.signal, clear: () => {
+    clearTimeout(timeout);
+    externalSignal?.removeEventListener('abort', abort);
+  } };
 }
 
 async function readJsonResponse(response) {
@@ -68,12 +79,12 @@ async function readJsonResponse(response) {
 }
 
 async function fetchJson(url, options = {}, timeoutMs = DEFAULT_CATALOG_TIMEOUT_MS) {
-  const timeout = withTimeout(timeoutMs);
+  const timeout = withTimeout(timeoutMs, options.signal);
   try {
     const response = await fetch(url, { ...options, signal: timeout.signal });
     return await readJsonResponse(response);
   } catch (error) {
-    if (error.name === 'AbortError') {
+    if (error.name === 'AbortError' && !options.signal?.aborted) {
       throw new Error(`Request timed out after ${Math.round(timeoutMs / 1000)} seconds`);
     }
     throw error;
@@ -134,6 +145,56 @@ function mappingMarkup(paths) {
 
 const RANK_EXPLANATION = 'At generation, sets are ordered by configured rule status (passed first), then more selected diseases represented, then fewer drugs. Candidate set ID breaks remaining ties. Backend validation can add a rejection without changing that rank. Interaction severity does not determine this rank.';
 
+function pairLabel(pair, candidate) {
+  return (pair.drugPair ?? []).map((id) => candidate.drugNames?.[candidate.drugs.indexOf(id)] ?? id).join(' + ');
+}
+
+function understandingGuide() {
+  const definitions = [
+    ['Candidate set', 'A group of existing drugs considered together by the system.'],
+    ['Compound', 'A drug or chemical entity represented in the knowledge graph.'],
+    ['Knowledge graph', 'A network of stored relationships between biomedical entities.'],
+    ['CtD', 'Compound treats Disease: a treatment relationship represented in the graph.'],
+    ['CbG', 'Compound binds Gene: a represented compound-gene relationship.'],
+    ['CuG', 'Compound upregulates Gene: a represented gene-activity relationship.'],
+    ['CdG', 'Compound downregulates Gene: a represented gene-activity relationship.'],
+    ['CcSE', 'Compound causes Side Effect: a side-effect relationship recorded in the graph.'],
+    ['Gene context', 'Information about how a compound is connected to genes in the graph. This does not establish clinical mechanism or benefit.'],
+    ['Graph coverage', 'The share of selected diseases with represented CtD treatment connections from the candidate drugs.'],
+    ['Deterministic rule', 'A predefined system check that accepts or rejects a candidate according to configured conditions.'],
+    ['ML prediction', 'A classification produced from the frozen drug-pair feature representation.'],
+    ['Major / Moderate / Minor', 'Interaction-severity categories learned from the curated DDInter dataset, not independent clinical verification.'],
+  ];
+  return `<aside class="reading-guide"><h4>Understanding your result</h4>
+    <dl class="result-guide"><div><dt>Graph evidence</dt><dd>Shows which drugs are connected to diseases, genes, or side effects in the knowledge graph.</dd></div>
+    <div><dt>Rule check</dt><dd>Shows whether the candidate triggered any of the system's configured exclusion rules.</dd></div>
+    <div><dt>Interaction prediction</dt><dd>Shows the severity class predicted for supported drug pairs by the Random Forest model.</dd></div>
+    <div><dt>Coverage</dt><dd>Shows how many selected diseases have represented treatment relationships in the graph.</dd></div></dl>
+    <details><summary>Terms and relationship definitions</summary><dl class="result-glossary">${definitions.map(([term, definition]) => `<dt>${escapeHtml(term)}</dt><dd>${escapeHtml(definition)}</dd>`).join('')}</dl><p>Side-effect context is not a complete side-effect profile. Compound resemblance is not drug-drug interaction evidence.</p></details>
+  </aside>`;
+}
+
+function finalCandidateSummary(candidate, data) {
+  const targets = data.diseaseIds ?? (data.diseases ?? []).map((disease) => disease.id);
+  const covered = (candidate.treatedDiseaseIds ?? []).filter((id) => targets.includes(id));
+  const treatments = graphPaths(candidate).filter((path) => relationshipType(path) === 'CtD' && targets.includes(path.targetEntity?.id));
+  const pairs = appliedPairs(candidate);
+  const ml = candidateMlPresentation(candidate);
+  const ruleOutcome = candidate.status === 'accepted'
+    ? 'No configured deterministic hard-rule violation was detected.'
+    : candidate.status === 'rejected'
+      ? `Rejected by configured rules. ${(candidate.rejectionReasons ?? []).map((reason) => reason.message ?? 'Reason not provided').join(' ')}`
+      : 'No rule outcome was returned.';
+  return `<section class="candidate-conclusion"><h4>What this result tells us</h4>
+    <dl class="result-guide"><div><dt>Why these drugs were included</dt><dd>This candidate contains ${escapeHtml(candidateLabel(candidate))}. ${treatments.length ? `${treatments.length} returned CtD treatment connections link its drugs to selected diseases.` : 'No CtD treatment connections to the selected diseases were returned for inspection.'}</dd></div>
+    <div><dt>Disease coverage</dt><dd>${covered.length} of ${targets.length} selected diseases are represented in the reported graph coverage.</dd></div>
+    <div><dt>Rule-check outcome</dt><dd>${escapeHtml(ruleOutcome)}</dd></div>
+    <div><dt>Interaction prediction</dt><dd>${pairs.length ? `<ul>${pairs.map((pair) => `<li>Random Forest classified ${escapeHtml(pairLabel(pair, candidate))} as ${escapeHtml(pair.predictedSeverity)}.</li>`).join('')}</ul>` : escapeHtml(ml.detail)}</dd></div>
+    <div><dt>Ranking explanation</dt><dd>Rank ${escapeHtml(candidate.rank ?? 'not provided')}, with ${candidate.drugs?.length ?? 0} drugs and rule status ${ruleLabel(candidate)}. This follows configured graph-coverage ordering, not an ML prediction of clinical benefit.</dd></div>
+    <div><dt>Research interpretation</dt><dd>These separate outputs support further research review. They do not establish clinical safety, effectiveness, or suitability for manufacturing.</dd></div></dl>
+  </section>`;
+}
+
 function candidateNarrative(candidate, data) {
   const labels = diseaseLabelMap(data);
   const covered = (candidate.treatedDiseaseIds ?? []).filter((id) => (data.diseaseIds ?? [...labels.keys()]).includes(id));
@@ -178,15 +239,15 @@ function candidateMlPresentation(candidate) {
       status: 'not_applicable',
       label: 'Not applicable',
       summary: 'Single-drug candidate; no drug pair to classify',
-      detail: 'This candidate contains one drug, so there is no drug pair to classify.',
+      detail: 'This candidate contains one drug. Since the interaction model evaluates drug pairs, no pair prediction is applicable.',
     };
   }
   if (candidate?.mlStatus === 'applied' && pairCount > 0) {
     return {
       status: 'complete',
-      label: [...new Set(pairs.map((pair) => pair.predictedSeverity))].join(' / '),
+      label: pairCount === 1 ? pairs[0].predictedSeverity : `${pairCount} pairs classified`,
       summary: pluralize(pairCount, 'drug-pair prediction'),
-      detail: `Random Forest classified ${pluralize(pairCount, 'represented drug pair')}. Severity: ${[...new Set(pairs.map((pair) => pair.predictedSeverity))].join(', ')}.`,
+      detail: pairs.map((pair) => `${pairLabel(pair, candidate)}: ${pair.predictedSeverity}`).join('; '),
     };
   }
   return {
@@ -355,6 +416,7 @@ function renderDiseases() {
 }
 
 async function loadDiseases() {
+  state.catalogStatus = 'loading';
   const catalogTag = document.getElementById('catalog-tag');
   const catalogMessage = document.getElementById('catalog-message');
   const diseaseList = document.getElementById('disease-list');
@@ -366,10 +428,12 @@ async function loadDiseases() {
   try {
     const data = await fetchJson('/api/diseases', {}, DEFAULT_CATALOG_TIMEOUT_MS);
     state.availableDiseases = data.diseases ?? [];
+    state.catalogStatus = 'ready';
     catalogMessage.hidden = true;
     catalogTag.textContent = 'Catalog ready';
     renderDiseases();
   } catch (error) {
+    state.catalogStatus = 'unavailable';
     catalogTag.textContent = 'Catalog unavailable';
     catalogMessage.className = 'catalog-message unavailable-message';
     catalogMessage.innerHTML = `<div><strong>Disease catalog unavailable</strong><p>The knowledge graph catalog could not be loaded.</p><small>${escapeHtml(error.message)}</small></div><button type="button" id="retry-catalog" class="retry-button">Try Again</button>`;
@@ -392,6 +456,17 @@ function renderSummary(data) {
 function renderResults(data) {
   const results = document.getElementById('results');
   const candidates = data.candidateSets ?? [];
+  const visible = state.showAllCandidates ? candidates : candidates.slice(0, CANDIDATE_DISPLAY_LIMIT);
+  const display = document.getElementById('result-display');
+  display.hidden = candidates.length === 0;
+  document.getElementById('show-all-candidates').checked = state.showAllCandidates;
+  document.getElementById('show-all-control').hidden = candidates.length <= CANDIDATE_DISPLAY_LIMIT;
+  document.getElementById('result-count').textContent = `Showing ${state.showAllCandidates ? 'all' : 'top'} ${visible.length} of ${candidates.length} returned candidates`;
+  document.getElementById('result-limit-note').textContent = !state.showAllCandidates && candidates.length > CANDIDATE_DISPLAY_LIMIT
+    ? 'Showing the first 10 ranked candidates. Other returned candidates are included in the analysis summary.' : '';
+  const selectedCandidate = candidates.find((candidate) => candidate.candidateSetId === state.selectedCandidateId);
+  document.getElementById('selected-result-link').innerHTML = selectedCandidate
+    ? `<a href="#explainability-panel">Selected: Candidate #${escapeHtml(selectedCandidate.rank ?? 'Not provided')} · ${escapeHtml(candidateLabel(selectedCandidate))}</a>` : '';
   renderSummary(data);
   if (data.metadata?.dataStatus === 'graph_unavailable') {
     setMessage(results, data.metadata.warning || 'Graph evidence is unavailable; no candidate sets were returned.', 'warning');
@@ -403,7 +478,7 @@ function renderResults(data) {
   }
 
   const diseaseLabels = diseaseLabelMap(data);
-  results.innerHTML = candidates.map((candidate) => {
+  results.innerHTML = visible.map((candidate) => {
     const selected = candidate.candidateSetId === state.selectedCandidateId;
     const rejectionReasons = (candidate.rejectionReasons ?? []).map((reason) => reason.message).join('; ');
     const ml = candidateMlPresentation(candidate);
@@ -480,7 +555,7 @@ function renderSelectedCandidate(candidate, data) {
   const ml = candidateMlPresentation(candidate);
   container.innerHTML = `<article class="candidate-explanation">
     ${candidateNarrative(candidate, data)}
-    <aside class="reading-guide"><h4>How to read this result</h4><p><strong>Graph Evidence</strong> shows represented biomedical relationships. <strong>Deterministic Rules</strong> shows configured rule outcomes. <strong>Interaction Prediction</strong> shows Random Forest predicted DDInter severity for supported drug pairs.</p></aside>
+    ${understandingGuide()}
     <section class="evidence-section section-graph">
       <h4>Graph Evidence</h4>
       <div class="graph-summary">
@@ -510,17 +585,18 @@ function renderSelectedCandidate(candidate, data) {
         <div class="prediction-grid">
           <span><small>Drug pair</small><strong>${pair.drugPair?.map((id) => escapeHtml(candidate.drugNames?.[candidate.drugs.indexOf(id)] ?? id)).join(' + ') ?? 'Drug pair not provided'}</strong></span>
           <span><small>Predicted severity</small><strong>${escapeHtml(pair.predictedSeverity)}</strong></span>
-          <span><small>Model</small><strong>Random Forest · Sprint 5</strong></span>
+          <span><small>Model</small><strong>Random Forest</strong></span>
         </div>
         <details><summary>Technical model details</summary><small>${escapeHtml(pair.model?.name ?? 'Model not provided')} · ${escapeHtml(pair.model?.version ?? 'Version not provided')} · ${escapeHtml(pair.inferenceStatus ?? 'Status not provided')}</small></details>
       </li>`).join('')}</ul>` : `<div class="predictions-unavailable"><strong>${escapeHtml(ml.label)}</strong><p>${escapeHtml(ml.detail)}</p></div>`}
     </section>
     <details class="technical-details"><summary>Candidate metadata</summary><p>Candidate set ID: ${escapeHtml(candidate.candidateSetId)} · Raw status: ${escapeHtml(candidate.status)}</p><p>${(candidate.drugs ?? []).map(escapeHtml).join(', ')}</p></details>
-    <p class="overall-disclaimer">PolyMerge is a research decision-support prototype and does not provide clinical recommendations.</p>
+    ${finalCandidateSummary(candidate, data)}
   </article>`;
 }
 
 function selectCandidate(candidateId, navigate = false) {
+  if (!state.currentResult) return;
   state.selectedCandidateId = candidateId;
   const candidates = state.currentResult?.candidateSets ?? [];
   const candidate = candidates.find((item) => item.candidateSetId === candidateId) ?? candidates[0];
@@ -534,6 +610,7 @@ function startElapsedTimer() {
   const elapsed = document.getElementById('elapsed-time');
   clearInterval(state.elapsedTimer);
   state.analysisStartedAt = Date.now();
+  elapsed.textContent = 'Elapsed: 0s';
   state.elapsedTimer = setInterval(() => {
     elapsed.textContent = `Elapsed: ${Math.floor((Date.now() - state.analysisStartedAt) / 1000)}s`;
   }, 1000);
@@ -547,6 +624,9 @@ function stopElapsedTimer() {
 
 async function analyzeCombination() {
   if (!state.selectedDiseases.size || state.analysisStartedAt) return;
+  const generation = ++state.requestGeneration;
+  const controller = new AbortController();
+  state.candidateController = controller;
   const analyzeBtn = document.getElementById('analyze-btn');
   const results = document.getElementById('results');
   const catalogTag = document.getElementById('catalog-tag');
@@ -556,6 +636,8 @@ async function analyzeCombination() {
   running.hidden = false;
   state.currentResult = null;
   state.selectedCandidateId = null;
+  state.showAllCandidates = false;
+  document.getElementById('result-display').hidden = true;
   document.getElementById('analysis-summary').hidden = true;
   startElapsedTimer();
   renderWorkflow(computeWorkflowStages(null, null, true));
@@ -567,7 +649,9 @@ async function analyzeCombination() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ diseaseIds: Array.from(state.selectedDiseases) }),
+      signal: controller.signal,
     }, DEFAULT_CANDIDATE_TIMEOUT_MS);
+    if (generation !== state.requestGeneration) return;
     state.currentResult = data;
     state.selectedCandidateId = data.candidateSets?.[0]?.candidateSetId ?? null;
     catalogTag.textContent = data.metadata?.dataStatus === 'graph_unavailable' ? 'Graph unavailable' : 'Search complete';
@@ -575,14 +659,53 @@ async function analyzeCombination() {
     renderWorkflow(computeWorkflowStages(data, state.selectedCandidateId));
     renderSelectedCandidate(data.candidateSets?.[0], data);
   } catch (error) {
+    if (generation !== state.requestGeneration) return;
     catalogTag.textContent = error.message.includes('timed out') ? 'Candidate search timeout' : 'System error';
     setMessage(results, `Candidate search unavailable: ${error.message}`, 'error');
     renderWorkflow(computeWorkflowStages(null, null, false, error.message));
   } finally {
-    stopElapsedTimer();
-    running.hidden = true;
+    if (generation === state.requestGeneration) {
+      state.candidateController = null;
+      stopElapsedTimer();
+      running.hidden = true;
+      renderSelectionSummary();
+    }
+  }
+}
+
+function resetSimulation() {
+  // Invalidate callbacks even when the server or a transport ignores the abort.
+  state.requestGeneration += 1;
+  state.candidateController?.abort();
+  state.candidateController = null;
+  stopElapsedTimer();
+  state.selectedDiseases.clear();
+  state.currentResult = null;
+  state.selectedCandidateId = null;
+  state.showAllCandidates = false;
+  document.getElementById('disease-search').value = '';
+  document.getElementById('elapsed-time').textContent = 'Elapsed: 0s';
+  document.getElementById('analysis-running').hidden = true;
+  document.getElementById('analysis-summary').hidden = true;
+  document.getElementById('result-display').hidden = true;
+  document.getElementById('show-all-candidates').checked = false;
+  for (const id of ['summary-cards', 'your-analysis', 'result-count', 'result-limit-note', 'selected-result-link']) {
+    document.getElementById(id).replaceChildren();
+  }
+  setMessage(document.getElementById('results'), 'Choose one or more target diseases, then search to see ranked candidate sets.', 'empty');
+  renderWorkflow(computeWorkflowStages(null));
+  renderSelectedCandidate(null, null);
+  document.getElementById('catalog-tag').textContent = state.catalogStatus === 'ready'
+    ? 'Catalog ready' : state.catalogStatus === 'loading' ? 'Loading catalog' : 'Catalog unavailable';
+  if (state.catalogStatus === 'ready') {
+    document.getElementById('catalog-message').hidden = true;
+    renderDiseases();
+  } else {
     renderSelectionSummary();
   }
+  window.location.hash = 'simulation';
+  document.body.dataset.view = 'simulation';
+  document.getElementById('disease-search').focus();
 }
 
 function renderModelAnalysisShell(data = null) {
@@ -593,7 +716,7 @@ function renderModelAnalysisShell(data = null) {
   ];
   const values = rows.map((row) => ({ name: row.Model, value: Number(row['Mean Macro F1']) }));
   const max = Math.max(...values.map((row) => row.value));
-  const table = rows.map((row) => `<tr>${Object.values(row).map((value) => `<td>${escapeHtml(value)}</td>`).join('')}</tr>`).join('');
+  const table = rows.map((row) => `<tr>${Object.entries(row).map(([key, value]) => `<td>${escapeHtml(key === 'Model' && value === 'RandomForestClassifier' ? 'Random Forest' : value)}</td>`).join('')}</tr>`).join('');
   const tabs = [
     ['overview', 'Overview'],
     ['eda', 'EDA'],
@@ -617,9 +740,9 @@ function renderModelAnalysisShell(data = null) {
     </section>`,
     comparison: `<section class="analysis-section" role="tabpanel">
       <h3>Model Comparison</h3>
-      <p>Preserved Sprint 4 validation Macro F1. Random Forest was selected by highest mean validation Macro F1.</p>
+      <p>Preserved validation Macro F1. Random Forest was selected by highest mean validation Macro F1.</p>
       <div class="bar-chart" aria-label="Validation Macro F1 chart">
-        ${values.map((row) => `<div class="bar-row ${row.name === 'RandomForestClassifier' ? 'selected-model' : ''}"><span>${escapeHtml(row.name.replace('Classifier', ''))}</span><div><i style="width:${Math.max(8, (row.value / max) * 100)}%"></i></div><strong>${row.value.toFixed(6)}</strong></div>`).join('')}
+        ${values.map((row) => `<div class="bar-row ${row.name === 'RandomForestClassifier' ? 'selected-model' : ''}"><span>${escapeHtml(row.name === 'RandomForestClassifier' ? 'Random Forest' : row.name.replace('Classifier', ''))}</span><div><i style="width:${Math.max(8, (row.value / max) * 100)}%"></i></div><strong>${row.value.toFixed(6)}</strong></div>`).join('')}
       </div>
       <p class="muted">Selected model: Random Forest. It had the highest mean validation Macro F1 among the three required traditional ML algorithms.</p>
       <div class="comparison-table-wrap"><table class="comparison-table"><thead><tr>${Object.keys(rows[0] ?? {}).map((key) => `<th>${escapeHtml(key)}</th>`).join('')}</tr></thead><tbody>${table}</tbody></table></div>
@@ -709,6 +832,11 @@ function showView() {
 function init() {
   renderWorkflow(computeWorkflowStages(null));
   document.getElementById('analyze-btn').addEventListener('click', analyzeCombination);
+  document.getElementById('reset-simulation').addEventListener('click', resetSimulation);
+  document.getElementById('show-all-candidates').addEventListener('change', (event) => {
+    state.showAllCandidates = event.target.checked;
+    if (state.currentResult) renderResults(state.currentResult);
+  });
   document.getElementById('disease-search').addEventListener('input', renderDiseases);
   document.getElementById('clear-selection').addEventListener('click', () => {
     state.selectedDiseases.clear();
@@ -742,6 +870,11 @@ globalThis.PolyMergeFrontend = {
   selectCandidate,
   state,
   escapeHtml,
+  renderResults,
+  resetSimulation,
+  analyzeCombination,
+  finalCandidateSummary,
+  understandingGuide,
 };
 
 if (typeof document !== 'undefined') {

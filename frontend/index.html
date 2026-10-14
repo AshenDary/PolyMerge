@@ -43,6 +43,7 @@
           <h1 id="page-title">Research Dashboard</h1>
           <p class="muted page-subtitle">Research decision support for multi-disease candidate analysis.</p>
         </div>
+        <button type="button" id="reset-simulation" class="secondary">New Simulation</button>
       </header>
 
       <main>
@@ -80,7 +81,6 @@
               <p>Inspect the evidence behind each candidate result.</p>
             </section>
           </div>
-          <p class="home-disclaimer">PolyMerge is a research decision-support prototype and does not provide clinical recommendations.</p>
         </section>
 
         <section class="view simulation-view" id="simulation">
@@ -134,6 +134,12 @@
                 <span class="step-number">03</span>
                 <h2>Candidate Results</h2>
               </div>
+            </div>
+            <div id="result-display" hidden>
+              <p id="result-count" role="status"></p>
+              <p id="result-limit-note" class="muted"></p>
+              <label id="show-all-control"><input type="checkbox" id="show-all-candidates" /> Show all returned candidates</label>
+              <p id="selected-result-link"></p>
             </div>
             <div id="results" class="results-list">
               <div class="empty-state"><span class="empty-icon">▦</span><p>Choose one or more target diseases, then search to see ranked candidate sets.</p></div>
