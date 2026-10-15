@@ -10,7 +10,7 @@ const WORKFLOW_STAGES = [
 const ALLOWED_GRAPH_RELATIONSHIPS = new Set(['CtD', 'CbG', 'CuG', 'CdG', 'CcSE']);
 const DEFAULT_CATALOG_TIMEOUT_MS = 10000;
 const DEFAULT_CANDIDATE_TIMEOUT_MS = 150000;
-const CANDIDATE_DISPLAY_LIMIT = 10;
+const CANDIDATE_DISPLAY_LIMIT = 5;
 
 const state = {
   selectedDiseases: new Set(),
@@ -26,7 +26,46 @@ const state = {
   showAllCandidates: false,
   requestGeneration: 0,
   candidateController: null,
+  simulationStep: 1,
+  displayMode: 'simple',
+  candidateOffset: 0,
 };
+
+function setSimulationStep(step, navigate = false) {
+  if ((step === 2 && !state.analysisStartedAt) || (step >= 3 && !state.currentResult)) return;
+  state.simulationStep = step;
+  document.body.dataset.step = String(step);
+  for (let number = 1; number <= 4; number += 1) {
+    const button = document.getElementById(`step-${number}`);
+    button.disabled = number === 2 ? !state.analysisStartedAt : number >= 3 ? !state.currentResult : Boolean(state.analysisStartedAt);
+    if (number === step) button.setAttribute('aria-current', 'step');
+    else button.removeAttribute('aria-current');
+  }
+  if (navigate) {
+    window.location.hash = step === 4 ? 'explainability-panel' : 'simulation';
+    document.body.dataset.view = step === 4 ? 'explainability-panel' : 'simulation';
+    document.getElementById(`step-${step}`).focus();
+  }
+}
+
+function setDisplayMode(mode) {
+  state.displayMode = mode === 'researcher' ? 'researcher' : 'simple';
+  document.body.dataset.mode = state.displayMode;
+  document.getElementById('simple-view').setAttribute('aria-pressed', String(state.displayMode === 'simple'));
+  document.getElementById('researcher-view').setAttribute('aria-pressed', String(state.displayMode === 'researcher'));
+  document.getElementById('technical-pipeline').open = state.displayMode === 'researcher';
+  if (state.currentResult) {
+    renderResults(state.currentResult);
+    renderSelectedCandidate(state.currentResult.candidateSets?.find(c => c.candidateSetId === state.selectedCandidateId), state.currentResult);
+  }
+}
+
+function changeCandidatePage(direction) {
+  const count = state.currentResult?.candidateSets?.length ?? 0;
+  state.candidateOffset = Math.max(0, Math.min(Math.max(0, Math.ceil(count / CANDIDATE_DISPLAY_LIMIT) - 1) * CANDIDATE_DISPLAY_LIMIT,
+    state.candidateOffset + direction * CANDIDATE_DISPLAY_LIMIT));
+  if (state.currentResult) renderResults(state.currentResult);
+}
 
 function escapeHtml(value) {
   return String(value ?? '').replace(/[&<>"']/g, (char) => ({
@@ -123,7 +162,7 @@ function appliedPairs(candidate) {
 }
 
 function ruleLabel(candidate) {
-  return candidate?.status === 'accepted' ? 'Passed' : candidate?.status === 'rejected' ? 'Rejected' : 'Not available';
+  return candidate?.status === 'accepted' ? 'No configured rule triggered' : candidate?.status === 'rejected' ? 'Rejected' : 'Not available';
 }
 
 function analysisMetrics(data) {
@@ -352,6 +391,10 @@ function setMessage(container, message, kind = 'info') {
 }
 
 function renderWorkflow(stages) {
+  const warning = document.getElementById('workflow-warning');
+  const problems = stages.filter(stage => ['unavailable', 'error', 'partial'].includes(stage.status));
+  warning.hidden = problems.length === 0;
+  warning.textContent = problems.map(stage => `${stage.name}: ${stage.summary}`).join(' · ');
   const list = document.getElementById('workflow-list');
   list.innerHTML = stages.map((stage, index) => `
     <li class="workflow-step status-${escapeHtml(stage.status)}">
@@ -447,8 +490,9 @@ function renderSummary(data) {
   const cards = document.getElementById('summary-cards');
   document.getElementById('analysis-summary').hidden = false;
   const labels = diseaseLabelMap(data);
-  document.getElementById('your-analysis').innerHTML = `<h3>Your analysis</h3><ul class="analysis-diseases">${(data.diseaseIds ?? [...labels.keys()]).map((id) => `<li><strong>${escapeHtml(labels.get(id) ?? id)}</strong><small>${escapeHtml(id)}</small></li>`).join('')}</ul><p>PolyMerge searched represented relationships, generated drug sets, checked configured rules, ranked graph coverage, and classified supported drug pairs.</p>`;
-  const cardData = analysisMetrics(data);
+  document.getElementById('your-analysis').innerHTML = `<p>${(data.diseaseIds ?? [...labels.keys()]).map((id) => escapeHtml(labels.get(id) ?? id)).join(' + ')}</p>`;
+  const cardData = [['Diseases selected', data.diseaseIds?.length ?? data.diseases?.length ?? 0],
+    ['Returned candidate sets', data.candidateSets?.length ?? 0], ['Candidates with predictions', mlSummary(data.candidateSets ?? []).applied]];
   cards.innerHTML = cardData.map(([label, value]) => `
     <div class="funnel-step"><div class="value">${escapeHtml(value)}</div><div class="label">${escapeHtml(label)}</div></div>`).join('');
 }
@@ -456,14 +500,16 @@ function renderSummary(data) {
 function renderResults(data) {
   const results = document.getElementById('results');
   const candidates = data.candidateSets ?? [];
-  const visible = state.showAllCandidates ? candidates : candidates.slice(0, CANDIDATE_DISPLAY_LIMIT);
+  const showAll = state.displayMode === 'researcher' && state.showAllCandidates;
+  const visible = showAll ? candidates : candidates.slice(state.candidateOffset, state.candidateOffset + CANDIDATE_DISPLAY_LIMIT);
   const display = document.getElementById('result-display');
   display.hidden = candidates.length === 0;
   document.getElementById('show-all-candidates').checked = state.showAllCandidates;
-  document.getElementById('show-all-control').hidden = candidates.length <= CANDIDATE_DISPLAY_LIMIT;
-  document.getElementById('result-count').textContent = `Showing ${state.showAllCandidates ? 'all' : 'top'} ${visible.length} of ${candidates.length} returned candidates`;
-  document.getElementById('result-limit-note').textContent = !state.showAllCandidates && candidates.length > CANDIDATE_DISPLAY_LIMIT
-    ? 'Showing the first 10 ranked candidates. Other returned candidates are included in the analysis summary.' : '';
+  document.getElementById('show-all-control').hidden = state.displayMode !== 'researcher' || candidates.length <= CANDIDATE_DISPLAY_LIMIT;
+  document.getElementById('result-count').textContent = showAll ? `Showing all ${candidates.length} returned candidates` : `Showing ${visible.length ? state.candidateOffset + 1 : 0}-${state.candidateOffset + visible.length} of ${candidates.length} returned candidates`;
+  document.getElementById('result-limit-note').textContent = '';
+  document.getElementById('next-candidates').disabled = showAll || state.candidateOffset + CANDIDATE_DISPLAY_LIMIT >= candidates.length;
+  document.getElementById('previous-candidates').disabled = showAll || state.candidateOffset === 0;
   const selectedCandidate = candidates.find((candidate) => candidate.candidateSetId === state.selectedCandidateId);
   document.getElementById('selected-result-link').innerHTML = selectedCandidate
     ? `<a href="#explainability-panel">Selected: Candidate #${escapeHtml(selectedCandidate.rank ?? 'Not provided')} · ${escapeHtml(candidateLabel(selectedCandidate))}</a>` : '';
@@ -490,17 +536,16 @@ function renderResults(data) {
         </div>
         <span class="status-badge status-${candidate.status === 'rejected' ? 'rejected' : 'accepted'}">Rule check: ${ruleLabel(candidate)}</span>
       </div>
-      <ul class="drug-list">${(candidate.drugs ?? []).map((id, index) => `
+      <ul class="drug-list researcher-only">${(candidate.drugs ?? []).map((id, index) => `
         <li class="drug-item"><strong>${escapeHtml(candidate.drugNames?.[index] ?? id)}</strong><code>${escapeHtml(id)}</code></li>`).join('')}</ul>
       <div class="result-meta">
         <span><strong>Graph coverage</strong> ${(candidate.treatedDiseaseIds ?? []).length} of ${data.diseaseIds?.length ?? data.diseases?.length ?? 0} selected diseases represented</span>
-        <span>Covered: ${(candidate.treatedDiseaseIds ?? []).map((id) => escapeHtml(diseaseLabels.get(id) ?? id)).join(', ') || 'None provided'}</span>
-        <span>Uncovered: ${(candidate.uncoveredDiseaseIds ?? []).map((id) => escapeHtml(diseaseLabels.get(id) ?? id)).join(', ') || 'None'}</span>
-        <span>Drugs: ${escapeHtml(candidate.drugCount ?? candidate.drugs?.length ?? 'Not provided')}</span>
+        <span class="researcher-only">Covered: ${(candidate.treatedDiseaseIds ?? []).map((id) => escapeHtml(diseaseLabels.get(id) ?? id)).join(', ') || 'None provided'}</span>
+        <span class="researcher-only">Uncovered: ${(candidate.uncoveredDiseaseIds ?? []).map((id) => escapeHtml(diseaseLabels.get(id) ?? id)).join(', ') || 'None'}</span>
         <span>Interaction prediction: ${escapeHtml(ml.label)}</span>
       </div>
       ${rejectionReasons ? `<p class="inline-warning">${escapeHtml(rejectionReasons)}</p>` : ''}
-      <button type="button" class="secondary explanation-button" data-candidate-id="${escapeHtml(candidate.candidateSetId)}" aria-pressed="${selected}">Inspect candidate</button>
+      <button type="button" class="secondary explanation-button" data-candidate-id="${escapeHtml(candidate.candidateSetId)}" aria-pressed="${selected}">Understand this candidate</button>
     </article>`;
   }).join('');
   results.querySelectorAll('[data-candidate-id]').forEach((button) => {
@@ -508,9 +553,9 @@ function renderResults(data) {
   });
 }
 
-function renderGraphVisualization(candidate) {
+function renderGraphVisualization(candidate, advanced = state.displayMode === 'researcher') {
   const priority = { CtD: 0, CbG: 1, CuG: 1, CdG: 1, CcSE: 2 };
-  const paths = graphPaths(candidate).slice().sort((a, b) => priority[relationshipType(a)] - priority[relationshipType(b)]).slice(0, 30);
+  const paths = graphPaths(candidate).filter(path => advanced || relationshipType(path) === 'CtD').slice().sort((a, b) => priority[relationshipType(a)] - priority[relationshipType(b)]).slice(0, 30);
   if (!paths.length) return '<p class="muted">Graph paths are unavailable for this candidate.</p>';
   return `<div class="graph-stage">
     <div class="evidence-diagram" aria-label="Candidate knowledge graph evidence paths">
@@ -519,15 +564,15 @@ function renderGraphVisualization(candidate) {
         const type = rel === 'CtD' ? 'disease' : rel === 'CcSE' ? 'side-effect' : 'gene';
         return `<div class="evidence-edge">
           <div class="evidence-node node-compound"><small>Drug</small><strong>${escapeHtml(path.sourceEntity?.name ?? path.sourceEntity?.id)}</strong></div>
-          <span class="evidence-connector" title="${escapeHtml(path.pathId)} · ${escapeHtml(path.provenance?.source)} · ${escapeHtml(path.provenance?.graphVersion)}">${escapeHtml(rel)} <span aria-hidden="true">→</span></span>
+          <span class="evidence-connector" title="${advanced ? `${escapeHtml(path.pathId)} · ${escapeHtml(path.provenance?.source)} · ${escapeHtml(path.provenance?.graphVersion)}` : 'Represented treatment relationship'}">${escapeHtml(rel)} <span aria-hidden="true">→</span></span>
           <div class="evidence-node node-${type}"><small>${type === 'side-effect' ? 'Side Effect' : type === 'disease' ? 'Disease' : 'Gene'}</small><strong>${escapeHtml(path.targetEntity?.name ?? path.targetEntity?.id)}</strong></div>
         </div>`;
       }).join('')}
     </div>
     <div class="graph-legend">
-      <span class="legend-compound">Drug / Compound</span><span class="legend-disease">Disease</span><span class="legend-gene">Gene</span><span class="legend-side-effect">Side Effect</span>
+      <span class="legend-compound">Drug</span><span class="legend-disease">Disease</span><span>Relationship</span>${advanced ? '<span class="legend-gene">Gene</span><span class="legend-side-effect">Side Effect</span>' : ''}
     </div>
-    <dl class="relationship-legend"><div><dt>CtD</dt><dd>Compound treats Disease</dd></div><div><dt>CbG</dt><dd>Compound binds Gene</dd></div><div><dt>CuG</dt><dd>Compound upregulates Gene</dd></div><div><dt>CdG</dt><dd>Compound downregulates Gene</dd></div><div><dt>CcSE</dt><dd>Compound causes Side Effect</dd></div></dl>
+    ${advanced ? '<dl class="relationship-legend"><div><dt>CtD</dt><dd>Compound treats Disease</dd></div><div><dt>CbG</dt><dd>Compound binds Gene</dd></div><div><dt>CuG</dt><dd>Compound upregulates Gene</dd></div><div><dt>CdG</dt><dd>Compound downregulates Gene</dd></div><div><dt>CcSE</dt><dd>Compound causes Side Effect</dd></div></dl>' : ''}
     ${graphPaths(candidate).length > paths.length ? `<p class="muted">Showing ${paths.length} of ${graphPaths(candidate).length} paths to keep the graph readable.</p>` : ''}
   </div>`;
 }
@@ -553,9 +598,9 @@ function renderSelectedCandidate(candidate, data) {
   const mlPairs = appliedPairs(candidate);
   const reasons = candidate.rejectionReasons ?? [];
   const ml = candidateMlPresentation(candidate);
-  container.innerHTML = `<article class="candidate-explanation">
+  const technical = `<article class="candidate-explanation">
     ${candidateNarrative(candidate, data)}
-    ${understandingGuide()}
+    <details><summary>Terms and evidence guide</summary>${understandingGuide()}</details>
     <section class="evidence-section section-graph">
       <h4>Graph Evidence</h4>
       <div class="graph-summary">
@@ -564,7 +609,7 @@ function renderSelectedCandidate(candidate, data) {
         <span>Uncovered diseases: ${(candidate.uncoveredDiseaseIds ?? []).map((id) => escapeHtml(diseaseLabels.get(id) ?? id)).join(', ') || 'None'}</span>
       </div>
       <p>Represented evidence for this candidate</p>
-      ${renderGraphVisualization(candidate)}
+      ${renderGraphVisualization(candidate, true)}
       <details class="technical-details"><summary>Technical graph details</summary><p>${escapeHtml(candidate.graphEvidence?.source ?? data.metadata?.graph ?? 'Not provided')} · ${escapeHtml(candidate.graphEvidence?.graphVersion ?? 'Not provided')}</p>
       ${renderPathList(candidate, 'treatment', 'CtD Treatment Paths')}
       ${renderPathList(candidate, 'gene_context', 'Gene Context')}
@@ -591,8 +636,24 @@ function renderSelectedCandidate(candidate, data) {
       </li>`).join('')}</ul>` : `<div class="predictions-unavailable"><strong>${escapeHtml(ml.label)}</strong><p>${escapeHtml(ml.detail)}</p></div>`}
     </section>
     <details class="technical-details"><summary>Candidate metadata</summary><p>Candidate set ID: ${escapeHtml(candidate.candidateSetId)} · Raw status: ${escapeHtml(candidate.status)}</p><p>${(candidate.drugs ?? []).map(escapeHtml).join(', ')}</p></details>
-    ${finalCandidateSummary(candidate, data)}
   </article>`;
+  container.innerHTML = state.displayMode === 'researcher' ? technical : `<article class="candidate-explanation simple-explanation">
+    <p class="eyebrow">Candidate #${escapeHtml(candidate.rank ?? 'Not provided')}</p>
+    <h3>${escapeHtml(candidateLabel(candidate))}</h3>
+    <h4>Why this candidate?</h4><p>${shortCandidateSummary(candidate, data)}</p>
+    <h4>Knowledge Graph Evidence</h4>${renderGraphVisualization(candidate, false)}
+    <details><summary>Research details: graph, rules and predictions</summary>${technical}</details>
+  </article>`;
+}
+
+function shortCandidateSummary(candidate, data) {
+  const labels = diseaseLabelMap(data);
+  const covered = (candidate.treatedDiseaseIds ?? []).filter(id => (data.diseaseIds ?? [...labels.keys()]).includes(id));
+  const targets = data.diseaseIds?.length ?? data.diseases?.length ?? 0;
+  const paths = graphPaths(candidate).filter(path => relationshipType(path) === 'CtD');
+  const pairs = appliedPairs(candidate);
+  const prediction = pairs.length ? pairs.map(pair => `${pairLabel(pair, candidate)}: ${pair.predictedSeverity}`).join('; ') : candidateMlPresentation(candidate).label;
+  return escapeHtml(`${paths.length ? 'These drugs have represented treatment connections to ' + (covered.map(id => labels.get(id) ?? id).join(', ') || 'graph diseases') : 'No treatment connections were returned for these drugs'}. Graph coverage is ${covered.length} of ${targets} selected diseases. Rule result: ${ruleLabel(candidate)}; Random Forest interaction prediction: ${prediction}. Rank ${candidate.rank ?? 'unavailable'} follows configured rule status, graph coverage and drug count, not clinical superiority.`);
 }
 
 function selectCandidate(candidateId, navigate = false) {
@@ -603,7 +664,7 @@ function selectCandidate(candidateId, navigate = false) {
   renderWorkflow(computeWorkflowStages(state.currentResult, state.selectedCandidateId));
   renderResults(state.currentResult);
   renderSelectedCandidate(candidate, state.currentResult);
-  if (navigate) window.location.hash = 'explainability-panel';
+  if (navigate) setSimulationStep(4, true);
 }
 
 function startElapsedTimer() {
@@ -634,12 +695,15 @@ async function analyzeCombination() {
   analyzeBtn.disabled = true;
   catalogTag.textContent = 'Search in progress';
   running.hidden = false;
+  if (state.catalogStatus === 'ready') document.getElementById('catalog-message').hidden = true;
   state.currentResult = null;
   state.selectedCandidateId = null;
   state.showAllCandidates = false;
+  state.candidateOffset = 0;
   document.getElementById('result-display').hidden = true;
   document.getElementById('analysis-summary').hidden = true;
   startElapsedTimer();
+  setSimulationStep(2, true);
   renderWorkflow(computeWorkflowStages(null, null, true));
   setMessage(results, 'Analysis running. The local research graph pipeline may take about a minute.');
   document.getElementById('summary-cards').replaceChildren();
@@ -658,17 +722,22 @@ async function analyzeCombination() {
     renderResults(data);
     renderWorkflow(computeWorkflowStages(data, state.selectedCandidateId));
     renderSelectedCandidate(data.candidateSets?.[0], data);
+    setSimulationStep(3, true);
   } catch (error) {
     if (generation !== state.requestGeneration) return;
     catalogTag.textContent = error.message.includes('timed out') ? 'Candidate search timeout' : 'System error';
     setMessage(results, `Candidate search unavailable: ${error.message}`, 'error');
     renderWorkflow(computeWorkflowStages(null, null, false, error.message));
+    setSimulationStep(1, true);
+    setMessage(document.getElementById('catalog-message'), `Analysis unavailable: ${error.message}`, 'error');
+    document.getElementById('catalog-message').hidden = false;
   } finally {
     if (generation === state.requestGeneration) {
       state.candidateController = null;
       stopElapsedTimer();
       running.hidden = true;
       renderSelectionSummary();
+      setSimulationStep(state.simulationStep);
     }
   }
 }
@@ -683,6 +752,7 @@ function resetSimulation() {
   state.currentResult = null;
   state.selectedCandidateId = null;
   state.showAllCandidates = false;
+  state.candidateOffset = 0;
   document.getElementById('disease-search').value = '';
   document.getElementById('elapsed-time').textContent = 'Elapsed: 0s';
   document.getElementById('analysis-running').hidden = true;
@@ -705,6 +775,7 @@ function resetSimulation() {
   }
   window.location.hash = 'simulation';
   document.body.dataset.view = 'simulation';
+  setSimulationStep(1);
   document.getElementById('disease-search').focus();
 }
 
@@ -731,7 +802,8 @@ function renderModelAnalysisShell(data = null) {
   const sections = {
     overview: `<section class="analysis-section" role="tabpanel">
       <h3>Overview</h3>
-      <p>PolyMerge uses graph evidence, deterministic rules, set-cover optimization, and a traditional Random Forest DDI severity model as separate research evidence channels.</p>
+      <p>Random Forest had the highest validation Macro F1 among the three tested classical models.</p>
+      <p class="inline-warning">Major and Minor recall remains limited. These results are not clinical validation.</p>
       <div class="final-metrics">
         <span>DDInter classes: Major, Moderate, Minor</span>
         <span>Primary metric: validation Macro F1</span>
@@ -814,6 +886,8 @@ function showView() {
   const requested = window.location.hash.slice(1) || 'home';
   const view = viewIds.includes(requested) ? requested : 'home';
   document.body.dataset.view = view;
+  if (view === 'explainability-panel' && state.currentResult) setSimulationStep(4);
+  if (view === 'simulation' && state.simulationStep === 4) setSimulationStep(state.currentResult ? 3 : 1);
   document.getElementById('page-title').textContent = view === 'home'
     ? 'Research Dashboard'
     : view === 'simulation'
@@ -830,9 +904,17 @@ function showView() {
 }
 
 function init() {
+  setSimulationStep(1);
+  setDisplayMode('simple');
   renderWorkflow(computeWorkflowStages(null));
   document.getElementById('analyze-btn').addEventListener('click', analyzeCombination);
   document.getElementById('reset-simulation').addEventListener('click', resetSimulation);
+  document.getElementById('cancel-analysis').addEventListener('click', resetSimulation);
+  document.getElementById('simple-view').addEventListener('click', () => setDisplayMode('simple'));
+  document.getElementById('researcher-view').addEventListener('click', () => setDisplayMode('researcher'));
+  document.getElementById('next-candidates').addEventListener('click', () => changeCandidatePage(1));
+  document.getElementById('previous-candidates').addEventListener('click', () => changeCandidatePage(-1));
+  for (let step = 1; step <= 4; step += 1) document.getElementById(`step-${step}`).addEventListener('click', () => setSimulationStep(step, true));
   document.getElementById('show-all-candidates').addEventListener('change', (event) => {
     state.showAllCandidates = event.target.checked;
     if (state.currentResult) renderResults(state.currentResult);
@@ -875,6 +957,10 @@ globalThis.PolyMergeFrontend = {
   analyzeCombination,
   finalCandidateSummary,
   understandingGuide,
+  shortCandidateSummary,
+  setSimulationStep,
+  setDisplayMode,
+  changeCandidatePage,
 };
 
 if (typeof document !== 'undefined') {

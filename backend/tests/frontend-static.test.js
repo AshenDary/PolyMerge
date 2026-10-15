@@ -126,7 +126,7 @@ test('frontend exposes Home, Simulation, Explainability, and Model Analysis navi
   assert.match(html, /href="#explainability-panel"/);
   assert.match(html, /href="#model-analysis"/);
   assert.match(html, /Start Simulation/);
-  assert.match(html, /Analysis Pipeline/);
+  assert.match(html, /View technical pipeline/);
   assert.doesNotMatch(html, /topbar-pills/);
   assert.doesNotMatch(html, /ml-tag/);
   assert.doesNotMatch(html, /Research use only/);
@@ -255,6 +255,9 @@ function attachDocument(logic) {
       if (!elements.has(id)) elements.set(id, {
         innerHTML: '', textContent: '', value: '', hidden: true, disabled: false,
         querySelectorAll: () => [],
+        attributes: {},
+        setAttribute(name, value) { this.attributes[name] = value; },
+        removeAttribute(name) { delete this.attributes[name]; },
         replaceChildren() { this.innerHTML = ''; this.textContent = ''; },
         focus() { this.focused = true; },
       });
@@ -270,10 +273,10 @@ test('analysis summary renders response disease names, IDs and actual counts', (
   logic.renderSummary(candidateResponse);
   assert.equal(elements.get('analysis-summary').hidden, false);
   assert.match(elements.get('your-analysis').innerHTML, /hypertension/);
-  assert.match(elements.get('your-analysis').innerHTML, /Disease::DOID:9352/);
+  assert.doesNotMatch(elements.get('your-analysis').innerHTML, /Disease::DOID:9352/);
   assert.deepEqual(JSON.parse(JSON.stringify(logic.analysisMetrics(candidateResponse))).map((metric) => metric[1]), [2, 2, 2, 1, 1, 1]);
   assert.match(elements.get('summary-cards').innerHTML, /Returned candidate sets/);
-  assert.match(elements.get('summary-cards').innerHTML, /Pair predictions across results/);
+  assert.match(elements.get('summary-cards').innerHTML, /Candidates with predictions/);
 });
 
 test('returned evidence is deduplicated and no live stage completion is invented', () => {
@@ -320,7 +323,7 @@ test('selection refreshes card highlight, evidence summary and candidate explana
 
 test('graph legend and secondary technical detail preserve evidence semantics', () => {
   const logic = loadFrontendLogic();
-  const graph = logic.renderGraphVisualization(candidateResponse.candidateSets[0]);
+  const graph = logic.renderGraphVisualization(candidateResponse.candidateSets[0], true);
   for (const relation of ['CtD', 'CbG', 'CuG', 'CdG', 'CcSE']) assert.ok(graph.includes(relation));
   assert.doesNotMatch(graph, /CrC/);
   const elements = attachDocument(logic);
@@ -354,7 +357,7 @@ test('graph diagram prioritizes treatment paths and escapes node names and metad
     ...candidateResponse.candidateSets[1].graphEvidence.paths,
     { ...candidateResponse.candidateSets[0].graphEvidence.paths[0], sourceEntity: { id: 'a', name: '<img src=x onerror=alert(1)>' }, pathId: '\" onmouseover=alert(1)' },
   ] } };
-  const html = logic.renderGraphVisualization(candidate);
+  const html = logic.renderGraphVisualization(candidate, true);
   assert.ok(html.indexOf('node-disease') < html.indexOf('node-gene'));
   assert.match(html, /&lt;img/);
   assert.match(html, /&quot; onmouseover/);
@@ -395,7 +398,7 @@ function manyCandidates() {
   })) };
 }
 
-test('default display limits cards to ten without changing response order, ranks or summary', () => {
+test('default display limits cards to five without changing response order, ranks or summary', () => {
   const { logic, get } = simulationHarness();
   const data = manyCandidates();
   // Keep deliberately nonsequential backend ranks to detect accidental reranking.
@@ -404,14 +407,15 @@ test('default display limits cards to ten without changing response order, ranks
   logic.state.currentResult = data;
   logic.selectCandidate(data.candidateSets[0].candidateSetId);
   const html = get('results').innerHTML;
-  assert.equal((html.match(/<article /g) ?? []).length, 10);
+  assert.equal((html.match(/<article /g) ?? []).length, 5);
   assert.ok(html.indexOf('Candidate #8') < html.indexOf('Candidate #3'));
   assert.ok(!html.includes('data-candidate-id="candidate:10"'));
-  assert.equal(get('result-count').textContent, 'Showing top 10 of 100 returned candidates');
+  assert.equal(get('result-count').textContent, 'Showing 1-5 of 100 returned candidates');
   assert.match(get('workflow-list').innerHTML, /93 of 100 candidates/);
   assert.equal(logic.analysisMetrics(data).find(([label]) => label === 'Returned candidate sets')[1], 100);
   assert.equal(logic.state.currentResult.candidateSets.length, 100);
   logic.state.showAllCandidates = true;
+  logic.setDisplayMode('researcher');
   logic.selectCandidate('candidate:40');
   assert.equal((get('results').innerHTML.match(/<article /g) ?? []).length, 100);
   logic.state.showAllCandidates = false;
@@ -562,4 +566,113 @@ test('Home has one shared disclaimer and New Simulation is wired', () => {
   assert.match(html, /id="reset-simulation"/);
   assert.match(app, /addEventListener\('click', resetSimulation\)/);
   assert.doesNotMatch(app, /Random Forest · Sprint/);
+});
+
+test('four-step flow advances through analysis, results and selected explanation', async () => {
+  const { logic, requests, get } = simulationHarness();
+  assert.equal(logic.state.simulationStep, 1);
+  assert.equal(logic.state.displayMode, 'simple');
+  logic.state.selectedDiseases.add('Disease::DOID:10763');
+  const pending = logic.analyzeCombination();
+  assert.equal(logic.state.simulationStep, 2);
+  assert.equal(get('step-2').attributes['aria-current'], 'step');
+  requests[0].resolve(candidateResponse);
+  await pending;
+  assert.equal(logic.state.simulationStep, 3);
+  logic.selectCandidate(candidateResponse.candidateSets[1].candidateSetId, true);
+  assert.equal(logic.state.simulationStep, 4);
+  assert.equal(logic.context.window.location.hash, 'explainability-panel');
+});
+
+test('mode changes retain the same result, selected candidate and full counts without fetching', () => {
+  const { logic, requests, get } = simulationHarness();
+  const data = manyCandidates();
+  logic.state.currentResult = data;
+  logic.selectCandidate('candidate:40');
+  logic.setDisplayMode('researcher');
+  assert.equal(logic.state.currentResult, data);
+  assert.equal(logic.state.selectedCandidateId, 'candidate:40');
+  assert.equal(get('technical-pipeline').open, true);
+  assert.equal(get('researcher-view').attributes['aria-pressed'], 'true');
+  logic.state.showAllCandidates = true;
+  logic.renderResults(data);
+  assert.equal((get('results').innerHTML.match(/<article /g) ?? []).length, 100);
+  logic.setDisplayMode('simple');
+  assert.equal((get('results').innerHTML.match(/<article /g) ?? []).length, 5);
+  assert.equal(logic.state.currentResult, data);
+  assert.equal(requests.length, 0);
+});
+
+test('next five replaces the page, preserves backend ordering and handles the last page', () => {
+  const { logic, get } = simulationHarness();
+  const data = manyCandidates();
+  data.candidateSets = data.candidateSets.slice(0, 12);
+  logic.state.currentResult = data;
+  const ids = data.candidateSets.map(c => c.candidateSetId);
+  logic.renderResults(data);
+  logic.changeCandidatePage(1);
+  assert.equal(get('result-count').textContent, 'Showing 6-10 of 12 returned candidates');
+  assert.equal((get('results').innerHTML.match(/<article /g) ?? []).length, 5);
+  assert.match(get('results').innerHTML, /data-candidate-id="candidate:5"/);
+  assert.doesNotMatch(get('results').innerHTML, /data-candidate-id="candidate:0"/);
+  logic.changeCandidatePage(1);
+  assert.equal(get('result-count').textContent, 'Showing 11-12 of 12 returned candidates');
+  assert.equal(get('next-candidates').disabled, true);
+  logic.changeCandidatePage(-1);
+  assert.equal(logic.state.candidateOffset, 5);
+  assert.deepEqual(data.candidateSets.map(c => c.candidateSetId), ids);
+});
+
+for (const step of [1, 3, 4]) {
+  test(`reset from step ${step} clears results while retaining chosen display mode`, () => {
+    const { logic, get } = simulationHarness();
+    logic.state.currentResult = candidateResponse;
+    logic.setDisplayMode('researcher');
+    logic.setSimulationStep(step);
+    logic.resetSimulation();
+    assert.equal(logic.state.simulationStep, 1);
+    assert.equal(logic.state.currentResult, null);
+    assert.equal(logic.state.selectedCandidateId, null);
+    assert.equal(logic.state.candidateOffset, 0);
+    assert.equal(logic.state.displayMode, 'researcher');
+    assert.equal(get('step-3').disabled, true);
+    assert.doesNotMatch(get('explainability').innerHTML, /Valsartan/);
+  });
+}
+
+test('simple explanation is four grounded sentences with honest rule and pair states', () => {
+  const { logic } = simulationHarness();
+  const single = logic.shortCandidateSummary(candidateResponse.candidateSets[0], candidateResponse);
+  assert.equal(single.split('. ').length, 4);
+  assert.match(single, /No configured rule triggered/);
+  assert.match(single, /Not applicable/);
+  const applied = logic.shortCandidateSummary(candidateResponse.candidateSets[1], candidateResponse);
+  assert.match(applied, /Moderate/);
+  assert.match(applied, /Rejected/);
+  assert.doesNotMatch(applied, /confidence|probability|safety score|clinically safe/i);
+  const escaped = logic.shortCandidateSummary({ ...candidateResponse.candidateSets[0], rank: '<img onerror=x>' }, candidateResponse);
+  assert.match(escaped, /&lt;img/);
+  assert.doesNotMatch(escaped, /<img/);
+});
+
+test('simple graph shows treatment only; researcher graph retains context and provenance', () => {
+  const { logic } = simulationHarness();
+  const candidate = candidateResponse.candidateSets[1];
+  const simple = logic.renderGraphVisualization(candidate, false);
+  assert.doesNotMatch(simple, /node-gene|node-side-effect|graph-path:/);
+  const advanced = logic.renderGraphVisualization(candidate, true);
+  assert.match(advanced, /node-gene/);
+  assert.match(advanced, /graph-path:/);
+  assert.doesNotMatch(advanced, /CrC/);
+});
+
+test('guided controls have semantic labels, focus styles and no fake progress', () => {
+  const html = readFileSync(path.join(frontendDir, 'index.html'), 'utf8');
+  const css = readFileSync(path.join(frontendDir, 'styles.css'), 'utf8');
+  for (const text of ['1. Select Diseases', '2. Analyze', '3. Review Candidates', '4. Understand Result', 'Simple View', 'Researcher View', 'Show next 5', 'Server processing may continue']) assert.ok(html.includes(text));
+  assert.match(html, /aria-label="Simulation steps"/);
+  assert.match(html, /role="group" aria-label="Result detail level"/);
+  assert.match(css, /focus-visible/);
+  assert.match(css, /overflow-wrap: anywhere/);
+  assert.doesNotMatch(html, /role="progressbar"/);
 });
