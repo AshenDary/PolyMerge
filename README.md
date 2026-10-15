@@ -149,24 +149,21 @@ Open the Fastify frontend at `http://127.0.0.1:3000`.
 
 1. Start on Home and choose **Start Simulation**.
 2. Search for `hypertension` and select `Disease::DOID:10763`.
-3. Run **Search Candidate Sets** and wait for the synchronous analysis. No live
-   stage completion is inferred while the request is running.
-4. Read **Your analysis**, **Analysis Summary**, then **Analysis Pipeline**.
-   Counts describe returned candidates, not all combinations considered. Graph
-   paths are deduplicated; pair predictions count occurrences across candidates.
-5. In **Candidate Results**, choose a single-drug result and confirm interaction
-   prediction is **Not applicable**. Select **Inspect candidate**.
-   The list initially shows only the first 10 returned candidates in backend
-   rank order. Summary and pipeline counts still describe the full response.
-   **Show all returned candidates** reveals the remaining results without
-   another request and preserves the selected candidate.
-6. In Explainability, read **Why this candidate?** and expand **Why this rank?**.
-   Generation ranks by rule status, graph coverage, fewer drugs, then candidate
-   ID. Backend validation can add rejections without reranking. ML is separate.
-7. Review the graph legend, configured rules, and interaction prediction.
-   Stable IDs, provenance, and model details are available in expandable sections.
-   Read **Understanding your result**, expand the glossary, and finish with
-   **What this result tells us**. Predictions remain specific to individual pairs.
+3. Choose **Analyze Candidates**. The Analyze step shows elapsed time, not
+   invented stage progress. Completion opens Review Candidates.
+4. Read the compact summary of selected diseases, returned candidate sets, and
+   candidates with predictions. These counts describe the full response.
+5. Review the first five candidates in backend rank order. **Show next 5** pages
+   through the response without fetching again. Single-drug predictions remain
+   **Not applicable**. Choose **Understand this candidate** to enter step 4.
+6. Simple View shows a short grounded explanation and treatment connections.
+   Expand research details for the full evidence. **Researcher View** exposes
+   IDs, provenance, technical pipeline and optional all-results display using
+   the same response; switching modes never reruns analysis.
+7. Ranking uses configured rule status, graph coverage, fewer drugs, then ID.
+   Backend validation can add rejections without reranking. ML remains separate.
+   Rule applicability to canonical graph drug IDs is still an audit blocker;
+   "No configured rule triggered" is not a clinical safety assessment.
 8. Choose **New Simulation** from Simulation or Explainability. It clears
    selection, search, results, explanations, and timers while keeping the catalog.
    Select hypertension and `type 2 diabetes mellitus` (`Disease::DOID:9352`),
@@ -178,16 +175,24 @@ Open the Fastify frontend at `http://127.0.0.1:3000`.
 
 **New Simulation** also works during a request: the browser request is aborted
 and late responses/errors are ignored. This does not cancel server-side graph
-work; a new request may wait for that synchronous work to finish. If catalog
+work; a new analysis receives a clear busy response while the single worker
+remains occupied. If catalog
 loading failed, its retry control remains available after reset.
 
 For local Streamlit validation, set `POLYMERGE_FRONTEND_URL` to the actual
 Fastify origin, open Streamlit, and repeat navigation, analysis, and reset.
 HTTP and script checks do not replace manual browser/iframe acceptance.
 
-Demo sequence: Home → Simulation → Disease Selection → Analysis Summary →
-Analysis Pipeline → Candidate Results → Inspect Candidate → Explainability →
-Model Analysis. Sprint 6 remains pending manual presentation review.
+Demo sequence: Select Diseases → Analyze → Review Candidates → Understand Result.
+Model Analysis retains the frozen metrics and EDA assets. Sprint 6 remains
+pending manual presentation review. See [guided demo acceptance](docs/sprint6-guided-demo.md).
+
+Local profiling reduced median single-disease latency from 20,147.848 ms to
+925.607 ms and two-disease latency from 57,893.834 ms to 1,051.950 ms across
+three sequential runs per case on the same dataset. Full canonical response
+equivalence was checked excluding request IDs/timestamps. These are local
+observations, not production guarantees. See the
+[performance investigation](docs/audits/sprint6-performance-investigation.md).
 
 If the ML/Graph service is unavailable or violates the response contract, the backend returns an explicitly labeled fallback:
 

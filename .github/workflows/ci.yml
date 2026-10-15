@@ -3,7 +3,7 @@ on:
   pull_request:
     branches: [main]
   push:
-    branches: [main, 'sprint6/jared/final-audit-cicd']
+    branches: [main, 'sprint6/jared/final-audit-cicd', 'sprint6/jared/performance-guided-ux']
   workflow_dispatch:
 permissions:
   contents: read
