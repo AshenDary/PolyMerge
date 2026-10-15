@@ -8,7 +8,7 @@ test('flags MAOI + SSRI as an absolute contraindication with structured evidence
   assert.deepEqual(violation, {
     type: 'hard_contraindication',
     pair: ['maoi', 'ssri'],
-    message: 'Absolute contraindication: maoi + ssri',
+    message: 'Configured research exclusion: maoi + ssri',
   });
 });
 

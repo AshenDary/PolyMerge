@@ -13,7 +13,7 @@ from app.services.graph_service import (
     GraphService,
     Neo4jConnectionError,
 )
-from app.services.safety_filter import check_hard_contraindications
+from app.services.safety_filter import check_hard_contraindications, evaluate_rule_applicability
 
 
 DEFAULT_CANDIDATE_SET_CONFIG = {
@@ -188,6 +188,7 @@ def _candidate_set_from_combo(
         "evidenceLevel": "graph",
         "dataStatus": "real_graph",
         "status": "accepted",
+        "ruleEvaluation": evaluate_rule_applicability(drug_ids),
         "evidence": evidence,
         "targets": targets,
         "sideEffects": side_effects,

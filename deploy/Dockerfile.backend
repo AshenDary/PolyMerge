@@ -4,6 +4,7 @@ WORKDIR /app/backend
 COPY backend/package.json backend/package-lock.json ./
 RUN npm ci --omit=dev --ignore-scripts && npm cache clean --force
 COPY backend/src ./src
+COPY data/rules /app/data/rules
 COPY frontend /app/frontend
 COPY docs /app/docs
 COPY data/interim/sprint4/feature_contract.json /app/data/interim/sprint4/feature_contract.json

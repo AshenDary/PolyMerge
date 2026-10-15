@@ -1,0 +1,21 @@
+{
+  "version": "polymerge-research-rules-2026-10-16-v1",
+  "scope": "research_only",
+  "clinicallyValidated": false,
+  "ruleSource": "Existing PolyMerge configured research exclusions; clinical hard-exclusion provenance not established",
+  "pairs": [["maoi", "ssri"], ["warfarin", "nsaid"], ["ace_inhibitor", "potassium_sparing_diuretic"]],
+  "mappings": {
+    "Compound::DB00945": {
+      "name": "Acetylsalicylic acid",
+      "tokens": ["nsaid"],
+      "complete": false,
+      "source": "Hetionet v1.0 filtered PolyMerge fragment",
+      "relationship": "PCiC",
+      "classId": "Pharmacologic Class::N0000175721",
+      "className": "Nonsteroidal Anti-inflammatory Compounds",
+      "evidenceFile": "data/processed/fragment_edges.csv",
+      "corroboratingSource": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=815a70e4-525c-4015-8d3b-83dbb979a66f",
+      "verifiedOn": "2026-10-16"
+    }
+  }
+}

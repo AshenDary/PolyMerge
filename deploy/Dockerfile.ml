@@ -5,6 +5,7 @@ COPY ml_engine/requirements.txt ./requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt && useradd --uid 10001 --create-home app
 COPY ml_engine/main.py ./main.py
 COPY ml_engine/app ./app
+COPY data/rules /app/data/rules
 COPY data/interim/sprint3/ddinter_hetionet_mapping.csv /app/data/interim/sprint3/ddinter_hetionet_mapping.csv
 COPY data/interim/sprint3/ddinter_pubchem_mapping.csv /app/data/interim/sprint3/ddinter_pubchem_mapping.csv
 COPY data/processed/fragment_edges.csv /app/data/processed/fragment_edges.csv
