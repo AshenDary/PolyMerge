@@ -194,6 +194,14 @@ equivalence was checked excluding request IDs/timestamps. These are local
 observations, not production guarantees. See the
 [performance investigation](docs/audits/sprint6-performance-investigation.md).
 
+Availability follow-up: single-drug results are **Not applicable**, supported
+pairs retain real predictions, and partially supported multi-drug sets retain
+their available pairs with explicit missing-mapping reasons. Rule evaluation
+now reports verified mapping coverage separately from candidate eligibility;
+no rejection is not a passed safety assessment. See the
+[availability remediation audit](docs/audits/sprint6-availability-remediation.md)
+for reproduced cases, sources, limitations and manual review instructions.
+
 If the ML/Graph service is unavailable or violates the response contract, the backend returns an explicitly labeled fallback:
 
 - `dataStatus: "demo"`
