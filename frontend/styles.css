@@ -383,6 +383,7 @@ body[data-view="model-analysis"] #model-analysis { display: block; }
 }
 .status-accepted { background: #e8f6ee; color: #20633f; }
 .status-rejected { background: #fff0ef; color: #8e2929; }
+.status-badge.status-unknown { background: #fff4d6; color: #684b00; }
 
 .drug-list, .path-list, .rule-list, .prediction-list { list-style: none; padding: 0; margin: 12px 0; }
 .drug-list { display: flex; flex-wrap: wrap; gap: 8px; }

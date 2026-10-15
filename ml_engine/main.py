@@ -153,7 +153,7 @@ class CandidateSetResult(BaseModel):
     rejectionReasons: list[dict[str, Any]] = Field(default_factory=list)
     evidence: list[dict[str, Any]] = Field(default_factory=list)
     dataStatus: Literal["real_graph"]
-    mlStatus: Literal["applied", "not_applied"]
+    mlStatus: Literal["applied", "partial", "not_applied"]
     mlPrediction: dict[str, Any] = Field(default_factory=dict)
     interactionRisk: None = None
     synergyScore: None = None
@@ -288,7 +288,7 @@ def _candidate_set_response(result: dict[str, Any]) -> dict[str, Any]:
     for candidate in result.get("candidates", []):
         treated_ids = candidate.get("treatedDiseaseIds", [])
         candidate_with_prediction = _apply_pair_predictions(candidate, prediction_context)
-        any_applied = any_applied or candidate_with_prediction.get("mlStatus") == "applied"
+        any_applied = any_applied or candidate_with_prediction.get("mlStatus") in ("applied", "partial")
         candidate_sets.append({
             **candidate_with_prediction,
             "uncoveredDiseaseIds": candidate.get(
@@ -335,18 +335,24 @@ def _apply_pair_predictions(candidate: dict[str, Any], context: Optional[dict[st
                 "status": "not_applied",
                 "pairs": [],
                 "reason": "At least two drugs are required for pair-level DDI inference.",
+                "reasonCode": "not_applicable",
+                "unavailablePairs": [],
             },
         }
 
-    try:
-        # Request-local snapshot: never shared across graph/model/mapping revisions.
-        context = context if context is not None else {"builder": None, "pairs": {}}
-        if context["builder"] is None:
-            context["builder"] = PairFeatureBuilder()
-        builder = context["builder"]
-        predicted_pairs = []
-        for drug_a, drug_b in combinations(drugs, 2):
-            key = (drug_a, drug_b)
+    # Both successful and unsupported outcomes belong only to this request snapshot.
+    context = context if context is not None else {"builder": None, "pairs": {}}
+    predicted_pairs, unavailable_pairs = [], []
+    failures = context.setdefault("failures", {})
+    for drug_a, drug_b in combinations(drugs, 2):
+        key = (drug_a, drug_b)
+        try:
+            if key in failures:
+                unavailable_pairs.append(failures[key])
+                continue
+            if context["builder"] is None:
+                context["builder"] = PairFeatureBuilder()
+            builder = context["builder"]
             if key not in context["pairs"]:
                 features = builder.build_features(drug_a, drug_b)
                 context["pairs"][key] = ddi_model_service.predict(features)
@@ -357,23 +363,22 @@ def _apply_pair_predictions(candidate: dict[str, Any], context: Optional[dict[st
                 "model": prediction["model"],
                 "inferenceStatus": prediction["inferenceStatus"],
             })
-    except (PairFeatureUnavailableError, FeatureSchemaError, ModelUnavailableError) as error:
-        return {
-            **candidate,
-            "mlStatus": "not_applied",
-            "mlPrediction": {
-                "status": "not_applied",
-                "pairs": [],
-                "reason": str(error),
-            },
-        }
+        except (PairFeatureUnavailableError, FeatureSchemaError, ModelUnavailableError) as error:
+            code = error.code if isinstance(error, PairFeatureUnavailableError) else "feature_validation_failure" if isinstance(error, FeatureSchemaError) else getattr(error, "code", "model_unavailable")
+            failure = {"drugPair": [drug_a, drug_b], "reasonCode": code, "reason": str(error),
+                       "missingDrugIds": getattr(error, "missing_drug_ids", [])}
+            failures[key] = failure
+            unavailable_pairs.append(failure)
 
+    status = "partial" if predicted_pairs and unavailable_pairs else "applied" if predicted_pairs else "not_applied"
     return {
         **candidate,
-        "mlStatus": "applied",
+        "mlStatus": status,
         "mlPrediction": {
-            "status": "applied",
+            "status": status,
             "pairs": predicted_pairs,
+            "unavailablePairs": unavailable_pairs,
+            **({"reason": unavailable_pairs[0]["reason"], "reasonCode": unavailable_pairs[0]["reasonCode"]} if unavailable_pairs else {}),
         },
     }
 

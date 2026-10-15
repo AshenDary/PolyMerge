@@ -156,13 +156,15 @@ function mlSummary(candidates) {
 }
 
 function appliedPairs(candidate) {
-  return candidate?.mlStatus === 'applied' && candidate.drugs?.length > 1
+  return ['applied', 'partial'].includes(candidate?.mlStatus) && candidate.drugs?.length > 1
     ? (candidate.mlPrediction?.pairs ?? []).filter((pair) => pair.inferenceStatus === 'applied' && pair.predictedSeverity)
     : [];
 }
 
 function ruleLabel(candidate) {
-  return candidate?.status === 'accepted' ? 'No configured rule triggered' : candidate?.status === 'rejected' ? 'Rejected' : 'Not available';
+  if (candidate?.status === 'rejected') return 'Rejected by research rule';
+  return candidate?.ruleEvaluation?.status === 'evaluated' ? 'Evaluated; no configured rule triggered'
+    : candidate?.ruleEvaluation?.status === 'partially_evaluated' ? 'Partial mapping coverage' : 'Insufficient verified mapping';
 }
 
 function analysisMetrics(data) {
@@ -171,7 +173,7 @@ function analysisMetrics(data) {
     ['Selected diseases', new Set(data.diseaseIds ?? (data.diseases ?? []).map((disease) => disease.id)).size],
     ['Mapped drugs in results', new Set(candidates.flatMap((candidate) => candidate.drugs ?? [])).size],
     ['Returned candidate sets', candidates.length],
-    ['Passed rules', candidates.filter((candidate) => candidate.status === 'accepted').length],
+    ['Rules evaluated', candidates.filter((candidate) => candidate.ruleEvaluation?.status === 'evaluated').length],
     ['Rejected by rules', candidates.filter((candidate) => candidate.status === 'rejected').length],
     ['Pair predictions across results', mlSummary(candidates).pairCount],
   ];
@@ -182,7 +184,7 @@ function mappingMarkup(paths) {
   return treatments.length ? `<ul class="mapping-list">${treatments.map((path) => `<li>${escapeHtml(path.sourceEntity?.name ?? path.sourceEntity?.id)} → ${escapeHtml(path.targetEntity?.name ?? path.targetEntity?.id)} <small>CtD</small></li>`).join('')}</ul>` : '<p>No treatment mapping paths were returned.</p>';
 }
 
-const RANK_EXPLANATION = 'At generation, sets are ordered by configured rule status (passed first), then more selected diseases represented, then fewer drugs. Candidate set ID breaks remaining ties. Backend validation can add a rejection without changing that rank. Interaction severity does not determine this rank.';
+const RANK_EXPLANATION = 'At generation, sets are ordered by configured exclusion status (not rejected first), then more selected diseases represented, then fewer drugs. Candidate set ID breaks remaining ties. Backend validation can add a rejection without changing that rank. Interaction severity does not determine this rank; an untriggered rule does not establish mapping coverage.';
 
 function pairLabel(pair, candidate) {
   return (pair.drugPair ?? []).map((id) => candidate.drugNames?.[candidate.drugs.indexOf(id)] ?? id).join(' + ');
@@ -220,7 +222,7 @@ function finalCandidateSummary(candidate, data) {
   const pairs = appliedPairs(candidate);
   const ml = candidateMlPresentation(candidate);
   const ruleOutcome = candidate.status === 'accepted'
-    ? 'No configured deterministic hard-rule violation was detected.'
+    ? ruleLabel(candidate)
     : candidate.status === 'rejected'
       ? `Rejected by configured rules. ${(candidate.rejectionReasons ?? []).map((reason) => reason.message ?? 'Reason not provided').join(' ')}`
       : 'No rule outcome was returned.';
@@ -278,20 +280,21 @@ function candidateMlPresentation(candidate) {
       status: 'not_applicable',
       label: 'Not applicable',
       summary: 'Single-drug candidate; no drug pair to classify',
-      detail: 'This candidate contains one drug. Since the interaction model evaluates drug pairs, no pair prediction is applicable.',
+      detail: 'This candidate contains one drug, so there is no drug pair to classify.',
     };
   }
-  if (candidate?.mlStatus === 'applied' && pairCount > 0) {
+  if (pairCount > 0) {
+    const partial = candidate.mlStatus === 'partial';
     return {
-      status: 'complete',
-      label: pairCount === 1 ? pairs[0].predictedSeverity : `${pairCount} pairs classified`,
+      status: partial ? 'partial' : 'complete',
+      label: `${partial ? 'Partial predictions available' : 'Prediction available'}: ${pairCount === 1 ? pairs[0].predictedSeverity : `${pairCount} pairs classified`}`,
       summary: pluralize(pairCount, 'drug-pair prediction'),
       detail: pairs.map((pair) => `${pairLabel(pair, candidate)}: ${pair.predictedSeverity}`).join('; '),
     };
   }
   return {
     status: 'unavailable',
-    label: 'Not available',
+    label: 'Prediction unavailable',
     summary: 'No pair-level prediction returned',
     detail: candidate?.mlPrediction?.reason ?? 'No pair-level prediction was returned for this candidate.',
   };
@@ -353,9 +356,10 @@ function computeWorkflowStages(data, selectedCandidateId = null, running = false
     {
       key: 'rules',
       name: 'Deterministic rules',
-      status: !candidates.length ? 'unavailable' : rejected ? 'partial' : 'complete',
-      summary: `${accepted} passed · ${rejected} rejected among returned sets; ${candidates.reduce((count, candidate) => count + (candidate.rejectionReasons?.length ?? 0), 0)} rejection reasons returned.`,
-      detail: 'Each candidate was checked against the configured deterministic hard-rule layer. Passed means no configured hard-rule violation was detected.',
+      status: !candidates.length || candidates.every(candidate => !candidate.ruleEvaluation || candidate.ruleEvaluation.status === 'not_evaluable') ? 'unavailable'
+        : candidates.every(candidate => candidate.ruleEvaluation?.status === 'evaluated') ? 'complete' : 'partial',
+      summary: `${candidates.filter(candidate => candidate.ruleEvaluation?.status === 'evaluated').length} fully evaluated · ${candidates.filter(candidate => candidate.ruleEvaluation?.status === 'partially_evaluated').length} partial · ${rejected} rejected by research rules; ${candidates.filter(candidate => !candidate.ruleEvaluation || candidate.ruleEvaluation.status === 'not_evaluable').length} lack sufficient mappings.`,
+      detail: 'Missing verified identity or category mappings prevent evaluation; no rejection is not a passed clinical safety check.',
     },
     {
       key: 'optimization',
@@ -367,7 +371,7 @@ function computeWorkflowStages(data, selectedCandidateId = null, running = false
     {
       key: 'ml',
       name: 'Interaction prediction',
-      status: allSingleDrug ? 'not_applicable' : ml.applied ? (ml.notApplied ? 'partial' : 'complete') : 'unavailable',
+      status: allSingleDrug ? 'not_applicable' : ml.applied ? (candidates.some(candidate => candidate.drugs?.length > 1 && candidate.mlStatus !== 'applied') ? 'partial' : 'complete') : 'unavailable',
       summary: allSingleDrug
         ? 'Single-drug candidate; no drug pair to classify'
         : ml.applied
@@ -519,7 +523,7 @@ function renderResults(data) {
     return;
   }
   if (!candidates.length) {
-    setMessage(results, 'No candidate sets were returned for this selection.', 'empty');
+    setMessage(results, 'No represented treatment connections were found for this selection; no candidate sets can be built from this graph fragment.', 'empty');
     return;
   }
 
@@ -534,7 +538,7 @@ function renderResults(data) {
           <p class="eyebrow">Candidate #${escapeHtml(candidate.rank ?? 'Not provided')}</p>
           <h3>${escapeHtml(candidateLabel(candidate))}</h3>
         </div>
-        <span class="status-badge status-${candidate.status === 'rejected' ? 'rejected' : 'accepted'}">Rule check: ${ruleLabel(candidate)}</span>
+        <span class="status-badge status-${candidate.status === 'rejected' ? 'rejected' : candidate.ruleEvaluation?.status === 'evaluated' ? 'accepted' : 'unknown'}">Rule check: ${ruleLabel(candidate)}</span>
       </div>
       <ul class="drug-list researcher-only">${(candidate.drugs ?? []).map((id, index) => `
         <li class="drug-item"><strong>${escapeHtml(candidate.drugNames?.[index] ?? id)}</strong><code>${escapeHtml(id)}</code></li>`).join('')}</ul>
@@ -622,11 +626,14 @@ function renderSelectedCandidate(candidate, data) {
         <p>${escapeHtml(reason.message ?? 'Reason not provided')}</p>
         ${reason.pair?.length ? `<small>Pair: ${reason.pair.map(escapeHtml).join(' + ')}</small>` : ''}
         <small>Stage: ${escapeHtml(reason.stage ?? 'Not provided')} · Source: ${escapeHtml(reason.source ?? 'PolyMerge Safety Rules')}</small>
-      </li>`).join('')}</ul>` : `<div class="rule-pass"><strong>Configured rule check</strong><span>${ruleLabel(candidate)}</span><p>${candidate.status === 'accepted' ? 'No configured deterministic hard-rule violation detected.' : 'No rule reason was returned.'}</p></div>`}
+      </li>`).join('')}</ul>` : `<div><strong>Configured research rule check</strong><span>${ruleLabel(candidate)}</span></div>`}
+      <details><summary>Rule mapping coverage and provenance</summary><p>${escapeHtml(candidate.ruleEvaluation?.source ?? 'Verified rule mappings were not provided.')}</p><p>Mapping version: ${escapeHtml(candidate.ruleEvaluation?.mappingVersion ?? 'Not provided')}</p>
+      <ul>${(candidate.ruleEvaluation?.identities ?? []).map(identity => `<li>${escapeHtml(identity.drugId)}: ${escapeHtml(identity.tokens?.join(', ') || 'No verified category mapping')} · ${escapeHtml(identity.source ?? 'No source')}</li>`).join('')}</ul>
+      <ul>${(candidate.ruleEvaluation?.rules ?? []).map(rule => `<li>${rule.pair.map(escapeHtml).join(' + ')}: ${escapeHtml(rule.status)}${rule.triggered ? ' (triggered)' : ''}</li>`).join('')}</ul></details>
     </section>
     <section class="evidence-section section-predictions">
       <h4>Interaction Prediction</h4>
-      ${candidate.mlStatus === 'applied' && mlPairs.length ? `<ul class="prediction-list">${mlPairs.map((pair) => `<li class="prediction-item">
+      ${mlPairs.length ? `<p>${escapeHtml(ml.label)}</p><ul class="prediction-list">${mlPairs.map((pair) => `<li class="prediction-item">
         <div class="prediction-grid">
           <span><small>Drug pair</small><strong>${pair.drugPair?.map((id) => escapeHtml(candidate.drugNames?.[candidate.drugs.indexOf(id)] ?? id)).join(' + ') ?? 'Drug pair not provided'}</strong></span>
           <span><small>Predicted severity</small><strong>${escapeHtml(pair.predictedSeverity)}</strong></span>
@@ -634,6 +641,7 @@ function renderSelectedCandidate(candidate, data) {
         </div>
         <details><summary>Technical model details</summary><small>${escapeHtml(pair.model?.name ?? 'Model not provided')} · ${escapeHtml(pair.model?.version ?? 'Version not provided')} · ${escapeHtml(pair.inferenceStatus ?? 'Status not provided')}</small></details>
       </li>`).join('')}</ul>` : `<div class="predictions-unavailable"><strong>${escapeHtml(ml.label)}</strong><p>${escapeHtml(ml.detail)}</p></div>`}
+      ${(candidate.mlPrediction?.unavailablePairs ?? []).length ? `<ul class="prediction-list">${candidate.mlPrediction.unavailablePairs.map(pair => `<li><strong>${escapeHtml(pairLabel(pair, candidate))}: Prediction unavailable</strong><p>${escapeHtml(pair.reason)}</p><small>${escapeHtml(pair.reasonCode)}${pair.missingDrugIds?.length ? ` · Missing: ${pair.missingDrugIds.map(escapeHtml).join(', ')}` : ''}</small></li>`).join('')}</ul>` : ''}
     </section>
     <details class="technical-details"><summary>Candidate metadata</summary><p>Candidate set ID: ${escapeHtml(candidate.candidateSetId)} · Raw status: ${escapeHtml(candidate.status)}</p><p>${(candidate.drugs ?? []).map(escapeHtml).join(', ')}</p></details>
   </article>`;
@@ -652,7 +660,8 @@ function shortCandidateSummary(candidate, data) {
   const targets = data.diseaseIds?.length ?? data.diseases?.length ?? 0;
   const paths = graphPaths(candidate).filter(path => relationshipType(path) === 'CtD');
   const pairs = appliedPairs(candidate);
-  const prediction = pairs.length ? pairs.map(pair => `${pairLabel(pair, candidate)}: ${pair.predictedSeverity}`).join('; ') : candidateMlPresentation(candidate).label;
+  const unavailable = candidate.mlPrediction?.unavailablePairs ?? [];
+  const prediction = pairs.length ? `${candidate.mlStatus === 'partial' ? 'Partial predictions available; ' : ''}${pairs.map(pair => `${pairLabel(pair, candidate)}: ${pair.predictedSeverity}`).join('; ')}${unavailable.length ? `; ${unavailable.length} pairs unavailable (see details)` : ''}` : candidateMlPresentation(candidate).label;
   return escapeHtml(`${paths.length ? 'These drugs have represented treatment connections to ' + (covered.map(id => labels.get(id) ?? id).join(', ') || 'graph diseases') : 'No treatment connections were returned for these drugs'}. Graph coverage is ${covered.length} of ${targets} selected diseases. Rule result: ${ruleLabel(candidate)}; Random Forest interaction prediction: ${prediction}. Rank ${candidate.rank ?? 'unavailable'} follows configured rule status, graph coverage and drug count, not clinical superiority.`);
 }
 

@@ -6,7 +6,7 @@ import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import dotenv from 'dotenv';
 
-import { checkHardContraindications } from './rules/contraindications.js';
+import { checkHardContraindications, evaluateRuleApplicability } from './rules/contraindications.js';
 import { buildExplainabilityResponse } from './explainability/presentation.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -496,14 +496,30 @@ export function validateCandidateSetResult(payload) {
       && (candidateSet.interactionRisk != null || candidateSet.synergyScore != null)) {
       throw new Error('ML engine returned prediction scores while mlStatus is not_applied');
     }
-    if (candidateSet.mlStatus === 'applied') {
+    if (!['applied', 'partial', 'not_applied'].includes(candidateSet.mlStatus)) {
+      throw new Error('ML candidate-set response has unknown availability status');
+    }
+    const unavailable = candidateSet.mlPrediction?.unavailablePairs ?? [];
+    if (!Array.isArray(unavailable) || unavailable.some(pair => !Array.isArray(pair?.drugPair)
+      || pair.drugPair.length !== 2 || new Set(pair.drugPair).size !== 2
+      || pair.drugPair.some(id => !candidateSet.drugs.includes(id))
+      || typeof pair.reason !== 'string' || typeof pair.reasonCode !== 'string'
+      || ['predictedSeverity', 'predictedClass', 'probability', 'probabilities', 'confidence', 'safetyScore'].some(field => Object.hasOwn(pair, field)))) {
+      throw new Error('ML candidate-set response has malformed unavailable pairs');
+    }
+    if (candidateSet.mlStatus === 'not_applied' && candidateSet.mlPrediction?.pairs?.length) {
+      throw new Error('ML candidate-set response contains predictions marked not_applied');
+    }
+    if (candidateSet.mlStatus === 'applied' || candidateSet.mlStatus === 'partial') {
       const prediction = candidateSet.mlPrediction;
       if (prediction === null || typeof prediction !== 'object' || Array.isArray(prediction)
-        || prediction.status !== 'applied' || !Array.isArray(prediction.pairs)
+        || prediction.status !== candidateSet.mlStatus || !Array.isArray(prediction.pairs)
         || prediction.pairs.length === 0
         || prediction.pairs.some((pair) => pair === null || typeof pair !== 'object'
           || !Array.isArray(pair.drugPair) || pair.drugPair.length !== 2
           || pair.drugPair.some((drugId) => typeof drugId !== 'string')
+          || new Set(pair.drugPair).size !== 2
+          || pair.drugPair.some(id => !candidateSet.drugs.includes(id))
           || !DDI_CLASSES.has(pair.predictedSeverity)
           || pair.inferenceStatus !== 'applied'
           || pair.model === null || typeof pair.model !== 'object'
@@ -516,6 +532,13 @@ export function validateCandidateSetResult(payload) {
         || Object.hasOwn(pair, 'confidence')
       ))) {
         throw new Error('ML candidate-set response included unsupported probability or confidence fields');
+      }
+      const allPairs = [...prediction.pairs, ...unavailable].map(pair => [...pair.drugPair].sort().join('|'));
+      if (new Set(allPairs).size !== allPairs.length
+        || (candidateSet.mlStatus === 'partial' && (!unavailable.length
+          || allPairs.length !== candidateSet.drugs.length * (candidateSet.drugs.length - 1) / 2))
+        || (candidateSet.mlStatus === 'applied' && unavailable.length)) {
+        throw new Error('ML candidate-set response has inconsistent pair coverage');
       }
     }
     if (candidateSet.dataStatus !== payload.metadata.dataStatus) {
@@ -802,6 +825,7 @@ app.post('/api/candidate-sets/search', async (request, reply) => {
     }
     return {
       ...candidateSet,
+      ruleEvaluation: evaluateRuleApplicability(candidateSet.drugs),
       rank: candidateSet.rank ?? index + 1,
       status: violation ? 'rejected' : candidateSet.status,
       rejectionReasons,
