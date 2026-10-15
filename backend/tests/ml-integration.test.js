@@ -772,6 +772,18 @@ test('candidate-set endpoint returns an explicit empty fallback on upstream fail
   assert.equal(payload.metadata.upstreamStatus, 'fallback');
 });
 
+test('candidate analysis busy is explicit and does not masquerade as missing graph data', async () => {
+  globalThis.fetch = async (url) => String(url).endsWith('/api/diseases')
+    ? jsonResponse({ diseases: graphDiseases })
+    : new Response(JSON.stringify({ detail: 'Analysis busy' }), { status: 503, headers: { 'Retry-After': '2' } });
+  const response = await app.inject({ method: 'POST', url: '/api/candidate-sets/search',
+    payload: { diseaseIds: ['Disease::DOID:10763'] } });
+  assert.equal(response.statusCode, 503);
+  assert.equal(response.headers['retry-after'], '2');
+  assert.match(response.json().error, /Analysis busy/);
+  assert.equal(response.json().candidateSets, undefined);
+});
+
 test('candidate-set endpoint rejects fake prediction scores when ML is not applied', async () => {
   globalThis.fetch = async (url) => {
     if (String(url).endsWith('/api/diseases')) {

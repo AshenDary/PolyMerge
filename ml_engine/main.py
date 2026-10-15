@@ -9,7 +9,10 @@ import os
 from contextlib import asynccontextmanager
 from itertools import combinations
 from pathlib import Path
-from typing import Any, Literal, Optional
+from typing import Any, Callable, Literal, Optional
+from threading import BoundedSemaphore
+import anyio
+from starlette.concurrency import run_in_threadpool
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
@@ -43,6 +46,22 @@ async def lifespan(_: FastAPI):
 
 
 app = FastAPI(title="PolyMerge ML Engine", version="0.1.0", lifespan=lifespan)
+_analysis_slot = BoundedSemaphore(1)
+
+
+async def _bounded_analysis(function: Callable[..., Any], *args: Any) -> Any:
+    if not _analysis_slot.acquire(blocking=False):
+        raise HTTPException(status_code=503, detail="Analysis busy; try again shortly.", headers={"Retry-After": "2"})
+
+    def execute() -> Any:
+        try:
+            return function(*args)
+        finally:
+            _analysis_slot.release()
+
+    # Hold admission until work actually ends, including when a client disconnects.
+    with anyio.CancelScope(shield=True):
+        return await run_in_threadpool(execute)
 
 app.add_middleware(
     CORSMiddleware,
@@ -264,10 +283,11 @@ def _candidate_set_response(result: dict[str, Any]) -> dict[str, Any]:
     target_disease_ids = [disease["id"] for disease in resolved_diseases]
 
     candidate_sets = []
+    prediction_context: dict[str, Any] = {"builder": None, "pairs": {}}
     any_applied = False
     for candidate in result.get("candidates", []):
         treated_ids = candidate.get("treatedDiseaseIds", [])
-        candidate_with_prediction = _apply_pair_predictions(candidate)
+        candidate_with_prediction = _apply_pair_predictions(candidate, prediction_context)
         any_applied = any_applied or candidate_with_prediction.get("mlStatus") == "applied"
         candidate_sets.append({
             **candidate_with_prediction,
@@ -305,7 +325,7 @@ def _candidate_set_response(result: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def _apply_pair_predictions(candidate: dict[str, Any]) -> dict[str, Any]:
+def _apply_pair_predictions(candidate: dict[str, Any], context: Optional[dict[str, Any]] = None) -> dict[str, Any]:
     drugs = sorted(candidate.get("drugs", []))
     if len(drugs) < 2:
         return {
@@ -319,11 +339,18 @@ def _apply_pair_predictions(candidate: dict[str, Any]) -> dict[str, Any]:
         }
 
     try:
-        builder = PairFeatureBuilder()
+        # Request-local snapshot: never shared across graph/model/mapping revisions.
+        context = context if context is not None else {"builder": None, "pairs": {}}
+        if context["builder"] is None:
+            context["builder"] = PairFeatureBuilder()
+        builder = context["builder"]
         predicted_pairs = []
         for drug_a, drug_b in combinations(drugs, 2):
-            features = builder.build_features(drug_a, drug_b)
-            prediction = ddi_model_service.predict(features)
+            key = (drug_a, drug_b)
+            if key not in context["pairs"]:
+                features = builder.build_features(drug_a, drug_b)
+                context["pairs"][key] = ddi_model_service.predict(features)
+            prediction = context["pairs"][key]
             predicted_pairs.append({
                 "drugPair": [drug_a, drug_b],
                 "predictedSeverity": prediction["predictedClass"],
@@ -354,6 +381,10 @@ def _apply_pair_predictions(candidate: dict[str, Any]) -> dict[str, Any]:
 @app.post("/predict/candidate-sets", response_model=CandidateSetResponse)
 async def predict_candidate_sets(payload: CandidateSetRequest) -> CandidateSetResponse:
     """Return graph-derived multi-drug research candidate sets."""
+    return await _bounded_analysis(_execute_candidate_sets, payload)
+
+
+def _execute_candidate_sets(payload: CandidateSetRequest) -> CandidateSetResponse:
     result = _run_candidate_set_pipeline(
         payload.diseaseIds,
         payload.candidateSetConfig.model_dump(exclude_none=True),
@@ -387,7 +418,7 @@ async def predict_combination(payload: CombinationRequest) -> CombinationRespons
     distinguishes real graph evidence from future model fields.
     """
     optimization_config = payload.optimizationConfig.model_dump(exclude_none=True)
-    result = _run_candidate_set_pipeline(
+    result = await _bounded_analysis(_run_candidate_set_pipeline,
         payload.diseases,
         optimization_config,
         optimization_config,

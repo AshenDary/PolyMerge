@@ -548,6 +548,8 @@ async function fetchMlResult(diseases, optimizationConfig = {}, options = {}) {
   }
 }
 
+class AnalysisBusyError extends Error {}
+
 async function fetchCandidateSetResult(
   diseaseIds,
   candidateSetConfig = {},
@@ -564,11 +566,15 @@ async function fetchCandidateSetResult(
       body: JSON.stringify({ diseaseIds, candidateSetConfig, optimizationConfig }),
       signal: AbortSignal.timeout(timeoutMs),
     });
+    if (response.status === 503 && response.headers?.get('retry-after') === '2') {
+      throw new AnalysisBusyError('Analysis busy. Server processing may still be finishing; try again shortly.');
+    }
     if (!response.ok) {
       throw new Error(`ML candidate-set service responded ${response.status}`);
     }
     return validateCandidateSetResult(await response.json());
   } catch (error) {
+    if (error instanceof AnalysisBusyError) throw error;
     options.logger?.warn({ error: error.message }, 'ML candidate-set request failed; using empty fallback');
     return createCandidateSetFallback(options.resolvedDiseases ?? diseaseIds, error.message);
   }
@@ -767,12 +773,20 @@ app.post('/api/candidate-sets/search', async (request, reply) => {
   }
 
   const resolvedDiseaseIds = resolved.diseases.map((disease) => disease.id);
-  const mlResult = await fetchCandidateSetResult(
-    resolvedDiseaseIds,
-    normalizedCandidateConfig.candidateSetConfig,
-    normalizedOptimization.optimizationConfig,
-    { logger: request.log, resolvedDiseases: resolved.diseases },
-  );
+  let mlResult;
+  try {
+    mlResult = await fetchCandidateSetResult(
+      resolvedDiseaseIds,
+      normalizedCandidateConfig.candidateSetConfig,
+      normalizedOptimization.optimizationConfig,
+      { logger: request.log, resolvedDiseases: resolved.diseases },
+    );
+  } catch (error) {
+    if (error instanceof AnalysisBusyError) {
+      return reply.code(503).header('Retry-After', '2').send({ error: error.message });
+    }
+    throw error;
+  }
   const dataStatus = mlResult.metadata.dataStatus;
   const mlStatus = mlResult.metadata.mlStatus;
   const candidateSets = (mlResult.candidateSets ?? []).map((candidateSet, index) => {
