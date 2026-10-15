@@ -58,7 +58,9 @@ def test_pair_snapshot_reused_only_within_request(monkeypatch):
     assert forward["mlPrediction"] == reverse["mlPrediction"]
     assert calls == {"builders": 1, "features": 1, "predictions": 1}
     failed = main._apply_pair_predictions({"drugs": ["a", "b", "unsupported"]}, context)
-    assert failed["mlStatus"] == "not_applied" and failed["mlPrediction"]["pairs"] == []
+    assert failed["mlStatus"] == "partial"
+    assert failed["mlPrediction"]["pairs"] == forward["mlPrediction"]["pairs"]
+    assert len(failed["mlPrediction"]["unavailablePairs"]) == 2
     # A new graph/model/mapping request never inherits an old snapshot or prediction.
     main._apply_pair_predictions({"drugs": ["a", "b"]}, {"builder": None, "pairs": {}})
     assert calls["builders"] == 2 and calls["predictions"] == 2

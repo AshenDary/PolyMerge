@@ -167,10 +167,10 @@ test('workflow summary is derived from real candidate response data', () => {
   assert.equal(stages.find((stage) => stage.key === 'graph').status, 'complete');
   assert.match(stages.find((stage) => stage.key === 'graph').summary, /3 evidence paths/);
   assert.match(stages.find((stage) => stage.key === 'mapping').summary, /2 mapped drugs/);
-  assert.match(stages.find((stage) => stage.key === 'rules').summary, /1 passed · 1 rejected/);
-  assert.equal(stages.find((stage) => stage.key === 'ml').status, 'partial');
+  assert.match(stages.find((stage) => stage.key === 'rules').summary, /0 fully evaluated · 0 partial · 1 rejected/);
+  assert.equal(stages.find((stage) => stage.key === 'ml').status, 'complete');
   assert.match(stages.find((stage) => stage.key === 'ml').summary, /1 of 2 candidates/);
-  assert.match(stages.find((stage) => stage.key === 'evidence').summary, /2 represented paths · Configured rules: Rejected · Interaction prediction: Moderate/);
+  assert.match(stages.find((stage) => stage.key === 'evidence').summary, /2 represented paths · Configured rules: Rejected by research rule · Interaction prediction: Prediction available: Moderate/);
   assert.equal(logic.humanStatus('not_applied'), 'Not applied');
   assert.equal(logic.humanStatus('not_applicable'), 'Not applicable');
 });
@@ -274,7 +274,7 @@ test('analysis summary renders response disease names, IDs and actual counts', (
   assert.equal(elements.get('analysis-summary').hidden, false);
   assert.match(elements.get('your-analysis').innerHTML, /hypertension/);
   assert.doesNotMatch(elements.get('your-analysis').innerHTML, /Disease::DOID:9352/);
-  assert.deepEqual(JSON.parse(JSON.stringify(logic.analysisMetrics(candidateResponse))).map((metric) => metric[1]), [2, 2, 2, 1, 1, 1]);
+  assert.deepEqual(JSON.parse(JSON.stringify(logic.analysisMetrics(candidateResponse))).map((metric) => metric[1]), [2, 2, 2, 0, 1, 1]);
   assert.match(elements.get('summary-cards').innerHTML, /Returned candidate sets/);
   assert.match(elements.get('summary-cards').innerHTML, /Candidates with predictions/);
 });
@@ -302,9 +302,9 @@ test('candidate narrative uses real treatment paths and escapes external values'
   assert.match(narrative, /&lt;script&gt;bad/);
   assert.doesNotMatch(narrative, /<script>/);
   assert.match(narrative, /Not applicable/);
-  assert.equal(logic.candidateMlPresentation(candidateResponse.candidateSets[1]).label, 'Moderate');
-  assert.equal(logic.candidateMlPresentation({ drugs: ['a', 'b'], mlStatus: 'applied', mlPrediction: { pairs: [] } }).label, 'Not available');
-  assert.equal(logic.candidateMlPresentation({}).label, 'Not available');
+  assert.equal(logic.candidateMlPresentation(candidateResponse.candidateSets[1]).label, 'Prediction available: Moderate');
+  assert.equal(logic.candidateMlPresentation({ drugs: ['a', 'b'], mlStatus: 'applied', mlPrediction: { pairs: [] } }).label, 'Prediction unavailable');
+  assert.equal(logic.candidateMlPresentation({}).label, 'Prediction unavailable');
 });
 
 test('selection refreshes card highlight, evidence summary and candidate explanation locally', () => {
@@ -315,7 +315,7 @@ test('selection refreshes card highlight, evidence summary and candidate explana
   assert.match(elements.get('explainability').innerHTML, /Why this candidate/);
   assert.match(elements.get('workflow-list').innerHTML, /Interaction prediction: Not applicable/);
   logic.selectCandidate('candidate-set:rejected-ml');
-  assert.match(elements.get('workflow-list').innerHTML, /Interaction prediction: Moderate/);
+  assert.match(elements.get('workflow-list').innerHTML, /Interaction prediction: Prediction available: Moderate/);
   assert.match(elements.get('explainability').innerHTML, /Configured blocked pair/);
   assert.match(elements.get('explainability').innerHTML, /RandomForestClassifier-sprint5-v1/);
   assert.match(elements.get('results').innerHTML, /data-candidate-id="candidate-set:rejected-ml" aria-pressed="true"/);
@@ -347,8 +347,8 @@ test('missing and unavailable evidence does not become a passed rule or applied 
   const partial = { drugs: ['a', 'b'], mlStatus: 'applied', mlPrediction: { pairs: [{ inferenceStatus: 'unavailable', predictedSeverity: null }] } };
   assert.equal(logic.mlSummary([partial]).applied, 0);
   assert.equal(logic.mlSummary([partial]).pairCount, 0);
-  assert.equal(logic.candidateMlPresentation(partial).label, 'Not available');
-  assert.match(logic.candidateNarrative(partial, empty), /Configured rule check<\/dt><dd>Not available/);
+  assert.equal(logic.candidateMlPresentation(partial).label, 'Prediction unavailable');
+  assert.match(logic.candidateNarrative(partial, empty), /Configured rule check<\/dt><dd>Insufficient verified mapping/);
 });
 
 test('graph diagram prioritizes treatment paths and escapes node names and metadata', () => {
@@ -432,7 +432,7 @@ test('small and empty responses show available cards and honest empty state', ()
   assert.equal(get('show-all-control').hidden, true);
   logic.renderResults({ candidateSets: [], diseaseIds: [] });
   assert.equal(get('result-display').hidden, true);
-  assert.match(get('results').innerHTML, /No candidate sets were returned/);
+  assert.match(get('results').innerHTML, /No represented treatment connections/);
 });
 
 test('completed search reset clears all simulation state while keeping the disease catalog', async () => {
@@ -539,7 +539,7 @@ test('beginner guide and conclusion keep pair predictions distinct and escaped',
       { drugPair: ['a', 'c'], predictedSeverity: 'Minor', inferenceStatus: 'applied' },
     ] },
   };
-  assert.equal(logic.candidateMlPresentation(candidate).label, '2 pairs classified');
+  assert.equal(logic.candidateMlPresentation(candidate).label, 'Prediction available: 2 pairs classified');
   const summary = logic.finalCandidateSummary(candidate, candidateResponse);
   assert.match(summary, /&lt;Drug A&gt; \+ Drug B as Major/);
   assert.match(summary, /&lt;Drug A&gt; \+ Drug C as Minor/);
@@ -548,7 +548,7 @@ test('beginner guide and conclusion keep pair predictions distinct and escaped',
   assert.match(summary, /do not establish clinical safety/);
   assert.doesNotMatch(summary, /<Drug A>|confidence|probability|safety score/i);
   const single = logic.finalCandidateSummary(candidateResponse.candidateSets[0], candidateResponse);
-  assert.match(single, /no pair prediction is applicable/);
+  assert.match(single, /no drug pair to classify/);
   const unavailable = logic.finalCandidateSummary({ ...candidate, mlStatus: 'not_applied', mlPrediction: {} }, candidateResponse);
   assert.match(unavailable, /No pair-level prediction was returned/);
   logic.renderSelectedCandidate(candidateResponse.candidateSets[1], candidateResponse);
@@ -603,6 +603,47 @@ test('mode changes retain the same result, selected candidate and full counts wi
   assert.equal(requests.length, 0);
 });
 
+test('partial availability survives view switching with exact pair reasons and no refetch', () => {
+  const { logic, get, requests } = simulationHarness();
+  const data = structuredClone(candidateResponse);
+  const candidate = data.candidateSets[1];
+  candidate.drugs.push('Compound::DB00796');
+  candidate.drugNames.push('Candesartan');
+  candidate.drugCount = 3;
+  candidate.mlStatus = 'partial';
+  candidate.mlPrediction.status = 'partial';
+  candidate.mlPrediction.unavailablePairs = [{ drugPair: ['Compound::DB00177', 'Compound::DB00796'], reasonCode: 'missing_drug_mapping', reason: '<missing reviewed mapping>', missingDrugIds: ['Compound::DB00796'] }];
+  candidate.status = 'accepted';
+  candidate.rejectionReasons = [];
+  candidate.ruleEvaluation = { status: 'partially_evaluated', mappingVersion: 'fixture', identities: [], rules: [] };
+  logic.state.currentResult = data;
+  logic.selectCandidate(candidate.candidateSetId);
+  assert.match(logic.shortCandidateSummary(candidate, data), /Partial predictions available/);
+  assert.match(get('explainability').innerHTML, /Moderate/);
+  logic.setDisplayMode('researcher');
+  assert.match(get('explainability').innerHTML, /missing_drug_mapping/);
+  assert.match(get('explainability').innerHTML, /&lt;missing reviewed mapping&gt;/);
+  assert.match(get('explainability').innerHTML, /Partial mapping coverage/);
+  logic.setDisplayMode('simple');
+  assert.equal(logic.state.currentResult, data);
+  assert.equal(requests.length, 0);
+  assert.equal(logic.candidateMlPresentation(candidate).status, 'partial');
+});
+
+test('legacy explanation renderer handles no graph button, single drug and partial predictions', () => {
+  const context = { window: {} };
+  vm.runInNewContext(readFileSync(path.join(frontendDir, 'explainability.js'), 'utf8'), context);
+  const container = { innerHTML: '', querySelector: () => null };
+  const render = context.window.PolyMergeExplainability.renderCandidateExplanation;
+  render({ sections: [{ type: 'predictions', content: { status: 'not_applicable', pairs: [], message: 'No drug pair to classify' } }] }, container);
+  assert.match(container.innerHTML, /Not applicable/);
+  assert.doesNotMatch(container.innerHTML, /Prediction unavailable/);
+  render({ sections: [{ type: 'predictions', content: { status: 'partial', pairs: [{ drugs: ['a', 'b'], severity: 'Moderate' }], unavailablePairs: [{ drugPair: ['a', 'c'], reason: '<missing>', reasonCode: 'missing_drug_mapping' }] } }] }, container);
+  assert.match(container.innerHTML, /Partial predictions available/);
+  assert.match(container.innerHTML, /Moderate/);
+  assert.match(container.innerHTML, /&lt;missing&gt;/);
+});
+
 test('next five replaces the page, preserves backend ordering and handles the last page', () => {
   const { logic, get } = simulationHarness();
   const data = manyCandidates();
@@ -644,7 +685,7 @@ test('simple explanation is four grounded sentences with honest rule and pair st
   const { logic } = simulationHarness();
   const single = logic.shortCandidateSummary(candidateResponse.candidateSets[0], candidateResponse);
   assert.equal(single.split('. ').length, 4);
-  assert.match(single, /No configured rule triggered/);
+  assert.match(single, /Insufficient verified mapping/);
   assert.match(single, /Not applicable/);
   const applied = logic.shortCandidateSummary(candidateResponse.candidateSets[1], candidateResponse);
   assert.match(applied, /Moderate/);
