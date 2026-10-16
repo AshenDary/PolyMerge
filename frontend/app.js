@@ -598,71 +598,87 @@ function renderSelectedCandidate(candidate, data) {
     container.innerHTML = '<div class="empty-state"><span class="empty-icon">ⓘ</span><p>Run a simulation and choose a candidate to inspect its explanations.</p></div>';
     return;
   }
-  const diseaseLabels = diseaseLabelMap(data);
-  const mlPairs = appliedPairs(candidate);
+  const labels = diseaseLabelMap(data);
+  const { targets, covered, uncovered } = candidateCoverage(candidate, data);
+  const pairs = appliedPairs(candidate);
+  const unavailable = candidate.mlPrediction?.unavailablePairs ?? [];
+  const evaluation = candidate.ruleEvaluation;
+  const rules = evaluation?.rules ?? [];
   const reasons = candidate.rejectionReasons ?? [];
-  const ml = candidateMlPresentation(candidate);
-  const technical = `<article class="candidate-explanation">
-    ${candidateNarrative(candidate, data)}
-    <details><summary>Terms and evidence guide</summary>${understandingGuide()}</details>
-    <section class="evidence-section section-graph">
-      <h4>Graph Evidence</h4>
-      <div class="graph-summary">
-        <span>Graph coverage: ${(candidate.treatedDiseaseIds ?? []).length} / ${data.diseaseIds?.length ?? data.diseases?.length ?? 0}</span>
-        <span>Covered diseases: ${(candidate.treatedDiseaseIds ?? []).map((id) => escapeHtml(diseaseLabels.get(id) ?? id)).join(', ') || 'None provided'}</span>
-        <span>Uncovered diseases: ${(candidate.uncoveredDiseaseIds ?? []).map((id) => escapeHtml(diseaseLabels.get(id) ?? id)).join(', ') || 'None'}</span>
-      </div>
-      <p>Represented evidence for this candidate</p>
-      ${renderGraphVisualization(candidate, true)}
-      <details class="technical-details"><summary>Technical graph details</summary><p>${escapeHtml(candidate.graphEvidence?.source ?? data.metadata?.graph ?? 'Not provided')} · ${escapeHtml(candidate.graphEvidence?.graphVersion ?? 'Not provided')}</p>
-      ${renderPathList(candidate, 'treatment', 'CtD Treatment Paths')}
-      ${renderPathList(candidate, 'gene_context', 'Gene Context')}
-      ${renderPathList(candidate, 'side_effect_context', 'Side-Effect Context')}</details>
+  const triggered = candidate.status === 'rejected' || rules.some(rule => rule.triggered);
+  const fullyEvaluated = evaluation?.status === 'evaluated';
+  const optimizer = data.metadata?.optimization;
+  container.innerHTML = `<article class="candidate-explanation candidate-overview">
+    <header class="overview-heading">
+      <p class="eyebrow">Candidate #${escapeHtml(candidate.rank ?? 'Not provided')}</p>
+      <h3>${escapeHtml(candidateLabel(candidate))}</h3>
+    </header>
+    <section class="overview-section overview-coverage" aria-label="Why these drugs?">
+      <h4>Why these drugs?</h4><p>${shortCandidateSummary(candidate, data)}</p>
+      <ul class="covered-diseases" aria-label="Covered diseases">${covered.map(id => `<li>${escapeHtml(labels.get(id) ?? id)}</li>`).join('')}</ul>
+      <div class="coverage-measure"><span>Graph coverage: ${covered.length} of ${targets.length} diseases</span>
+        ${targets.length ? `<meter min="0" max="${targets.length}" value="${covered.length}" aria-label="Represented graph coverage">${covered.length} of ${targets.length}</meter>` : ''}</div>
+      ${uncovered.length ? `<details class="uncovered-diseases"><summary>Not covered (${uncovered.length})</summary><ul>${uncovered.map(id => `<li>${escapeHtml(labels.get(id) ?? id)}</li>`).join('')}</ul></details>` : ''}
     </section>
-    <section class="evidence-section section-rules">
-      <h4>Deterministic Rules</h4>
-      ${reasons.length ? `<ul class="rule-list">${reasons.map((reason) => `<li class="rule-item rule-rejected">
-        <strong>Configured rule check · Rejected</strong>
-        <p>${escapeHtml(reason.message ?? 'Reason not provided')}</p>
-        ${reason.pair?.length ? `<small>Pair: ${reason.pair.map(escapeHtml).join(' + ')}</small>` : ''}
-        <small>Stage: ${escapeHtml(reason.stage ?? 'Not provided')} · Source: ${escapeHtml(reason.source ?? 'PolyMerge Safety Rules')}</small>
-      </li>`).join('')}</ul>` : `<div><strong>Configured research rule check</strong><span>${ruleLabel(candidate)}</span></div>`}
-      <details><summary>Rule mapping coverage and provenance</summary><p>${escapeHtml(candidate.ruleEvaluation?.source ?? 'Verified rule mappings were not provided.')}</p><p>Mapping version: ${escapeHtml(candidate.ruleEvaluation?.mappingVersion ?? 'Not provided')}</p>
-      <ul>${(candidate.ruleEvaluation?.identities ?? []).map(identity => `<li>${escapeHtml(identity.drugId)}: ${escapeHtml(identity.tokens?.join(', ') || 'No verified category mapping')} · ${escapeHtml(identity.source ?? 'No source')}</li>`).join('')}</ul>
-      <ul>${(candidate.ruleEvaluation?.rules ?? []).map(rule => `<li>${rule.pair.map(escapeHtml).join(' + ')}: ${escapeHtml(rule.status)}${rule.triggered ? ' (triggered)' : ''}</li>`).join('')}</ul></details>
+    <section class="overview-section overview-rules" aria-label="Rule check">
+      <h4>Rule check</h4>
+      <strong>${fullyEvaluated ? (triggered ? 'Configured rule triggered' : 'Evaluated; no configured rule triggered') : 'Not fully evaluated'}</strong>
+      ${!fullyEvaluated ? `<p>${evaluation?.status ? 'Some drug-category mappings are missing, so the configured research rules could not be fully checked.' : 'Rule applicability information was not returned, so evaluation cannot be confirmed.'}</p>` : ''}
+      ${rules.length ? `<p class="rule-coverage">${rules.filter(rule => rule.status === 'evaluated').length} of ${rules.length} configured rules evaluated${fullyEvaluated ? '' : `; ${rules.filter(rule => rule.status === 'partially_evaluated').length} with partial coverage, ${rules.filter(rule => rule.status === 'not_evaluable').length} not evaluable`}.</p>` : ''}
+      ${triggered ? `<p class="rule-triggered">${fullyEvaluated ? 'Research exclusion applies.' : 'A configured research exclusion was triggered despite incomplete coverage.'}</p>` : ''}
+      ${reasons.length ? `<ul>${reasons.map(reason => `<li>${escapeHtml(reason.message ?? 'Reason not provided')}</li>`).join('')}</ul>` : ''}
     </section>
-    <section class="evidence-section section-predictions">
-      <h4>Interaction Prediction</h4>
-      ${mlPairs.length ? `<p>${escapeHtml(ml.label)}</p><ul class="prediction-list">${mlPairs.map((pair) => `<li class="prediction-item">
-        <div class="prediction-grid">
-          <span><small>Drug pair</small><strong>${pair.drugPair?.map((id) => escapeHtml(candidate.drugNames?.[candidate.drugs.indexOf(id)] ?? id)).join(' + ') ?? 'Drug pair not provided'}</strong></span>
-          <span><small>Predicted severity</small><strong>${escapeHtml(pair.predictedSeverity)}</strong></span>
-          <span><small>Model</small><strong>Random Forest</strong></span>
-        </div>
-        <details><summary>Technical model details</summary><small>${escapeHtml(pair.model?.name ?? 'Model not provided')} · ${escapeHtml(pair.model?.version ?? 'Version not provided')} · ${escapeHtml(pair.inferenceStatus ?? 'Status not provided')}</small></details>
-      </li>`).join('')}</ul>` : `<div class="predictions-unavailable"><strong>${escapeHtml(ml.label)}</strong><p>${escapeHtml(ml.detail)}</p></div>`}
-      ${(candidate.mlPrediction?.unavailablePairs ?? []).length ? `<ul class="prediction-list">${candidate.mlPrediction.unavailablePairs.map(pair => `<li><strong>${escapeHtml(pairLabel(pair, candidate))}: Prediction unavailable</strong><p>${escapeHtml(pair.reason)}</p><small>${escapeHtml(pair.reasonCode)}${pair.missingDrugIds?.length ? ` · Missing: ${pair.missingDrugIds.map(escapeHtml).join(', ')}` : ''}</small></li>`).join('')}</ul>` : ''}
+    <section class="overview-section overview-predictions" aria-label="Random Forest predictions">
+      <h4>Random Forest predictions</h4>
+      ${candidate.drugs?.length === 1 ? '<p>Not applicable: this candidate contains one drug.</p>' : `
+        ${candidate.mlStatus === 'partial' ? '<p>Partial predictions available</p>' : ''}
+        ${pairs.length ? `<ul class="pair-results" aria-label="Available pair predictions">${pairs.map(pair => `<li class="pair-result"><span class="pair-name">${escapeHtml(pairLabel(pair, candidate))}</span><strong class="pair-severity">${escapeHtml(pair.predictedSeverity)}</strong></li>`).join('')}</ul>` : ''}
+        ${unavailable.length ? `<h5>Unavailable pairs</h5><ul class="pair-results" aria-label="Unavailable pair predictions">${unavailable.map(pair => `<li class="pair-result pair-unavailable"><span class="pair-name">${escapeHtml(pairLabel(pair, candidate))}</span><span class="pair-severity">Unavailable</span><p class="pair-reason">${escapeHtml(pair.reason ?? 'No reason provided.')}</p></li>`).join('')}</ul>` : ''}
+        ${!pairs.length && !unavailable.length ? `<p>Prediction unavailable</p><p>${escapeHtml(candidate.mlPrediction?.reason ?? 'No pair-level prediction was returned.')}</p>` : ''}`}
     </section>
-    <details class="technical-details"><summary>Candidate metadata</summary><p>Candidate set ID: ${escapeHtml(candidate.candidateSetId)} · Raw status: ${escapeHtml(candidate.status)}</p><p>${(candidate.drugs ?? []).map(escapeHtml).join(', ')}</p></details>
-  </article>`;
-  container.innerHTML = state.displayMode === 'researcher' ? technical : `<article class="candidate-explanation simple-explanation">
-    <p class="eyebrow">Candidate #${escapeHtml(candidate.rank ?? 'Not provided')}</p>
-    <h3>${escapeHtml(candidateLabel(candidate))}</h3>
-    <h4>Why this candidate?</h4><p>${shortCandidateSummary(candidate, data)}</p>
-    <h4>Knowledge Graph Evidence</h4>${renderGraphVisualization(candidate, false)}
-    <details><summary>Research details: graph, rules and predictions</summary>${technical}</details>
+    <section class="overview-section overview-ranking" aria-label="Ranking explanation">
+      <h4>Why rank #${escapeHtml(candidate.rank ?? 'Not provided')}?</h4>
+      <p>This rank reflects configured exclusion status, graph coverage and drug count, not clinical superiority.</p>
+    </section>
+    <div class="overview-details">
+      <details class="technical-details"><summary>Graph evidence and connections</summary>
+        <p>${escapeHtml(candidate.graphEvidence?.source ?? data.metadata?.graph ?? 'Source not provided')} · ${escapeHtml(candidate.graphEvidence?.graphVersion ?? 'Version not provided')}</p>
+        ${renderGraphVisualization(candidate, true)}
+        ${renderPathList(candidate, 'treatment', 'CtD Treatment Paths')}
+        ${renderPathList(candidate, 'gene_context', 'Gene Context')}
+        ${renderPathList(candidate, 'side_effect_context', 'Side-Effect Context')}
+      </details>
+      <details class="technical-details"><summary>Rule mapping coverage and provenance</summary>
+        <p>${escapeHtml(evaluation?.source ?? 'Verified rule mappings were not provided.')}</p><p>Mapping version: ${escapeHtml(evaluation?.mappingVersion ?? 'Not provided')}</p>
+        <ul>${(evaluation?.identities ?? []).map(identity => `<li>${escapeHtml(identity.drugId)}: ${escapeHtml(identity.tokens?.join(', ') || 'No verified category mapping')} · ${escapeHtml(identity.source ?? 'No source')}${identity.classId ? ` · ${escapeHtml(identity.classId)}` : ''}</li>`).join('')}</ul>
+        <ul>${rules.map(rule => `<li>${(rule.pair ?? []).map(escapeHtml).join(' + ')}: ${escapeHtml(rule.status)}${rule.triggered ? ' (triggered)' : ''}</li>`).join('')}</ul>
+        ${reasons.length ? `<ul>${reasons.map(reason => `<li>${(reason.pair ?? []).map(escapeHtml).join(' + ')} · Stage: ${escapeHtml(reason.stage ?? 'Not provided')} · Source: ${escapeHtml(reason.source ?? 'PolyMerge research rules')}</li>`).join('')}</ul>` : ''}
+      </details>
+      <details class="technical-details"><summary>ML details and model provenance</summary>
+        ${pairs.length ? `<ul>${pairs.map(pair => `<li>${(pair.drugPair ?? []).map(escapeHtml).join(' + ')}<br>${escapeHtml(pair.model?.name ?? 'Model not provided')} · ${escapeHtml(pair.model?.version ?? 'Version not provided')} · ${escapeHtml(pair.inferenceStatus ?? 'Status not provided')}</li>`).join('')}</ul>` : '<p>No model prediction was applied.</p>'}
+        ${unavailable.length ? `<ul>${unavailable.map(pair => `<li>${(pair.drugPair ?? []).map(escapeHtml).join(' + ')} · ${escapeHtml(pair.reasonCode)}${pair.missingDrugIds?.length ? ` · Missing: ${pair.missingDrugIds.map(escapeHtml).join(', ')}` : ''}</li>`).join('')}</ul>` : ''}
+      </details>
+      <details class="technical-details"><summary>Ranking and optimizer details</summary><p>${RANK_EXPLANATION}</p>
+        ${optimizer ? `<p>Greedy coverage selection: ${(optimizer.selectedDrugs ?? []).map(escapeHtml).join(', ') || 'No drugs selected'}.</p><p>Selected candidate sets: ${(optimizer.selectedCandidateSetIds ?? []).map(escapeHtml).join(', ') || 'None provided'}.</p><p>Covered diseases: ${(optimizer.coveredDiseaseIds ?? []).map(escapeHtml).join(', ') || 'None provided'}.</p><p>Rule applicability: ${escapeHtml(optimizer.ruleEvaluation?.status ?? 'Not provided')}.</p>` : '<p>No optimizer details were returned.</p>'}
+      </details>
+      <details class="technical-details"${state.displayMode === 'researcher' ? ' open' : ''}><summary>Candidate identifiers</summary><p>${escapeHtml(candidate.candidateSetId)} · Raw status: ${escapeHtml(candidate.status)}</p><p>${(candidate.drugs ?? []).map(escapeHtml).join(', ')}</p><p>Selected diseases: ${targets.map(escapeHtml).join(', ') || 'None provided'}</p></details>
+      <details><summary>Terms and evidence guide</summary>${understandingGuide()}</details>
+    </div>
   </article>`;
 }
 
+function candidateCoverage(candidate, data) {
+  const targets = [...new Set(data.diseaseIds ?? (data.diseases ?? []).map(disease => disease.id))];
+  const covered = targets.filter(id => (candidate.treatedDiseaseIds ?? []).includes(id));
+  return { targets, covered, uncovered: targets.filter(id => !covered.includes(id)) };
+}
+
 function shortCandidateSummary(candidate, data) {
-  const labels = diseaseLabelMap(data);
-  const covered = (candidate.treatedDiseaseIds ?? []).filter(id => (data.diseaseIds ?? [...labels.keys()]).includes(id));
-  const targets = data.diseaseIds?.length ?? data.diseases?.length ?? 0;
+  const { targets, covered } = candidateCoverage(candidate, data);
   const paths = graphPaths(candidate).filter(path => relationshipType(path) === 'CtD');
-  const pairs = appliedPairs(candidate);
-  const unavailable = candidate.mlPrediction?.unavailablePairs ?? [];
-  const prediction = pairs.length ? `${candidate.mlStatus === 'partial' ? 'Partial predictions available; ' : ''}${pairs.map(pair => `${pairLabel(pair, candidate)}: ${pair.predictedSeverity}`).join('; ')}${unavailable.length ? `; ${unavailable.length} pairs unavailable (see details)` : ''}` : candidateMlPresentation(candidate).label;
-  return escapeHtml(`${paths.length ? 'These drugs have represented treatment connections to ' + (covered.map(id => labels.get(id) ?? id).join(', ') || 'graph diseases') : 'No treatment connections were returned for these drugs'}. Graph coverage is ${covered.length} of ${targets} selected diseases. Rule result: ${ruleLabel(candidate)}; Random Forest interaction prediction: ${prediction}. Rank ${candidate.rank ?? 'unavailable'} follows configured rule status, graph coverage and drug count, not clinical superiority.`);
+  return paths.length && covered.length
+    ? `These drugs have represented treatment connections for ${covered.length} of your ${targets.length} selected diseases.`
+    : 'No treatment connections were returned for these drugs.';
 }
 
 function selectCandidate(candidateId, navigate = false) {

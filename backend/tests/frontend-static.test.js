@@ -243,7 +243,7 @@ test('polished frontend copy avoids raw status and generic AI wording in visible
   assert.doesNotMatch(html, /AI-powered|revolutionary|powerful insights|unlock|transform|Agent-assisted/i);
   assert.doesNotMatch(html, />[^<]*not_applied[^<]*</);
   assert.match(app, /humanStatus\(stage\.status\)/);
-  assert.match(app, /Interaction Prediction/);
+  assert.match(app, /Random Forest predictions/);
   assert.match(app, /Configured rule check/);
 });
 
@@ -312,7 +312,7 @@ test('selection refreshes card highlight, evidence summary and candidate explana
   const elements = attachDocument(logic);
   logic.state.currentResult = candidateResponse;
   logic.selectCandidate('candidate-set:accepted');
-  assert.match(elements.get('explainability').innerHTML, /Why this candidate/);
+  assert.match(elements.get('explainability').innerHTML, /Why these drugs/);
   assert.match(elements.get('workflow-list').innerHTML, /Interaction prediction: Not applicable/);
   logic.selectCandidate('candidate-set:rejected-ml');
   assert.match(elements.get('workflow-list').innerHTML, /Interaction prediction: Prediction available: Moderate/);
@@ -329,8 +329,8 @@ test('graph legend and secondary technical detail preserve evidence semantics', 
   const elements = attachDocument(logic);
   logic.renderSelectedCandidate(candidateResponse.candidateSets[0], candidateResponse);
   const html = elements.get('explainability').innerHTML;
-  assert.match(html, /<details class="technical-details"><summary>Technical graph details/);
-  assert.match(html, /<details class="technical-details"><summary>Candidate metadata/);
+  assert.match(html, /<details class="technical-details"><summary>Graph evidence and connections/);
+  assert.match(html, /<details class="technical-details"><summary>Candidate identifiers/);
   assert.match(html, /Understanding your result/);
   assert.doesNotMatch(html, /safety score/i);
 });
@@ -554,7 +554,7 @@ test('beginner guide and conclusion keep pair predictions distinct and escaped',
   logic.renderSelectedCandidate(candidateResponse.candidateSets[1], candidateResponse);
   const html = get('explainability').innerHTML;
   for (const term of ['Understanding your result', 'Candidate set', 'Compound', 'Knowledge graph', 'CtD', 'CbG', 'CuG', 'CdG', 'CcSE', 'Gene context', 'Graph coverage', 'Deterministic rule', 'ML prediction', 'Major / Moderate / Minor']) assert.ok(html.includes(term), term);
-  assert.match(html, /<strong>Random Forest<\/strong>/);
+  assert.match(html, /<h4>Random Forest predictions<\/h4>/);
   assert.match(html, /RandomForestClassifier-sprint5-v1-65e9834666ad19c5/);
   assert.doesNotMatch(html, /Random Forest · Sprint/);
 });
@@ -618,12 +618,13 @@ test('partial availability survives view switching with exact pair reasons and n
   candidate.ruleEvaluation = { status: 'partially_evaluated', mappingVersion: 'fixture', identities: [], rules: [] };
   logic.state.currentResult = data;
   logic.selectCandidate(candidate.candidateSetId);
-  assert.match(logic.shortCandidateSummary(candidate, data), /Partial predictions available/);
+  assert.doesNotMatch(logic.shortCandidateSummary(candidate, data), /prediction|Moderate/);
+  assert.match(get('explainability').innerHTML, /Partial predictions available/);
   assert.match(get('explainability').innerHTML, /Moderate/);
   logic.setDisplayMode('researcher');
   assert.match(get('explainability').innerHTML, /missing_drug_mapping/);
   assert.match(get('explainability').innerHTML, /&lt;missing reviewed mapping&gt;/);
-  assert.match(get('explainability').innerHTML, /Partial mapping coverage/);
+  assert.match(get('explainability').innerHTML, /Not fully evaluated/);
   logic.setDisplayMode('simple');
   assert.equal(logic.state.currentResult, data);
   assert.equal(requests.length, 0);
@@ -681,19 +682,126 @@ for (const step of [1, 3, 4]) {
   });
 }
 
-test('simple explanation is four grounded sentences with honest rule and pair states', () => {
-  const { logic } = simulationHarness();
+test('short explanation contains only treatment coverage, with outcomes in separate sections', () => {
+  const { logic, get } = simulationHarness();
   const single = logic.shortCandidateSummary(candidateResponse.candidateSets[0], candidateResponse);
-  assert.equal(single.split('. ').length, 4);
-  assert.match(single, /Insufficient verified mapping/);
-  assert.match(single, /Not applicable/);
-  const applied = logic.shortCandidateSummary(candidateResponse.candidateSets[1], candidateResponse);
-  assert.match(applied, /Moderate/);
-  assert.match(applied, /Rejected/);
-  assert.doesNotMatch(applied, /confidence|probability|safety score|clinically safe/i);
-  const escaped = logic.shortCandidateSummary({ ...candidateResponse.candidateSets[0], rank: '<img onerror=x>' }, candidateResponse);
-  assert.match(escaped, /&lt;img/);
-  assert.doesNotMatch(escaped, /<img/);
+  assert.equal(single, 'These drugs have represented treatment connections for 2 of your 2 selected diseases.');
+  assert.doesNotMatch(single, /rule|prediction|rank/i);
+  logic.renderSelectedCandidate({ ...candidateResponse.candidateSets[0], rank: '<img onerror=x>' }, candidateResponse);
+  const html = get('explainability').innerHTML;
+  assert.match(html, /Not fully evaluated/);
+  assert.match(html, /Not applicable: this candidate contains one drug/);
+  assert.match(html, /Why rank #&lt;img/);
+  assert.doesNotMatch(html, /<img/);
+});
+
+function threeDrugOverviewFixture() {
+  const data = structuredClone(candidateResponse);
+  data.diseases = ['Metabolic syndrome X', 'Nephrolithiasis', 'Migraine', 'Other selected disease', 'Another selected disease']
+    .map((name, index) => ({ id: `d${index}`, name }));
+  data.diseaseIds = data.diseases.map(disease => disease.id);
+  const candidate = {
+    ...data.candidateSets[0], rank: 7,
+    drugs: ['Compound::DB00999', 'Compound::DB00331', 'Compound::DB00373'],
+    drugNames: ['Hydrochlorothiazide', 'Metformin', 'Timolol'], drugCount: 3,
+    treatedDiseaseIds: ['d0', 'd1', 'd2'], uncoveredDiseaseIds: ['d3', 'd4'], coverage: .6,
+    ruleEvaluation: { status: 'partially_evaluated', mappingVersion: 'review-fixture', source: 'reviewed fixture',
+      identities: [{ drugId: 'Compound::DB00999', tokens: [], source: 'fixture-source' }],
+      rules: [{ pair: ['category-a', 'category-b'], status: 'evaluated', triggered: false },
+        { pair: ['category-c', 'category-d'], status: 'partially_evaluated', triggered: false },
+        { pair: ['category-e', 'category-f'], status: 'not_evaluable', triggered: false }] },
+    mlStatus: 'applied', mlPrediction: { status: 'applied', pairs: [] },
+  };
+  candidate.mlPrediction.pairs = [[0, 1], [0, 2], [1, 2]].map(([a, b], index) => ({
+    drugPair: [candidate.drugs[a], candidate.drugs[b]], predictedSeverity: ['Moderate', 'Major', 'Minor'][index],
+    inferenceStatus: 'applied', model: { name: 'RandomForestClassifier', version: 'model-fixture' },
+  }));
+  data.candidateSets = [candidate];
+  return { data, candidate };
+}
+
+test('three-drug overview separates coverage, rules, each pair and backend rank without duplicate narrative', () => {
+  const { logic, get } = simulationHarness();
+  const { data, candidate } = threeDrugOverviewFixture();
+  logic.renderSelectedCandidate(candidate, data);
+  const html = get('explainability').innerHTML;
+  const overview = html.split('<div class="overview-details">')[0];
+  for (const heading of ['Why these drugs?', 'Rule check', 'Random Forest predictions', 'Why rank #7?']) {
+    assert.ok(overview.includes(`<h4>${heading}</h4>`));
+  }
+  assert.match(overview, /Hydrochlorothiazide \+ Metformin \+ Timolol/);
+  assert.match(overview, /Graph coverage: 3 of 5 diseases/);
+  assert.match(overview, /<meter min="0" max="5" value="3"/);
+  for (const name of ['Metabolic syndrome X', 'Nephrolithiasis', 'Migraine']) assert.ok(overview.includes(`<li>${name}</li>`));
+  assert.match(overview, /<summary>Not covered \(2\)<\/summary><ul><li>Other selected disease/);
+  assert.match(overview, /1 of 3 configured rules evaluated; 1 with partial coverage, 1 not evaluable/);
+  assert.equal((overview.match(/class="pair-result"/g) ?? []).length, 3);
+  for (const severity of ['Major', 'Moderate', 'Minor']) assert.ok(overview.includes(`class="pair-severity">${severity}</strong>`));
+  assert.doesNotMatch(overview, /Compound::|graph-path:|model-fixture|overall severity|confidence|probability|safety score/i);
+  assert.doesNotMatch(html, /candidate-narrative|candidate-conclusion|Why this candidate\?/);
+  assert.equal((html.match(/<h3>/g) ?? []).length, 1);
+  assert.doesNotMatch(html, /<details[^>]* open/);
+  assert.match(html, /review-fixture/);
+  assert.match(html, /model-fixture/);
+  assert.match(html, /Ranking and optimizer details/);
+});
+
+for (const status of ['evaluated', 'partially_evaluated', 'not_evaluable']) {
+  test(`overview renders actual ${status} rule applicability`, () => {
+    const { logic, get } = simulationHarness();
+    const { data, candidate } = threeDrugOverviewFixture();
+    candidate.ruleEvaluation.status = status;
+    logic.renderSelectedCandidate(candidate, data);
+    const rules = get('explainability').innerHTML.split('<section class="overview-section overview-rules"')[1].split('</section>')[0];
+    assert.match(rules, status === 'evaluated' ? /Evaluated; no configured rule triggered/ : /Not fully evaluated/);
+    assert.doesNotMatch(rules, /safe|approved|passed all/i);
+    candidate.status = 'rejected';
+    candidate.rejectionReasons = [{ message: 'Research exclusion fixture' }];
+    logic.renderSelectedCandidate(candidate, data);
+    assert.match(get('explainability').innerHTML, /Research exclusion fixture/);
+  });
+}
+
+test('partial overview preserves every successful and unavailable pair with escaped reasons', () => {
+  const { logic, get, requests } = simulationHarness();
+  const { data, candidate } = threeDrugOverviewFixture();
+  candidate.drugNames[0] = '<img onerror=x>' + 'VeryLongDrugName'.repeat(10);
+  data.diseases[0].name = '<script>disease</script>';
+  candidate.mlStatus = 'partial';
+  candidate.mlPrediction.status = 'partial';
+  candidate.mlPrediction.unavailablePairs = candidate.mlPrediction.pairs.splice(1).map(pair => ({
+    drugPair: pair.drugPair, reason: '<unverified bridge>', reasonCode: 'missing_drug_mapping', missingDrugIds: [candidate.drugs[2]],
+  }));
+  logic.state.currentResult = data;
+  logic.selectCandidate(candidate.candidateSetId);
+  const html = get('explainability').innerHTML;
+  assert.equal((html.match(/class="pair-result"/g) ?? []).length, 1);
+  assert.equal((html.match(/class="pair-result pair-unavailable"/g) ?? []).length, 2);
+  assert.match(html, /&lt;unverified bridge&gt;/);
+  assert.match(html, /&lt;script&gt;disease&lt;\/script&gt;/);
+  assert.match(html, /&lt;img onerror=x&gt;/);
+  assert.doesNotMatch(html, /<img|<script/);
+  logic.setDisplayMode('researcher');
+  assert.match(get('explainability').innerHTML, /<details class="technical-details" open><summary>Candidate identifiers/);
+  assert.equal(logic.state.selectedCandidateId, candidate.candidateSetId);
+  assert.equal(logic.state.currentResult, data);
+  assert.equal(requests.length, 0);
+  logic.resetSimulation();
+  assert.doesNotMatch(get('explainability').innerHTML, /VeryLongDrugName|pair-result/);
+});
+
+test('responsive CSS protects long names and all four step controls without hiding overflow', () => {
+  const css = readFileSync(path.join(frontendDir, 'styles.css'), 'utf8');
+  const evidenceCss = readFileSync(path.join(frontendDir, 'explainability.css'), 'utf8');
+  assert.match(css, /container: simulation-controls \/ inline-size/);
+  assert.match(css, /@container simulation-controls \(max-width: 640px\)/);
+  assert.match(css, /@container simulation-controls \(max-width: 300px\)/);
+  assert.match(css, /\.simulation-steps button \{[^}]*min-width: 0;[^}]*overflow-wrap: anywhere/);
+  assert.match(css, /body.sidebar-collapsed \.page-shell \{ margin-left: 0/);
+  assert.match(evidenceCss, /\.pair-name \{[^}]*overflow-wrap: anywhere/);
+  assert.match(evidenceCss, /@media \(max-width: 420px\)[\s\S]*\.pair-result \{ grid-template-columns: minmax\(0, 1fr\)/);
+  // This is a layout contract, not a substitute for browser pixel/overflow checks.
+  assert.doesNotMatch(css, /\.simulation-steps[^}]*overflow(?:-x)?: hidden/);
 });
 
 test('simple graph shows treatment only; researcher graph retains context and provenance', () => {
