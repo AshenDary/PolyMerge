@@ -28,6 +28,21 @@ Static DOM tests and HTTP checks do not verify visual layout or iframe behavior.
    Check long IDs wrap and graph connections remain readable at all viewports.
 9. Review Model Analysis comparison, EDA, metrics and limitations. Repeat in the
    Streamlit wrapper and inspect the console for errors. Capture screenshots.
+10. At the bottom of Understand Result, inspect Research Takeaway. It is a
+    deterministic synthesis of graph coverage, configured-rule applicability,
+    and available drug-pair classification evidence, identifying unresolved
+    research questions. It is not a new prediction model.
+11. Confirm three summary sentences and at most three visible review items,
+    ordered by rules, prediction gaps/Major interpretation, then uncovered
+    diseases. Extra graph gaps can appear under View all research limitations.
+    Select another candidate, switch modes, and reset: the takeaway must follow
+    the existing selection without another request and disappear on reset.
+12. Check partial graph coverage using DOID:14221, DOID:585, DOID:6364,
+    DOID:8398 and DOID:7148. The first triple covers 3/5; no efficacy conclusion
+    follows for the uncovered diseases. Confirm long names wrap on mobile.
+
+See [Research Takeaway verification](audits/sprint6-research-takeaway.md) for
+automated and live-response checks, including a partially supported triple.
 
 Do not interpret untriggered rules as safety: configured class/literal tokens
 are not yet mapped to canonical Compound::DB identifiers. Public deployment

@@ -720,6 +720,140 @@ function threeDrugOverviewFixture() {
   return { data, candidate };
 }
 
+for (const count of [0, 3, 5]) {
+  test(`takeaway grounds ${count}/5 coverage in selected disease IDs`, () => {
+    const { logic } = simulationHarness();
+    const { data, candidate } = threeDrugOverviewFixture();
+    candidate.treatedDiseaseIds = [...data.diseaseIds.slice(0, count), 'unselected'];
+    candidate.uncoveredDiseaseIds = [...data.diseaseIds.slice(count), 'unselected'];
+    const result = logic.buildResearchTakeaway(candidate, data);
+    assert.equal(result.sentences.length, 3);
+    assert.match(result.sentences[0], count === 0 ? /No treatment connections/ : count === 5 ? /all 5 selected diseases/ : /3 of the 5/);
+    const coverage = result.review.find(item => item.category === 'coverage');
+    assert.equal(Boolean(coverage), count < 5);
+    if (coverage) {
+      assert.deepEqual(Array.from(coverage.diseaseIds), data.diseaseIds.slice(count));
+      for (const disease of data.diseases.slice(count)) assert.ok(coverage.text.includes(disease.name));
+      assert.doesNotMatch(coverage.text, /unselected|ineffective/);
+    }
+  });
+}
+
+for (const status of ['evaluated', 'partially_evaluated', 'not_evaluable', undefined]) {
+  test(`takeaway separates ${status} rules from clinical validation`, () => {
+    const { logic } = simulationHarness();
+    const { data, candidate } = threeDrugOverviewFixture();
+    candidate.ruleEvaluation.status = status;
+    const result = logic.buildResearchTakeaway(candidate, data);
+    assert.equal(result.review.some(item => item.category === 'rules'), status !== 'evaluated');
+    assert.match(result.sentences[1], status === 'evaluated' ? /none was triggered/ : status === 'partially_evaluated' ? /Some configured rules/ : status === 'not_evaluable' ? /could not be reliably evaluated/ : /not provided/);
+    assert.doesNotMatch(result.sentences.join(' '), /clinically validated|passed|safe|best treatment/i);
+    candidate.ruleEvaluation.rules[0].triggered = true;
+    const triggered = logic.buildResearchTakeaway(candidate, data);
+    assert.equal(triggered.triggered, true);
+    assert.match(triggered.sentences[0], /exclusion was triggered/);
+    assert.equal(triggered.review[0].category, 'rules');
+    assert.match(logic.renderResearchTakeaway(candidate, data), /<strong class="rule-triggered">A configured research exclusion/);
+  });
+}
+
+for (const count of [0, 1, 3]) {
+  test(`takeaway counts ${count}/3 supported unordered pairs without fabricating reasons`, () => {
+    const { logic } = simulationHarness();
+    const { data, candidate } = threeDrugOverviewFixture();
+    candidate.mlStatus = count === 3 ? 'applied' : count ? 'partial' : 'not_applied';
+    candidate.mlPrediction.pairs = candidate.mlPrediction.pairs.slice(0, count);
+    if (count) candidate.mlPrediction.pairs.push({ ...candidate.mlPrediction.pairs[0], drugPair: [...candidate.mlPrediction.pairs[0].drugPair].reverse() });
+    const result = logic.buildResearchTakeaway(candidate, data);
+    assert.equal(result.expectedPairs, 3);
+    assert.equal(result.predictedPairs, count);
+    assert.match(result.sentences[2], count === 3 ? /all 3 drug pairs/ : count ? /1 of 3 drug pairs/ : /unavailable/);
+    const review = result.review.find(item => item.category === 'predictions');
+    assert.doesNotMatch(review.text, /mapping|safe|contraindication|score|confidence/i);
+    if (count === 3) assert.match(review.text, /Major.*expert interpretation/);
+    else assert.match(review.text, /remain unclassified/);
+    assert.equal(candidate.status, 'accepted');
+  });
+}
+
+test('takeaway single drug is not an ML gap, and complete evidence invents no review issue', () => {
+  const { logic } = simulationHarness();
+  const candidate = structuredClone(candidateResponse.candidateSets[0]);
+  candidate.ruleEvaluation = { status: 'evaluated', rules: [] };
+  const result = logic.buildResearchTakeaway(candidate, candidateResponse);
+  assert.equal(result.expectedPairs, 0);
+  assert.equal(result.review.length, 0);
+  assert.match(result.sentences[2], /not applicable.*only one drug/);
+  assert.match(logic.renderResearchTakeaway(candidate, candidateResponse), /independent clinical and formulation evaluation/);
+});
+
+test('takeaway preserves actual failure reasons, caps review categories and escapes unknown names', () => {
+  const { logic } = simulationHarness();
+  const { data, candidate } = threeDrugOverviewFixture();
+  candidate.graphEvidence.paths = [];
+  candidate.mlStatus = 'partial';
+  candidate.mlPrediction.unavailablePairs = candidate.mlPrediction.pairs.splice(1).map(pair => ({ drugPair: pair.drugPair, reason: 'Service <offline>', reasonCode: 'service_unavailable' }));
+  data.diseases[3].name = '<img onerror=x>' + 'LongDiseaseName'.repeat(20);
+  data.diseases.pop();
+  const result = logic.buildResearchTakeaway(candidate, data);
+  assert.deepEqual(Array.from(result.review, item => item.category), ['rules', 'predictions', 'coverage']);
+  assert.deepEqual(Array.from(result.additionalReview, item => item.category), ['graph']);
+  assert.match(result.review[1].text, /Service <offline>/);
+  assert.doesNotMatch(result.review[1].text, /feature mapping|missing mapping/);
+  assert.match(result.review[2].text, /Selected disease \(name unavailable\)/);
+  const html = logic.renderResearchTakeaway(candidate, data);
+  assert.equal((html.match(/<li /g) ?? []).length, 3);
+  assert.match(html, /View all research limitations/);
+  assert.match(html, /&lt;img onerror=x&gt;/);
+  assert.match(html, /Service &lt;offline&gt;/);
+  assert.doesNotMatch(html, /<img|<offline>|overall severity|safety score|confidence percentage/i);
+  assert.match(html, /class="researcher-only"> \(d3, d4\)/);
+});
+
+test('takeaway missing coverage is unknown, not an invented uncovered disease', () => {
+  const { logic } = simulationHarness();
+  const candidate = structuredClone(candidateResponse.candidateSets[0]);
+  delete candidate.treatedDiseaseIds;
+  delete candidate.uncoveredDiseaseIds;
+  const result = logic.buildResearchTakeaway(candidate, candidateResponse);
+  assert.match(result.sentences[0], /information was not provided/);
+  assert.equal(result.review.some(item => item.category === 'coverage'), false);
+});
+
+test('takeaway selection, mode and reset reuse results and preserve evidence sections', () => {
+  const { logic, get, requests } = simulationHarness();
+  logic.state.currentResult = candidateResponse;
+  logic.selectCandidate(candidateResponse.candidateSets[0].candidateSetId, true);
+  assert.equal(logic.state.simulationStep, 4);
+  const single = get('explainability').innerHTML;
+  assert.ok(single.indexOf('class="overview-section research-takeaway"') > single.indexOf('Ranking and optimizer details'));
+  assert.match(single, /Interaction prediction is not applicable because/);
+  logic.selectCandidate(candidateResponse.candidateSets[1].candidateSetId, true);
+  const multiple = get('explainability').innerHTML;
+  const takeaway = multiple.split('<section class="overview-section research-takeaway"')[1];
+  assert.match(takeaway, /A prediction is available for the drug pair/);
+  assert.doesNotMatch(takeaway, /only one drug/);
+  assert.match(multiple, /class="pair-severity">Moderate/);
+  assert.match(multiple, /graph-path:/);
+  logic.setDisplayMode('researcher');
+  assert.equal(get('explainability').innerHTML.split('<section class="overview-section research-takeaway"')[1], takeaway);
+  assert.equal(requests.length, 0);
+  assert.equal(logic.state.currentResult, candidateResponse);
+  logic.resetSimulation();
+  assert.doesNotMatch(get('explainability').innerHTML, /Research Takeaway/);
+});
+
+test('stale search cannot restore a takeaway after reset', async () => {
+  const { logic, get, requests } = simulationHarness();
+  logic.state.selectedDiseases.add(candidateResponse.diseaseIds[0]);
+  const search = logic.analyzeCombination();
+  logic.resetSimulation();
+  requests[0].resolve(candidateResponse);
+  await search;
+  assert.equal(logic.state.currentResult, null);
+  assert.doesNotMatch(get('explainability').innerHTML, /Research Takeaway/);
+});
+
 test('three-drug overview separates coverage, rules, each pair and backend rank without duplicate narrative', () => {
   const { logic, get } = simulationHarness();
   const { data, candidate } = threeDrugOverviewFixture();

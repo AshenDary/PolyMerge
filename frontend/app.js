@@ -664,7 +664,74 @@ function renderSelectedCandidate(candidate, data) {
       <details class="technical-details"${state.displayMode === 'researcher' ? ' open' : ''}><summary>Candidate identifiers</summary><p>${escapeHtml(candidate.candidateSetId)} · Raw status: ${escapeHtml(candidate.status)}</p><p>${(candidate.drugs ?? []).map(escapeHtml).join(', ')}</p><p>Selected diseases: ${targets.map(escapeHtml).join(', ') || 'None provided'}</p></details>
       <details><summary>Terms and evidence guide</summary>${understandingGuide()}</details>
     </div>
+    ${renderResearchTakeaway(candidate, data)}
   </article>`;
+}
+
+function buildResearchTakeaway(candidate, data) {
+  const { targets, covered } = candidateCoverage(candidate, data);
+  const uncovered = targets.filter(id => (candidate.uncoveredDiseaseIds ?? []).includes(id) && !covered.includes(id));
+  const labels = diseaseLabelMap(data);
+  const coverageKnown = targets.length > 0 && Array.isArray(candidate.treatedDiseaseIds);
+  const coverage = !coverageKnown ? 'Treatment coverage information was not provided for the selected diseases.'
+    : !covered.length ? 'No treatment connections for the selected diseases were established in the current graph evidence.'
+      : covered.length === targets.length ? targets.length === 1 ? 'This candidate has represented treatment connections for the selected disease.' : `This candidate has represented treatment connections for all ${targets.length} selected diseases.`
+        : `This candidate has represented treatment connections for ${covered.length} of the ${targets.length} selected diseases.`;
+  const evaluation = candidate.ruleEvaluation;
+  const triggered = candidate.status === 'rejected' || (evaluation?.rules ?? []).some(rule => rule.triggered);
+  const ruleStatus = evaluation?.status;
+  const rules = triggered ? `A configured research exclusion was triggered${ruleStatus === 'evaluated' ? '.' : '; rule applicability is also incomplete.'}`
+    : ruleStatus === 'evaluated' ? 'The configured rules were evaluated; none was triggered.'
+      : ruleStatus === 'partially_evaluated' ? 'Some configured rules were evaluated, but verified mapping gaps remain.'
+        : ruleStatus === 'not_evaluable' ? 'The configured rules could not be reliably evaluated with the available verified drug mappings.'
+          : 'Configured-rule applicability information was not provided.';
+
+  // Count distinct expected unordered pairs, never response rows or an overall severity.
+  const drugs = [...new Set(candidate.drugs ?? [])];
+  const expectedPairs = drugs.length * (drugs.length - 1) / 2;
+  const pairKey = pair => JSON.stringify([...pair].sort());
+  const validPair = pair => pair?.length === 2 && pair[0] !== pair[1] && pair.every(id => drugs.includes(id));
+  const pairs = appliedPairs(candidate).filter(pair => validPair(pair.drugPair) && ['Major', 'Moderate', 'Minor'].includes(pair.predictedSeverity));
+  const predictedKeys = new Set(pairs.map(pair => pairKey(pair.drugPair)));
+  const predictedPairs = predictedKeys.size;
+  const predictions = drugs.length === 1 ? 'Interaction prediction is not applicable because this candidate contains only one drug.'
+    : expectedPairs && predictedPairs === expectedPairs ? expectedPairs === 1 ? 'A prediction is available for the drug pair.' : `Predictions are available for all ${expectedPairs} drug pairs.`
+      : predictedPairs ? `Predictions are available for ${predictedPairs} of ${expectedPairs} drug pairs.`
+        : 'Drug-pair severity predictions are unavailable for this candidate.';
+  const review = [];
+  if (triggered || ruleStatus !== 'evaluated') review.push({ category: 'rules', text: triggered
+    ? `Review the triggered configured research exclusion${ruleStatus === 'evaluated' ? '.' : ' and incomplete rule applicability.'}`
+    : ['partially_evaluated', 'not_evaluable'].includes(ruleStatus) ? 'Verified drug-category mapping gaps need review before the configured rules can be fully evaluated.'
+      : 'Rule applicability cannot be confirmed without the missing evaluation information.' });
+  if (expectedPairs && predictedPairs < expectedPairs) {
+    const reasons = [...new Set((candidate.mlPrediction?.unavailablePairs ?? [])
+      .filter(pair => validPair(pair.drugPair) && !predictedKeys.has(pairKey(pair.drugPair)))
+      .map(pair => pair.reason).filter(Boolean))];
+    if (!reasons.length && candidate.mlPrediction?.reason) reasons.push(candidate.mlPrediction.reason);
+    review.push({ category: 'predictions', text: `${expectedPairs - predictedPairs} of ${expectedPairs} drug pairs remain unclassified.${reasons.length ? ` Reported reason: ${reasons.join('; ')}` : ''}${pairs.some(pair => pair.predictedSeverity === 'Major') ? ' Available Major classifications also require expert interpretation.' : ''}` });
+  } else if (pairs.some(pair => pair.predictedSeverity === 'Major')) {
+    review.push({ category: 'predictions', text: 'Available Major pair classifications require expert interpretation; they do not determine candidate approval or rejection.' });
+  }
+  if (uncovered.length) review.push({ category: 'coverage', text: `No represented treatment coverage was reported for: ${uncovered.map(id => labels.get(id) || 'Selected disease (name unavailable)').join(', ')}.`, diseaseIds: uncovered });
+  const graphGaps = [];
+  if (!coverageKnown) graphGaps.push('Selected-disease coverage information was not returned.');
+  if (!graphPaths(candidate).length) graphGaps.push('Supporting graph paths were not returned for this candidate.');
+  if (graphGaps.length) review.push({ category: 'graph', text: graphGaps.join(' ') });
+  return { sentences: triggered ? [rules, coverage, predictions] : [coverage, rules, predictions], review: review.slice(0, 3), additionalReview: review.slice(3), expectedPairs, predictedPairs, triggered };
+}
+
+function renderResearchTakeaway(candidate, data) {
+  const takeaway = buildResearchTakeaway(candidate, data);
+  const renderItem = item => `<li data-review-category="${item.category}">${escapeHtml(item.text)}${item.diseaseIds?.length ? `<span class="researcher-only"> (${item.diseaseIds.map(escapeHtml).join(', ')})</span>` : ''}</li>`;
+  return `<section class="overview-section research-takeaway" aria-label="Research Takeaway">
+    <h4>Research Takeaway</h4>
+    <h5>What did this exploration find?</h5>
+    <p class="takeaway-findings">${takeaway.sentences.map((sentence, index) => takeaway.triggered && index === 0 ? `<strong class="rule-triggered">${escapeHtml(sentence)}</strong>` : escapeHtml(sentence)).join(' ')}</p>
+    <h5>What still needs review?</h5>
+    ${takeaway.review.length ? `<ul class="takeaway-review">${takeaway.review.map(renderItem).join('')}</ul>` : '<p>No specific evidence gaps were reported for this candidate; independent clinical and formulation evaluation is still required.</p>'}
+    ${takeaway.additionalReview.length ? `<details><summary>View all research limitations</summary>${takeaway.additionalReview.map(item => `<p>${escapeHtml(item.text)}</p>`).join('')}<p>Supporting evidence is available in the graph, rule mapping and ML details above.</p></details>` : ''}
+    <p class="takeaway-scope">These results guide further research; they do not establish clinical safety or formulation feasibility. Configured research rules are not clinically validated.</p>
+  </section>`;
 }
 
 function candidateCoverage(candidate, data) {
@@ -983,6 +1050,8 @@ globalThis.PolyMergeFrontend = {
   finalCandidateSummary,
   understandingGuide,
   shortCandidateSummary,
+  buildResearchTakeaway,
+  renderResearchTakeaway,
   setSimulationStep,
   setDisplayMode,
   changeCandidatePage,

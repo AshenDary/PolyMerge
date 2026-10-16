@@ -470,6 +470,10 @@
 .pair-severity { text-align: right; font-size: 14px; overflow-wrap: anywhere; }
 .candidate-overview .pair-reason { grid-column: 1 / -1; font-size: 13px; margin: 0; }
 .overview-details { border-top: 1px solid var(--line); padding-top: 8px; }
+.research-takeaway { min-width: 0; overflow-wrap: anywhere; }
+.research-takeaway .takeaway-review { max-width: 72ch; padding-left: 20px; }
+.research-takeaway .takeaway-review li { margin-block: 8px; line-height: 1.55; }
+.research-takeaway .takeaway-scope { color: #586677; font-size: 12px; margin-top: 18px; }
 .overview-details > details { padding: 12px 0; border-bottom: 1px solid var(--line); }
 .overview-details summary { line-height: 1.5; }
 .overview-details ul { padding-left: 20px; }
