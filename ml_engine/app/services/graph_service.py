@@ -256,7 +256,6 @@ class GraphService:
                     "interactionRisk": None,
                     "synergyScore": None,
                     "evidenceLevel": "graph",
-                    "confidence": coverage,
                     "dataStatus": "real_graph",
                     "status": "accepted",
                     "evidence": [

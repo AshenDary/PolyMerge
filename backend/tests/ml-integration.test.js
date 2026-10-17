@@ -415,6 +415,9 @@ test('forwards candidate-set requests and preserves IDs, safety, coverage, and p
   assert.equal(payload.candidateSets[0].mlStatus, 'not_applied');
   assert.equal(payload.candidateSets[0].interactionRisk, null);
   assert.equal(payload.candidateSets[0].synergyScore, null);
+  for (const field of ['confidence', 'probability', 'probabilities', 'safetyScore', 'combinedSafetyScore']) {
+    assert.equal(Object.hasOwn(payload.candidateSets[0], field), false);
+  }
 });
 
 test('candidate-set endpoint preserves structured rejection reasons from the ML service', async () => {
@@ -540,64 +543,76 @@ test('candidate-set endpoint preserves real pair-level ML prediction shape', asy
   assert.equal(Object.hasOwn(candidateSet.mlPrediction.pairs[0], 'probabilities'), false);
   assert.equal(Object.hasOwn(candidateSet.mlPrediction.pairs[0], 'confidence'), false);
   assert.equal(Object.hasOwn(candidateSet, 'safetyScore'), false);
+  for (const field of ['confidence', 'probability', 'probabilities', 'combinedSafetyScore']) {
+    assert.equal(Object.hasOwn(candidateSet, field), false);
+    assert.equal(Object.hasOwn(candidateSet.mlPrediction.pairs[0], field), false);
+  }
 });
 
-test('candidate-set endpoint fails closed on unsupported fabricated probability fields', async () => {
-  globalThis.fetch = async (url) => {
-    if (String(url).endsWith('/api/diseases')) {
-      return jsonResponse({ diseases: graphDiseases });
-    }
-    return jsonResponse({
-      queryId: 'fabricated-probability',
-      diseaseIds: ['Disease::DOID:10763'],
-      diseases: [graphDiseases[0]],
-      candidateSets: [{
-        candidateSetId: 'candidate-set:Compound::DB00177+Compound::DB00331',
-        rank: 1,
-        drugs: ['Compound::DB00177', 'Compound::DB00331'],
-        drugNames: ['Valsartan', 'Metformin'],
-        treatedDiseaseIds: ['Disease::DOID:10763'],
-        uncoveredDiseaseIds: [],
-        coverage: 1,
-        drugCount: 2,
-        status: 'accepted',
-        rejectionReasons: [],
-        evidence: [],
-        dataStatus: 'real_graph',
-        mlStatus: 'applied',
-        mlPrediction: {
-          status: 'applied',
-          pairs: [{
-            drugPair: ['Compound::DB00177', 'Compound::DB00331'],
-            predictedSeverity: 'Moderate',
-            inferenceStatus: 'applied',
-            probabilities: { Moderate: 1 },
-            model: {
-              name: 'RandomForestClassifier',
-              version: 'RandomForestClassifier-sprint5-v1-65e9834666ad19c5',
-            },
-          }],
+for (const [level, field] of [
+  ...['confidence', 'probability', 'probabilities', 'safetyScore', 'combinedSafetyScore'].map((field) => ['candidate', field]),
+  ...['confidence', 'probability', 'probabilities'].map((field) => ['pair', field]),
+]) {
+  test(`candidate-set endpoint fails closed on unsupported ${level} ${field}`, async () => {
+    globalThis.fetch = async (url) => {
+      if (String(url).endsWith('/api/diseases')) {
+        return jsonResponse({ diseases: graphDiseases });
+      }
+      return jsonResponse({
+        queryId: 'fabricated-probability',
+        diseaseIds: ['Disease::DOID:10763'],
+        diseases: [graphDiseases[0]],
+        candidateSets: [{
+          ...(level === 'candidate' ? { [field]: 1 } : {}),
+          candidateSetId: 'candidate-set:Compound::DB00177+Compound::DB00331',
+          rank: 1,
+          drugs: ['Compound::DB00177', 'Compound::DB00331'],
+          drugNames: ['Valsartan', 'Metformin'],
+          treatedDiseaseIds: ['Disease::DOID:10763'],
+          uncoveredDiseaseIds: [],
+          coverage: 1,
+          drugCount: 2,
+          status: 'accepted',
+          rejectionReasons: [],
+          evidence: [],
+          dataStatus: 'real_graph',
+          mlStatus: 'applied',
+          mlPrediction: {
+            status: 'applied',
+            pairs: [{
+              drugPair: ['Compound::DB00177', 'Compound::DB00331'],
+              predictedSeverity: 'Moderate',
+              inferenceStatus: 'applied',
+              ...(level === 'pair' ? { [field]: 1 } : {}),
+              model: {
+                name: 'RandomForestClassifier',
+                version: 'RandomForestClassifier-sprint5-v1-65e9834666ad19c5',
+              },
+            }],
+          },
+          interactionRisk: null,
+          synergyScore: null,
+        }],
+        metadata: {
+          dataStatus: 'real_graph',
+          mlStatus: 'applied',
         },
-        interactionRisk: null,
-        synergyScore: null,
-      }],
-      metadata: {
-        dataStatus: 'real_graph',
-        mlStatus: 'applied',
-      },
+      });
+    };
+
+    const response = await app.inject({
+      method: 'POST',
+      url: '/api/candidate-sets/search',
+      payload: { diseaseIds: ['Disease::DOID:10763'] },
     });
-  };
 
-  const response = await app.inject({
-    method: 'POST',
-    url: '/api/candidate-sets/search',
-    payload: { diseaseIds: ['Disease::DOID:10763'] },
+    assert.equal(response.statusCode, 200);
+    assert.equal(response.json().metadata.mlStatus, 'not_applied');
+    assert.deepEqual(response.json().candidateSets, []);
+    assert.match(response.json().metadata.warning, level === 'candidate'
+      ? /unsupported candidate-level predictive fields/ : /unsupported probability or confidence/);
   });
-
-  assert.equal(response.statusCode, 200);
-  assert.equal(response.json().metadata.mlStatus, 'not_applied');
-  assert.match(response.json().metadata.warning, /unsupported probability or confidence/);
-});
+}
 
 test('candidate-set endpoint rejects invalid IDs and configuration before prediction', async () => {
   const calls = [];
@@ -755,6 +770,18 @@ test('candidate-set endpoint returns an explicit empty fallback on upstream fail
   assert.equal(payload.metadata.dataStatus, 'graph_unavailable');
   assert.equal(payload.metadata.mlStatus, 'not_applied');
   assert.equal(payload.metadata.upstreamStatus, 'fallback');
+});
+
+test('candidate analysis busy is explicit and does not masquerade as missing graph data', async () => {
+  globalThis.fetch = async (url) => String(url).endsWith('/api/diseases')
+    ? jsonResponse({ diseases: graphDiseases })
+    : new Response(JSON.stringify({ detail: 'Analysis busy' }), { status: 503, headers: { 'Retry-After': '2' } });
+  const response = await app.inject({ method: 'POST', url: '/api/candidate-sets/search',
+    payload: { diseaseIds: ['Disease::DOID:10763'] } });
+  assert.equal(response.statusCode, 503);
+  assert.equal(response.headers['retry-after'], '2');
+  assert.match(response.json().error, /Analysis busy/);
+  assert.equal(response.json().candidateSets, undefined);
 });
 
 test('candidate-set endpoint rejects fake prediction scores when ML is not applied', async () => {

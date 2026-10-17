@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any, Optional, Union
 
-from app.services.safety_filter import check_hard_contraindications
+from app.services.safety_filter import check_hard_contraindications, evaluate_rule_applicability
 
 
 DEFAULT_OPTIMIZATION_CONFIG = {
@@ -37,6 +37,7 @@ def optimize_set_cover(
 
     return {
         "selectedDrugs": selected_drugs,
+        "ruleEvaluation": evaluate_rule_applicability(selected_drugs),
         "selectedDrugCount": len(selected_drugs),
         "coveredDiseaseIds": covered_diseases,
         "uncoveredDiseaseIds": [
@@ -80,6 +81,9 @@ def optimize_candidate_sets(
             for candidate in remaining
             if len(_merged_drugs(selected_drugs, candidate.get("drugs", [])))
             <= effective_config["maxDrugCount"]
+            and check_hard_contraindications(
+                _merged_drugs(selected_drugs, candidate.get("drugs", []))
+            ) is None
         ]
         if not eligible:
             break
@@ -90,7 +94,6 @@ def optimize_candidate_sets(
                 len((set(candidate.get("treatedDiseaseIds", [])) & target_disease_set) - covered),
                 _score(candidate.get("coverage")),
                 -int(candidate.get("drugCount", len(candidate.get("drugs", [])))),
-                _score(candidate.get("confidence")),
             ),
         )
         newly_covered = (
@@ -131,6 +134,7 @@ def optimize_candidate_sets(
             for candidate in selected_sets
         ],
         "selectedDrugs": selected_drugs,
+        "ruleEvaluation": evaluate_rule_applicability(selected_drugs),
         "selectedDrugCount": len(selected_drugs),
         "coveredDiseaseIds": covered_diseases,
         "uncoveredDiseaseIds": [
@@ -220,10 +224,10 @@ def _legacy_selection(
     candidate_drugs: list[str],
     max_drugs: int,
 ) -> list[str]:
-    filtered_candidates = [
-        drug for drug in candidate_drugs[:max_drugs] if check_hard_contraindications([drug]) is None
-    ]
-    selected = filtered_candidates[: min(len(filtered_candidates), max_drugs)]
+    selected: list[str] = []
+    for drug in candidate_drugs[:max_drugs]:
+        if check_hard_contraindications([*selected, drug]) is None:
+            selected.append(drug)
     return selected
 
 

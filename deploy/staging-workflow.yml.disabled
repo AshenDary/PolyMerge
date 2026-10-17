@@ -1,0 +1,42 @@
+# TEMPLATE ONLY: install under .github/workflows after target approval and security remediation.
+name: Approved staging
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  staging:
+    if: github.ref == 'refs/heads/main' && vars.STAGING_DEPLOY_ENABLED == 'true'
+    environment: staging
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Require successful CI for this exact SHA
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          result=$(gh run list --workflow ci.yml --commit "$GITHUB_SHA" --event push --limit 1 --json conclusion --jq '.[0].conclusion')
+          test "$result" = success
+      - name: Configure verified SSH identity
+        env:
+          SSH_KEY: ${{ secrets.STAGING_SSH_KEY }}
+          KNOWN_HOSTS: ${{ secrets.STAGING_KNOWN_HOSTS }}
+        run: |
+          test -n "$SSH_KEY" && test -n "$KNOWN_HOSTS"
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/id_ed25519
+          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/*
+      - name: Build, deploy privately and smoke test on approved host
+        env:
+          HOST: ${{ vars.STAGING_SSH_HOST }}
+        run: |
+          [[ "$HOST" =~ ^[a-zA-Z0-9.-]+$ ]]
+          ssh -o BatchMode=yes -o StrictHostKeyChecking=yes "deploy@$HOST" "POLYMERGE_DEPLOY_APPROVED=staging bash /srv/polymerge/release.sh '$GITHUB_SHA'"
+      - name: Remove runner key
+        if: always()
+        run: rm -f ~/.ssh/id_ed25519

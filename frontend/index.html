@@ -4,8 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>PolyMerge Research Dashboard</title>
-    <link rel="stylesheet" href="/frontend/styles.css?v=20261010-flow-repair" />
-    <link rel="stylesheet" href="/frontend/explainability.css?v=20261010-flow-repair" />
+    <link rel="stylesheet" href="/frontend/styles.css?v=20261017-navigation-coverage" />
+    <link rel="stylesheet" href="/frontend/explainability.css?v=20261017-navigation-coverage" />
   </head>
   <body>
     <aside class="sidebar" aria-label="Main navigation">
@@ -41,18 +41,30 @@
         <div>
           <p class="eyebrow">PolyMerge</p>
           <h1 id="page-title">Research Dashboard</h1>
-          <p class="muted page-subtitle">Research decision support for multi-disease candidate analysis.</p>
+          <p class="muted page-subtitle">Explore existing-drug combinations for multiple diseases.</p>
         </div>
+        <button type="button" id="reset-simulation" class="secondary">New Simulation</button>
       </header>
 
       <main>
+        <div class="guided-controls">
+          <div class="display-mode" role="group" aria-label="Result detail level">
+            <button type="button" id="simple-view" aria-pressed="true">Simple View</button>
+            <button type="button" id="researcher-view" aria-pressed="false">Researcher View</button>
+          </div>
+          <nav class="simulation-steps" aria-label="Simulation steps">
+            <button type="button" id="step-1" aria-current="step">1. Select Diseases</button>
+            <button type="button" id="step-2" disabled>2. Analyze</button>
+            <button type="button" id="step-3" disabled>3. Review Candidates</button>
+            <button type="button" id="step-4" disabled>4. Understand Result</button>
+          </nav>
+        </div>
         <section class="view home-view" id="home">
           <div class="home-hero">
             <div>
               <p class="eyebrow">Biomedical candidate exploration</p>
               <h2>PolyMerge</h2>
-              <p class="hero-copy">Multi-disease candidate exploration using knowledge graphs and traditional machine learning.</p>
-              <p class="hero-support">PolyMerge brings graph evidence, deterministic rules, candidate optimization, and drug-pair interaction predictions into one research workflow.</p>
+              <p class="hero-copy">Explore existing-drug combinations for multiple diseases.</p>
               <div class="home-actions">
                 <button type="button" class="primary" id="start-simulation">Start Simulation</button>
                 <a class="secondary-link" href="#model-analysis">View Model Analysis</a>
@@ -80,7 +92,6 @@
               <p>Inspect the evidence behind each candidate result.</p>
             </section>
           </div>
-          <p class="home-disclaimer">PolyMerge is a research decision-support prototype and does not provide clinical recommendations.</p>
         </section>
 
         <section class="view simulation-view" id="simulation">
@@ -88,10 +99,10 @@
             <section class="panel selection-panel" id="disease-selection">
               <div class="section-title">
                 <span class="step-number">01</span>
-                <h2>Disease Selection</h2>
+                <h2>Select Diseases</h2>
                 <div id="catalog-tag" class="status-tag">Loading catalog</div>
               </div>
-              <p class="muted">Select represented disease nodes from the Neo4j-backed catalog.</p>
+              <p class="muted">Choose the diseases you want to explore together.</p>
               <label class="search-wrap">
                 <span aria-hidden="true">⌕</span>
                 <input id="disease-search" type="search" placeholder="Search by disease name or ID" aria-label="Search diseases by name or ID" />
@@ -105,20 +116,33 @@
                 </div>
                 <button type="button" id="clear-selection" class="secondary small-button" disabled>Clear</button>
               </div>
-              <button id="analyze-btn" class="primary" disabled>Search Candidate Sets</button>
+              <button id="analyze-btn" class="primary" disabled>Analyze Candidates</button>
             </section>
 
             <section class="panel workflow-panel" id="workflow" aria-label="Analysis workflow">
               <div class="section-title">
                 <span class="step-number">02</span>
-                <h2>Analysis Pipeline</h2>
+                <h2>Analyze</h2>
               </div>
               <div id="analysis-running" class="analysis-running" hidden>
-                <strong>Analysis running...</strong>
-                <p>Graph retrieval, candidate generation, optimization, and ML analysis may take about a minute in the local research environment.</p>
-                <span id="elapsed-time">Elapsed: 0s</span>
+                <strong>Analyzing candidate combinations</strong>
+                <p>PolyMerge is finding related drugs, evaluating candidate sets, and checking supported drug-pair interactions.</p>
+                <span id="elapsed-time" role="timer">Elapsed: 0s</span>
+                <button type="button" id="cancel-analysis" class="secondary">Cancel / Reset</button>
+                <small>Reset clears this session. Server processing may continue.</small>
               </div>
-              <ol id="workflow-list" class="workflow"></ol>
+              <div id="analysis-error" hidden></div>
+              <button type="button" id="retry-analysis" class="secondary" hidden>Retry analysis</button>
+              <section class="analysis-summary" id="analysis-summary" hidden aria-label="Analysis Summary">
+                <h3>Analysis Summary</h3>
+                <div id="your-analysis"></div>
+                <div id="summary-cards" class="summary-cards"></div>
+                <div id="analysis-rule-coverage"></div>
+                <div id="analysis-limitations"></div>
+              </section>
+              <p id="workflow-warning" role="status" hidden></p>
+              <details id="technical-pipeline"><summary>View technical pipeline</summary><ol id="workflow-list" class="workflow"></ol></details>
+              <button type="button" id="review-candidates" class="primary" hidden>Review Candidates &rarr;</button>
             </section>
           </div>
 
@@ -126,10 +150,19 @@
             <div class="results-header">
               <div class="section-title">
                 <span class="step-number">03</span>
-                <h2>Candidate Results</h2>
+                <h2>Top Candidates</h2>
               </div>
             </div>
-            <div id="summary-cards" class="summary-cards"></div>
+            <div id="result-display" hidden>
+              <p id="result-count" role="status"></p>
+              <p id="result-limit-note" class="muted"></p>
+              <label id="show-all-control"><input type="checkbox" id="show-all-candidates" /> Show all returned candidates</label>
+              <div class="candidate-pagination" role="group" aria-label="Candidate pages">
+                <button type="button" id="previous-candidates" class="secondary" disabled>Previous 5</button>
+                <button type="button" id="next-candidates" class="secondary">Show next 5</button>
+              </div>
+              <p id="selected-result-link"></p>
+            </div>
             <div id="results" class="results-list">
               <div class="empty-state"><span class="empty-icon">▦</span><p>Choose one or more target diseases, then search to see ranked candidate sets.</p></div>
             </div>
@@ -140,7 +173,7 @@
           <div class="results-header">
             <div class="section-title">
               <span class="step-number">04</span>
-              <h2>Explainability</h2>
+              <h2>Understand Result</h2>
             </div>
             <div class="channel-pills"><span class="graph-label">Graph evidence</span><span class="rules-label">Rules</span><span class="ml-label">Interaction prediction</span></div>
           </div>
@@ -163,7 +196,7 @@
       <footer class="research-note" id="research-note">PolyMerge is a research decision-support prototype and does not provide clinical recommendations.</footer>
     </div>
 
-    <script src="/frontend/explainability.js?v=20261010-flow-repair"></script>
-    <script src="/frontend/app.js?v=20261010-flow-repair"></script>
+    <script src="/frontend/explainability.js?v=20261017-navigation-coverage"></script>
+    <script src="/frontend/app.js?v=20261017-navigation-coverage"></script>
   </body>
 </html>

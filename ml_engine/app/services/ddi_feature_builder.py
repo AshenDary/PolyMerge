@@ -21,6 +21,11 @@ from app.data.ddinter_dataset import (
 class PairFeatureUnavailableError(RuntimeError):
     """Raised when a candidate pair cannot be represented by the frozen contract."""
 
+    def __init__(self, message: str, code: str = "unsupported_pair", missing_drug_ids: list[str] | None = None) -> None:
+        super().__init__(message)
+        self.code = code
+        self.missing_drug_ids = missing_drug_ids or []
+
 
 @dataclass(frozen=True)
 class PairFeatureBuilder:
@@ -31,10 +36,13 @@ class PairFeatureBuilder:
     edges_path: Path = EDGES_PATH
 
     def __post_init__(self) -> None:
-        object.__setattr__(self, "_hetionet_to_ddinter", self._load_hetionet_mapping())
-        object.__setattr__(self, "_pubchem_by_ddinter", self._load_pubchem_mapping())
-        edges = pd.read_csv(self.edges_path, dtype="string").fillna("")
-        object.__setattr__(self, "_graph_lookup", build_graph_feature_lookup(edges))
+        try:
+            object.__setattr__(self, "_hetionet_to_ddinter", self._load_hetionet_mapping())
+            object.__setattr__(self, "_pubchem_by_ddinter", self._load_pubchem_mapping())
+            edges = pd.read_csv(self.edges_path, dtype="string").fillna("")
+            object.__setattr__(self, "_graph_lookup", build_graph_feature_lookup(edges))
+        except (OSError, KeyError, pd.errors.ParserError, pd.errors.EmptyDataError) as error:
+            raise PairFeatureUnavailableError("Required reviewed feature source is missing or invalid", "missing_feature_source") from error
 
     def build_features(self, drug_a: str, drug_b: str) -> dict[str, float | int | None]:
         if drug_a == drug_b:
@@ -45,14 +53,17 @@ class PairFeatureBuilder:
         right_ddinter = self._hetionet_to_ddinter.get(right)
         if left_ddinter is None or right_ddinter is None:
             raise PairFeatureUnavailableError(
-                "candidate pair is not fully mapped through the reviewed DDInter-Hetionet bridge"
+                "candidate pair is not fully mapped through the reviewed DDInter-Hetionet bridge",
+                "missing_drug_mapping",
+                [drug for drug in (left, right) if drug not in self._hetionet_to_ddinter],
             )
 
         left_pubchem = self._pubchem_by_ddinter.get(left_ddinter)
         right_pubchem = self._pubchem_by_ddinter.get(right_ddinter)
         if left_pubchem is None or right_pubchem is None:
             raise PairFeatureUnavailableError(
-                "candidate pair is missing reviewed PubChem enrichment rows"
+                "candidate pair is missing reviewed PubChem enrichment rows", "missing_feature_source",
+                [drug for drug, row in ((left, left_pubchem), (right, right_pubchem)) if row is None],
             )
 
         graph_features = _pair_graph_features(left, right, self._graph_lookup)
@@ -69,7 +80,7 @@ class PairFeatureBuilder:
     def _load_hetionet_mapping(self) -> dict[str, str]:
         if not self.hetionet_mapping_path.is_file():
             raise PairFeatureUnavailableError(
-                f"missing DDInter-Hetionet mapping: {self.hetionet_mapping_path}"
+                "Missing reviewed DDInter-Hetionet mapping source", "missing_feature_source"
             )
         mapping = pd.read_csv(self.hetionet_mapping_path, dtype="string")
         exact = mapping.loc[
@@ -85,7 +96,7 @@ class PairFeatureBuilder:
     def _load_pubchem_mapping(self) -> dict[str, dict[str, Any]]:
         if not self.pubchem_mapping_path.is_file():
             raise PairFeatureUnavailableError(
-                f"missing PubChem mapping: {self.pubchem_mapping_path}"
+                "Missing reviewed PubChem mapping source", "missing_feature_source"
             )
         mapping = pd.read_csv(self.pubchem_mapping_path, dtype="string")
         return {
