@@ -348,7 +348,7 @@ test('missing and unavailable evidence does not become a passed rule or applied 
   assert.equal(logic.mlSummary([partial]).applied, 0);
   assert.equal(logic.mlSummary([partial]).pairCount, 0);
   assert.equal(logic.candidateMlPresentation(partial).label, 'Prediction unavailable');
-  assert.match(logic.candidateNarrative(partial, empty), /Configured rule check<\/dt><dd>Insufficient verified mapping/);
+  assert.match(logic.candidateNarrative(partial, empty), /Configured rule check<\/dt><dd>Insufficient verified information/);
 });
 
 test('graph diagram prioritizes treatment paths and escapes node names and metadata', () => {
@@ -397,6 +397,112 @@ function manyCandidates() {
     candidateSetId: `candidate:${index}`, rank: index + 1,
   })) };
 }
+
+test('Analyze remains active on completion and all completed steps preserve selection and paging', async () => {
+  const { logic, get, requests } = simulationHarness();
+  logic.setSimulationStep(1);
+  for (const step of [2, 3, 4]) { logic.setSimulationStep(step); assert.equal(logic.state.simulationStep, 1); }
+  logic.state.selectedDiseases.add(candidateResponse.diseaseIds[0]);
+  const search = logic.analyzeCombination();
+  assert.equal(logic.state.simulationStep, 2);
+  assert.equal(logic.state.analysisStatus, 'running');
+  for (const step of [1, 3, 4]) { logic.setSimulationStep(step); assert.equal(logic.state.simulationStep, 2); }
+  assert.equal(get('analysis-running').hidden, false);
+  requests[0].resolve(manyCandidates());
+  await search;
+  assert.equal(logic.state.analysisStatus, 'complete');
+  assert.equal(logic.state.simulationStep, 2);
+  assert.equal(get('analysis-summary').hidden, false);
+  assert.equal(get('review-candidates').hidden, false);
+  assert.equal(get('step-2').disabled, false);
+  assert.equal(get('step-3').attributes['data-state'], 'available');
+  assert.equal(get('step-4').disabled, true);
+  logic.setSimulationStep(4);
+  assert.equal(logic.state.simulationStep, 2);
+  logic.setSimulationStep(3, true);
+  logic.changeCandidatePage(1);
+  logic.selectCandidate('candidate:7', true);
+  assert.equal(logic.state.simulationStep, 4);
+  const explanation = get('explainability').innerHTML;
+  for (const step of [2, 3, 4, 1, 2, 3]) {
+    logic.setSimulationStep(step, true);
+    assert.equal(logic.state.simulationStep, step);
+    assert.equal(logic.state.selectedCandidateId, 'candidate:7');
+    assert.equal(logic.state.candidateOffset, 5);
+    assert.equal(get('explainability').innerHTML, explanation);
+    assert.equal(get(`step-${step}`).focused, true);
+  }
+  assert.equal(get('step-2').attributes['data-state'], 'complete');
+  assert.equal(requests.length, 1);
+  logic.resetSimulation();
+  assert.equal(logic.state.analysisStatus, 'idle');
+  assert.equal(get('step-2').disabled, true);
+});
+
+for (const failure of ['transport', 'graph_unavailable']) {
+  test(`Analyze retains ${failure} error with retry and no candidate unlock`, async () => {
+    const { logic, get, requests } = simulationHarness();
+    logic.state.selectedDiseases.add(candidateResponse.diseaseIds[0]);
+    const search = logic.analyzeCombination();
+    if (failure === 'transport') requests[0].reject(new Error('<offline>'));
+    else requests[0].resolve({ candidateSets: [], metadata: { dataStatus: 'graph_unavailable', warning: '<offline>' } });
+    await search;
+    assert.equal(logic.state.simulationStep, 2);
+    assert.equal(logic.state.analysisStatus, 'error');
+    assert.equal(get('step-3').disabled, true);
+    assert.equal(get('retry-analysis').hidden, false);
+    assert.match(get('analysis-error').innerHTML, /&lt;offline&gt;/);
+    assert.equal(get('catalog-message').hidden, true);
+    const retry = logic.analyzeCombination();
+    requests[1].resolve(candidateResponse);
+    await retry;
+    assert.equal(logic.state.simulationStep, 2);
+    assert.equal(logic.state.analysisStatus, 'complete');
+    assert.equal(get('analysis-error').hidden, true);
+  });
+}
+
+test('empty results stay on Analyze and offer honest Review without unlocking Understand', async () => {
+  const { logic, get, requests } = simulationHarness();
+  logic.state.selectedDiseases.add(candidateResponse.diseaseIds[0]);
+  const search = logic.analyzeCombination();
+  requests[0].resolve({ diseaseIds: candidateResponse.diseaseIds, candidateSets: [], metadata: { dataStatus: 'real_graph' } });
+  await search;
+  assert.equal(logic.state.simulationStep, 2);
+  assert.match(get('analysis-limitations').innerHTML, /No represented treatment connections/);
+  logic.setSimulationStep(3);
+  assert.equal(logic.state.simulationStep, 3);
+  logic.selectCandidate('not-returned', true);
+  assert.equal(logic.state.simulationStep, 3);
+  assert.equal(logic.state.selectedCandidateId, null);
+});
+
+test('structured rule counts match candidate states and separate candidate counts from pair counts', () => {
+  const { logic, get } = simulationHarness();
+  const { data, candidate } = threeDrugOverviewFixture();
+  data.candidateSets = ['evaluated', 'partially_evaluated', 'not_evaluable', undefined].map((status, index) => ({ ...candidate, candidateSetId: String(index), status: index === 0 ? 'rejected' : 'accepted', ruleEvaluation: { status } }));
+  const counts = logic.ruleOutcomeCounts(data.candidateSets);
+  assert.deepEqual(JSON.parse(JSON.stringify(counts)), { evaluated: 1, partial: 1, unavailable: 2, rejected: 1 });
+  logic.renderSummary(data);
+  assert.match(get('summary-cards').innerHTML, /class="value">4<\/div><div class="label">Candidates with predictions/);
+  assert.equal(logic.mlSummary(data.candidateSets).pairCount, 12);
+  const html = get('analysis-rule-coverage').innerHTML;
+  assert.match(html, /<details><summary>View rule evaluation details/);
+  assert.match(html, /<dt>Not evaluable<\/dt><dd>2/);
+  assert.match(html, /1 candidates rejected/);
+  assert.doesNotMatch(html, /safe|low risk|approved|passed/i);
+});
+
+test('step panels are exclusive and native buttons remain keyboard accessible', () => {
+  const css = readFileSync(path.join(frontendDir, 'styles.css'), 'utf8');
+  const html = readFileSync(path.join(frontendDir, 'index.html'), 'utf8');
+  assert.match(css, /body:not\(\[data-step="2"\]\) #workflow/);
+  assert.match(css, /body:not\(\[data-step="3"\]\) #candidate-sets/);
+  assert.doesNotMatch(css, /body\[data-step="2"\] #technical-pipeline/);
+  for (const step of [1, 2, 3, 4]) assert.match(html, new RegExp(`<button type="button" id="step-${step}"`));
+  assert.ok(html.indexOf('id="analysis-summary"') > html.indexOf('id="workflow"'));
+  assert.doesNotMatch(html, /class="rule-limit"/);
+});
 
 test('default display limits cards to five without changing response order, ranks or summary', () => {
   const { logic, get } = simulationHarness();
@@ -451,6 +557,8 @@ test('completed search reset clears all simulation state while keeping the disea
   assert.equal(get('disease-search').value, '');
   assert.equal(get('summary-cards').innerHTML, '');
   assert.equal(get('your-analysis').innerHTML, '');
+  assert.equal(get('analysis-rule-coverage').innerHTML, '');
+  assert.equal(get('analysis-limitations').innerHTML, '');
   assert.equal(get('analysis-summary').hidden, true);
   assert.equal(get('result-display').hidden, true);
   assert.equal(get('analysis-running').hidden, true);
@@ -489,6 +597,7 @@ for (const staleOutcome of ['response', 'error']) {
     await oldSearch;
     assert.equal(logic.state.currentResult, null);
     assert.equal(logic.state.elapsedTimer, timer);
+    assert.equal(logic.state.analysisStatus, 'running');
     assert.equal(intervals.size, 1);
     assert.equal(get('analysis-running').hidden, false);
     assert.equal(get('analyze-btn').disabled, true);
@@ -578,7 +687,11 @@ test('four-step flow advances through analysis, results and selected explanation
   assert.equal(get('step-2').attributes['aria-current'], 'step');
   requests[0].resolve(candidateResponse);
   await pending;
-  assert.equal(logic.state.simulationStep, 3);
+  assert.equal(logic.state.simulationStep, 2);
+  assert.equal(get('step-3').disabled, false);
+  assert.equal(get('step-4').disabled, true);
+  assert.equal(logic.state.selectedCandidateId, null);
+  logic.setSimulationStep(3, true);
   logic.selectCandidate(candidateResponse.candidateSets[1].candidateSetId, true);
   assert.equal(logic.state.simulationStep, 4);
   assert.equal(logic.context.window.location.hash, 'explainability-panel');
@@ -624,7 +737,7 @@ test('partial availability survives view switching with exact pair reasons and n
   logic.setDisplayMode('researcher');
   assert.match(get('explainability').innerHTML, /missing_drug_mapping/);
   assert.match(get('explainability').innerHTML, /&lt;missing reviewed mapping&gt;/);
-  assert.match(get('explainability').innerHTML, /Not fully evaluated/);
+  assert.match(get('explainability').innerHTML, /Limited evaluation/);
   logic.setDisplayMode('simple');
   assert.equal(logic.state.currentResult, data);
   assert.equal(requests.length, 0);
@@ -689,7 +802,7 @@ test('short explanation contains only treatment coverage, with outcomes in separ
   assert.doesNotMatch(single, /rule|prediction|rank/i);
   logic.renderSelectedCandidate({ ...candidateResponse.candidateSets[0], rank: '<img onerror=x>' }, candidateResponse);
   const html = get('explainability').innerHTML;
-  assert.match(html, /Not fully evaluated/);
+  assert.match(html, /Insufficient verified information/);
   assert.match(html, /Not applicable: this candidate contains one drug/);
   assert.match(html, /Why rank #&lt;img/);
   assert.doesNotMatch(html, /<img/);
@@ -860,7 +973,7 @@ test('three-drug overview separates coverage, rules, each pair and backend rank 
   logic.renderSelectedCandidate(candidate, data);
   const html = get('explainability').innerHTML;
   const overview = html.split('<div class="overview-details">')[0];
-  for (const heading of ['Why these drugs?', 'Rule check', 'Random Forest predictions', 'Why rank #7?']) {
+  for (const heading of ['Why these drugs?', 'Research Rule Check', 'Random Forest predictions', 'Why rank #7?']) {
     assert.ok(overview.includes(`<h4>${heading}</h4>`));
   }
   assert.match(overview, /Hydrochlorothiazide \+ Metformin \+ Timolol/);
@@ -868,7 +981,8 @@ test('three-drug overview separates coverage, rules, each pair and backend rank 
   assert.match(overview, /<meter min="0" max="5" value="3"/);
   for (const name of ['Metabolic syndrome X', 'Nephrolithiasis', 'Migraine']) assert.ok(overview.includes(`<li>${name}</li>`));
   assert.match(overview, /<summary>Not covered \(2\)<\/summary><ul><li>Other selected disease/);
-  assert.match(overview, /1 of 3 configured rules evaluated; 1 with partial coverage, 1 not evaluable/);
+  assert.match(html, /1 of 3 configured rules evaluated; 1 with partial coverage, 1 not evaluable/);
+  assert.doesNotMatch(overview, /1 of 3 configured rules evaluated/);
   assert.equal((overview.match(/class="pair-result"/g) ?? []).length, 3);
   for (const severity of ['Major', 'Moderate', 'Minor']) assert.ok(overview.includes(`class="pair-severity">${severity}</strong>`));
   assert.doesNotMatch(overview, /Compound::|graph-path:|model-fixture|overall severity|confidence|probability|safety score/i);
@@ -887,7 +1001,7 @@ for (const status of ['evaluated', 'partially_evaluated', 'not_evaluable']) {
     candidate.ruleEvaluation.status = status;
     logic.renderSelectedCandidate(candidate, data);
     const rules = get('explainability').innerHTML.split('<section class="overview-section overview-rules"')[1].split('</section>')[0];
-    assert.match(rules, status === 'evaluated' ? /Evaluated; no configured rule triggered/ : /Not fully evaluated/);
+    assert.match(rules, status === 'evaluated' ? /Checked against configured research rules/ : status === 'partially_evaluated' ? /Limited evaluation/ : /Insufficient verified information/);
     assert.doesNotMatch(rules, /safe|approved|passed all/i);
     candidate.status = 'rejected';
     candidate.rejectionReasons = [{ message: 'Research exclusion fixture' }];

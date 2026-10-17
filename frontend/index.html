@@ -4,8 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>PolyMerge Research Dashboard</title>
-    <link rel="stylesheet" href="/frontend/styles.css?v=20261016-research-takeaway" />
-    <link rel="stylesheet" href="/frontend/explainability.css?v=20261016-research-takeaway" />
+    <link rel="stylesheet" href="/frontend/styles.css?v=20261017-navigation-coverage" />
+    <link rel="stylesheet" href="/frontend/explainability.css?v=20261017-navigation-coverage" />
   </head>
   <body>
     <aside class="sidebar" aria-label="Main navigation">
@@ -58,7 +58,6 @@
             <button type="button" id="step-3" disabled>3. Review Candidates</button>
             <button type="button" id="step-4" disabled>4. Understand Result</button>
           </nav>
-          <p class="rule-limit">Research rules have incomplete mapping coverage and are not clinically validated.</p>
         </div>
         <section class="view home-view" id="home">
           <div class="home-hero">
@@ -120,10 +119,6 @@
               <button id="analyze-btn" class="primary" disabled>Analyze Candidates</button>
             </section>
 
-            <section class="analysis-summary" id="analysis-summary" hidden>
-              <div id="your-analysis"></div>
-              <div id="summary-cards" class="summary-cards"></div>
-            </section>
             <section class="panel workflow-panel" id="workflow" aria-label="Analysis workflow">
               <div class="section-title">
                 <span class="step-number">02</span>
@@ -136,9 +131,18 @@
                 <button type="button" id="cancel-analysis" class="secondary">Cancel / Reset</button>
                 <small>Reset clears this session. Server processing may continue.</small>
               </div>
-              <p class="phase-overview">Find drugs &rarr; Build candidates &rarr; Evaluate combinations &rarr; Explain results</p>
+              <div id="analysis-error" hidden></div>
+              <button type="button" id="retry-analysis" class="secondary" hidden>Retry analysis</button>
+              <section class="analysis-summary" id="analysis-summary" hidden aria-label="Analysis Summary">
+                <h3>Analysis Summary</h3>
+                <div id="your-analysis"></div>
+                <div id="summary-cards" class="summary-cards"></div>
+                <div id="analysis-rule-coverage"></div>
+                <div id="analysis-limitations"></div>
+              </section>
               <p id="workflow-warning" role="status" hidden></p>
               <details id="technical-pipeline"><summary>View technical pipeline</summary><ol id="workflow-list" class="workflow"></ol></details>
+              <button type="button" id="review-candidates" class="primary" hidden>Review Candidates &rarr;</button>
             </section>
           </div>
 
@@ -192,7 +196,7 @@
       <footer class="research-note" id="research-note">PolyMerge is a research decision-support prototype and does not provide clinical recommendations.</footer>
     </div>
 
-    <script src="/frontend/explainability.js?v=20261016-research-takeaway"></script>
-    <script src="/frontend/app.js?v=20261016-research-takeaway"></script>
+    <script src="/frontend/explainability.js?v=20261017-navigation-coverage"></script>
+    <script src="/frontend/app.js?v=20261017-navigation-coverage"></script>
   </body>
 </html>

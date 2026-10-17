@@ -18,6 +18,7 @@ const state = {
   currentResult: null,
   selectedCandidateId: null,
   analysisStartedAt: null,
+  analysisStatus: 'idle',
   elapsedTimer: null,
   comparisonLoaded: false,
   modelAnalysisData: null,
@@ -32,12 +33,17 @@ const state = {
 };
 
 function setSimulationStep(step, navigate = false) {
-  if ((step === 2 && !state.analysisStartedAt) || (step >= 3 && !state.currentResult)) return;
+  const running = state.analysisStatus === 'running';
+  const selected = state.currentResult?.candidateSets?.some(candidate => candidate.candidateSetId === state.selectedCandidateId);
+  const available = [false, !running, state.analysisStatus !== 'idle' || Boolean(state.currentResult), !running && Boolean(state.currentResult), !running && Boolean(selected)];
+  if (!available[step]) return;
   state.simulationStep = step;
   document.body.dataset.step = String(step);
   for (let number = 1; number <= 4; number += 1) {
     const button = document.getElementById(`step-${number}`);
-    button.disabled = number === 2 ? !state.analysisStartedAt : number >= 3 ? !state.currentResult : Boolean(state.analysisStartedAt);
+    button.disabled = !available[number];
+    const complete = number === 1 ? Boolean(state.currentResult) || running : number === 2 ? Boolean(state.currentResult) : number === 3 ? Boolean(selected) : false;
+    button.setAttribute('data-state', number === step ? 'current' : !available[number] ? 'unavailable' : complete ? 'complete' : 'available');
     if (number === step) button.setAttribute('aria-current', 'step');
     else button.removeAttribute('aria-current');
   }
@@ -163,8 +169,8 @@ function appliedPairs(candidate) {
 
 function ruleLabel(candidate) {
   if (candidate?.status === 'rejected') return 'Rejected by research rule';
-  return candidate?.ruleEvaluation?.status === 'evaluated' ? 'Evaluated; no configured rule triggered'
-    : candidate?.ruleEvaluation?.status === 'partially_evaluated' ? 'Partial mapping coverage' : 'Insufficient verified mapping';
+  return candidate?.ruleEvaluation?.status === 'evaluated' ? 'Checked against configured research rules'
+    : candidate?.ruleEvaluation?.status === 'partially_evaluated' ? 'Limited evaluation' : 'Insufficient verified information';
 }
 
 function analysisMetrics(data) {
@@ -321,7 +327,7 @@ function computeWorkflowStages(data, selectedCandidateId = null, running = false
   const uniqueCompounds = new Set(candidates.flatMap((candidate) => candidate.drugs ?? []));
   const accepted = candidates.filter((candidate) => candidate.status === 'accepted').length;
   const rejected = candidates.filter((candidate) => candidate.status === 'rejected').length;
-  const selected = candidates.find((candidate) => candidate.candidateSetId === selectedCandidateId) ?? candidates[0];
+  const selected = candidates.find((candidate) => candidate.candidateSetId === selectedCandidateId);
   const ml = mlSummary(candidates);
   const optimization = data.metadata?.optimization;
   const coveredCount = candidates[0]?.treatedDiseaseIds?.length ?? 0;
@@ -396,9 +402,8 @@ function setMessage(container, message, kind = 'info') {
 
 function renderWorkflow(stages) {
   const warning = document.getElementById('workflow-warning');
-  const problems = stages.filter(stage => ['unavailable', 'error', 'partial'].includes(stage.status));
-  warning.hidden = problems.length === 0;
-  warning.textContent = problems.map(stage => `${stage.name}: ${stage.summary}`).join(' · ');
+  warning.hidden = true;
+  warning.textContent = '';
   const list = document.getElementById('workflow-list');
   list.innerHTML = stages.map((stage, index) => `
     <li class="workflow-step status-${escapeHtml(stage.status)}">
@@ -499,6 +504,28 @@ function renderSummary(data) {
     ['Returned candidate sets', data.candidateSets?.length ?? 0], ['Candidates with predictions', mlSummary(data.candidateSets ?? []).applied]];
   cards.innerHTML = cardData.map(([label, value]) => `
     <div class="funnel-step"><div class="value">${escapeHtml(value)}</div><div class="label">${escapeHtml(label)}</div></div>`).join('');
+  const candidates = data.candidateSets ?? [];
+  const counts = ruleOutcomeCounts(candidates);
+  document.getElementById('analysis-rule-coverage').innerHTML = `<h4>Research-rule coverage</h4>
+    <p>${!candidates.length ? 'No candidates were returned for rule evaluation.' : counts.evaluated === candidates.length ? 'All returned candidates were checked against the configured research rules.' : 'Verified rule applicability is limited for this candidate pool.'}</p>
+    ${counts.rejected ? `<p class="rule-triggered">${counts.rejected} candidates rejected by configured research rules.</p>` : ''}
+    <details><summary>View rule evaluation details</summary><dl class="rule-counts">${[['Fully evaluated', counts.evaluated], ['Partially evaluated', counts.partial], ['Not evaluable', counts.unavailable], ['Rejected by configured rules', counts.rejected]].map(([label, count]) => `<div><dt>${label}</dt><dd>${count}</dd></div>`).join('')}</dl></details>`;
+  const limitations = [];
+  if (data.metadata?.dataStatus === 'graph_unavailable') limitations.push(data.metadata.warning || 'Graph evidence is unavailable.');
+  else if (!candidates.length) limitations.push('No represented treatment connections were found for this selection.');
+  const unsupported = candidates.filter(candidate => candidate.drugs?.length > 1 && candidate.mlStatus !== 'applied').length;
+  if (unsupported) limitations.push(`${unsupported} multi-drug candidates have incomplete or unavailable pair predictions; reasons are retained with each candidate.`);
+  document.getElementById('analysis-limitations').innerHTML = limitations.map(text => `<p>${escapeHtml(text)}</p>`).join('');
+  document.getElementById('review-candidates').hidden = false;
+}
+
+function ruleOutcomeCounts(candidates) {
+  return {
+    evaluated: candidates.filter(c => c.ruleEvaluation?.status === 'evaluated').length,
+    partial: candidates.filter(c => c.ruleEvaluation?.status === 'partially_evaluated').length,
+    unavailable: candidates.filter(c => !['evaluated', 'partially_evaluated'].includes(c.ruleEvaluation?.status)).length,
+    rejected: candidates.filter(c => c.status === 'rejected').length,
+  };
 }
 
 function renderResults(data) {
@@ -620,11 +647,10 @@ function renderSelectedCandidate(candidate, data) {
         ${targets.length ? `<meter min="0" max="${targets.length}" value="${covered.length}" aria-label="Represented graph coverage">${covered.length} of ${targets.length}</meter>` : ''}</div>
       ${uncovered.length ? `<details class="uncovered-diseases"><summary>Not covered (${uncovered.length})</summary><ul>${uncovered.map(id => `<li>${escapeHtml(labels.get(id) ?? id)}</li>`).join('')}</ul></details>` : ''}
     </section>
-    <section class="overview-section overview-rules" aria-label="Rule check">
-      <h4>Rule check</h4>
-      <strong>${fullyEvaluated ? (triggered ? 'Configured rule triggered' : 'Evaluated; no configured rule triggered') : 'Not fully evaluated'}</strong>
-      ${!fullyEvaluated ? `<p>${evaluation?.status ? 'Some drug-category mappings are missing, so the configured research rules could not be fully checked.' : 'Rule applicability information was not returned, so evaluation cannot be confirmed.'}</p>` : ''}
-      ${rules.length ? `<p class="rule-coverage">${rules.filter(rule => rule.status === 'evaluated').length} of ${rules.length} configured rules evaluated${fullyEvaluated ? '' : `; ${rules.filter(rule => rule.status === 'partially_evaluated').length} with partial coverage, ${rules.filter(rule => rule.status === 'not_evaluable').length} not evaluable`}.</p>` : ''}
+    <section class="overview-section overview-rules" aria-label="Research Rule Check">
+      <h4>Research Rule Check</h4>
+      <strong>${triggered ? 'Configured research exclusion triggered' : ruleLabel(candidate)}</strong>
+      ${!fullyEvaluated ? `<p>${evaluation?.status ? 'The available verified drug information does not support checking every configured research rule for this candidate.' : 'Rule applicability information was not returned, so evaluation cannot be confirmed.'}</p>` : ''}
       ${triggered ? `<p class="rule-triggered">${fullyEvaluated ? 'Research exclusion applies.' : 'A configured research exclusion was triggered despite incomplete coverage.'}</p>` : ''}
       ${reasons.length ? `<ul>${reasons.map(reason => `<li>${escapeHtml(reason.message ?? 'Reason not provided')}</li>`).join('')}</ul>` : ''}
     </section>
@@ -649,8 +675,10 @@ function renderSelectedCandidate(candidate, data) {
         ${renderPathList(candidate, 'side_effect_context', 'Side-Effect Context')}
       </details>
       <details class="technical-details"><summary>Rule mapping coverage and provenance</summary>
+        <p>Rule coverage status: ${escapeHtml(evaluation?.status ?? 'Not provided')}.</p>
+        ${rules.length ? `<p class="rule-coverage">${rules.filter(rule => rule.status === 'evaluated').length} of ${rules.length} configured rules evaluated; ${rules.filter(rule => rule.status === 'partially_evaluated').length} with partial coverage, ${rules.filter(rule => rule.status === 'not_evaluable').length} not evaluable.</p>` : ''}
         <p>${escapeHtml(evaluation?.source ?? 'Verified rule mappings were not provided.')}</p><p>Mapping version: ${escapeHtml(evaluation?.mappingVersion ?? 'Not provided')}</p>
-        <ul>${(evaluation?.identities ?? []).map(identity => `<li>${escapeHtml(identity.drugId)}: ${escapeHtml(identity.tokens?.join(', ') || 'No verified category mapping')} · ${escapeHtml(identity.source ?? 'No source')}${identity.classId ? ` · ${escapeHtml(identity.classId)}` : ''}</li>`).join('')}</ul>
+        <ul>${(evaluation?.identities ?? []).map(identity => `<li>${escapeHtml(identity.drugId)}: ${escapeHtml(identity.name ?? 'Identity not verified for rule mapping')} · ${escapeHtml(identity.tokens?.join(', ') || 'No verified category mapping')} · ${escapeHtml(identity.source ?? 'No source')}${identity.classId ? ` · ${escapeHtml(identity.classId)}` : ''}${identity.sourceId ? ` · Source ID: ${escapeHtml(identity.sourceId)}` : ''}${identity.verifiedOn ? ` · Verified: ${escapeHtml(identity.verifiedOn)}` : ''}${identity.categoryEvidence ? `<p>${Object.entries(identity.categoryEvidence).map(([category, evidence]) => `${escapeHtml(category)}: ${escapeHtml(evidence)}`).join('; ')}</p>` : ''}</li>`).join('')}</ul>
         <ul>${rules.map(rule => `<li>${(rule.pair ?? []).map(escapeHtml).join(' + ')}: ${escapeHtml(rule.status)}${rule.triggered ? ' (triggered)' : ''}</li>`).join('')}</ul>
         ${reasons.length ? `<ul>${reasons.map(reason => `<li>${(reason.pair ?? []).map(escapeHtml).join(' + ')} · Stage: ${escapeHtml(reason.stage ?? 'Not provided')} · Source: ${escapeHtml(reason.source ?? 'PolyMerge research rules')}</li>`).join('')}</ul>` : ''}
       </details>
@@ -750,9 +778,10 @@ function shortCandidateSummary(candidate, data) {
 
 function selectCandidate(candidateId, navigate = false) {
   if (!state.currentResult) return;
-  state.selectedCandidateId = candidateId;
   const candidates = state.currentResult?.candidateSets ?? [];
-  const candidate = candidates.find((item) => item.candidateSetId === candidateId) ?? candidates[0];
+  const candidate = candidates.find((item) => item.candidateSetId === candidateId);
+  if (!candidate) return;
+  state.selectedCandidateId = candidateId;
   renderWorkflow(computeWorkflowStages(state.currentResult, state.selectedCandidateId));
   renderResults(state.currentResult);
   renderSelectedCandidate(candidate, state.currentResult);
@@ -784,6 +813,10 @@ async function analyzeCombination() {
   const results = document.getElementById('results');
   const catalogTag = document.getElementById('catalog-tag');
   const running = document.getElementById('analysis-running');
+  state.analysisStatus = 'running';
+  document.getElementById('analysis-error').hidden = true;
+  document.getElementById('retry-analysis').hidden = true;
+  document.getElementById('review-candidates').hidden = true;
   analyzeBtn.disabled = true;
   catalogTag.textContent = 'Search in progress';
   running.hidden = false;
@@ -808,21 +841,24 @@ async function analyzeCombination() {
       signal: controller.signal,
     }, DEFAULT_CANDIDATE_TIMEOUT_MS);
     if (generation !== state.requestGeneration) return;
+    if (data.metadata?.dataStatus === 'graph_unavailable') throw new Error(data.metadata.warning || 'Graph evidence is unavailable.');
     state.currentResult = data;
-    state.selectedCandidateId = data.candidateSets?.[0]?.candidateSetId ?? null;
+    state.analysisStatus = 'complete';
     catalogTag.textContent = data.metadata?.dataStatus === 'graph_unavailable' ? 'Graph unavailable' : 'Search complete';
     renderResults(data);
     renderWorkflow(computeWorkflowStages(data, state.selectedCandidateId));
-    renderSelectedCandidate(data.candidateSets?.[0], data);
-    setSimulationStep(3, true);
+    renderSelectedCandidate(null, data);
+    setSimulationStep(2, true);
   } catch (error) {
     if (generation !== state.requestGeneration) return;
+    state.analysisStatus = 'error';
     catalogTag.textContent = error.message.includes('timed out') ? 'Candidate search timeout' : 'System error';
     setMessage(results, `Candidate search unavailable: ${error.message}`, 'error');
     renderWorkflow(computeWorkflowStages(null, null, false, error.message));
-    setSimulationStep(1, true);
-    setMessage(document.getElementById('catalog-message'), `Analysis unavailable: ${error.message}`, 'error');
-    document.getElementById('catalog-message').hidden = false;
+    setMessage(document.getElementById('analysis-error'), `Candidate search unavailable: ${error.message}`, 'error');
+    document.getElementById('analysis-error').hidden = false;
+    document.getElementById('retry-analysis').hidden = false;
+    setSimulationStep(2, true);
   } finally {
     if (generation === state.requestGeneration) {
       state.candidateController = null;
@@ -842,6 +878,7 @@ function resetSimulation() {
   stopElapsedTimer();
   state.selectedDiseases.clear();
   state.currentResult = null;
+  state.analysisStatus = 'idle';
   state.selectedCandidateId = null;
   state.showAllCandidates = false;
   state.candidateOffset = 0;
@@ -849,9 +886,10 @@ function resetSimulation() {
   document.getElementById('elapsed-time').textContent = 'Elapsed: 0s';
   document.getElementById('analysis-running').hidden = true;
   document.getElementById('analysis-summary').hidden = true;
+  for (const id of ['analysis-error', 'retry-analysis', 'review-candidates']) document.getElementById(id).hidden = true;
   document.getElementById('result-display').hidden = true;
   document.getElementById('show-all-candidates').checked = false;
-  for (const id of ['summary-cards', 'your-analysis', 'result-count', 'result-limit-note', 'selected-result-link']) {
+  for (const id of ['summary-cards', 'your-analysis', 'result-count', 'result-limit-note', 'selected-result-link', 'analysis-rule-coverage', 'analysis-limitations', 'analysis-error']) {
     document.getElementById(id).replaceChildren();
   }
   setMessage(document.getElementById('results'), 'Choose one or more target diseases, then search to see ranked candidate sets.', 'empty');
@@ -976,7 +1014,8 @@ async function loadModelComparison() {
 function showView() {
   const viewIds = ['home', 'simulation', 'explainability-panel', 'model-analysis'];
   const requested = window.location.hash.slice(1) || 'home';
-  const view = viewIds.includes(requested) ? requested : 'home';
+  let view = viewIds.includes(requested) ? requested : 'home';
+  if (view === 'explainability-panel' && !state.currentResult?.candidateSets?.some(candidate => candidate.candidateSetId === state.selectedCandidateId)) view = 'simulation';
   document.body.dataset.view = view;
   if (view === 'explainability-panel' && state.currentResult) setSimulationStep(4);
   if (view === 'simulation' && state.simulationStep === 4) setSimulationStep(state.currentResult ? 3 : 1);
@@ -1000,6 +1039,8 @@ function init() {
   setDisplayMode('simple');
   renderWorkflow(computeWorkflowStages(null));
   document.getElementById('analyze-btn').addEventListener('click', analyzeCombination);
+  document.getElementById('retry-analysis').addEventListener('click', analyzeCombination);
+  document.getElementById('review-candidates').addEventListener('click', () => setSimulationStep(3, true));
   document.getElementById('reset-simulation').addEventListener('click', resetSimulation);
   document.getElementById('cancel-analysis').addEventListener('click', resetSimulation);
   document.getElementById('simple-view').addEventListener('click', () => setDisplayMode('simple'));
@@ -1040,6 +1081,7 @@ globalThis.PolyMergeFrontend = {
   candidateNarrative,
   renderGraphVisualization,
   renderSummary,
+  ruleOutcomeCounts,
   renderSelectedCandidate,
   selectCandidate,
   state,
