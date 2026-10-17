@@ -10,11 +10,14 @@ Static DOM tests and HTTP checks do not verify visual layout or iframe behavior.
 1. On desktop, laptop, tablet and mobile, open Simulation. Confirm Simple View,
    Select Diseases, visible focus, readable contrast and no horizontal overflow.
 2. Search hypertension (Disease::DOID:10763), select it and Analyze Candidates.
-   Confirm Analyze shows elapsed time without fabricated percentages.
+   Confirm Analyze shows elapsed time without fabricated percentages. When the
+   request finishes, remain on Analyze and inspect Analysis Summary and the
+   expandable rule counts. Explicitly click Review Candidates to continue.
 3. Confirm Review Candidates shows five rows and full-response summary counts.
    Show next 5 must show ranks 6-10; previous must return to 1-5.
 4. Select a single-drug candidate. Understand Result must say Not applicable for
    interaction prediction, show treatment connections and a short explanation.
+   Step 4 must be unavailable before selecting an actual returned candidate.
 5. Switch Researcher View. Confirm selected candidate and counts persist without
    a network analysis request. Expand pipeline, IDs, provenance, graph paths and
    model details; optionally show all returned candidates.
@@ -26,6 +29,9 @@ Static DOM tests and HTTP checks do not verify visual layout or iframe behavior.
    can continue, and a new request can receive a busy response until it finishes.
 8. Use keyboard-only navigation for steps, modes, pagination, details and reset.
    Check long IDs wrap and graph connections remain readable at all viewports.
+   Return from Step 4 to Step 2, then Step 3: preserve the selected candidate,
+   pagination and completed summary without a new API request. Failed analysis
+   must remain on Step 2 with its actual error and a Retry analysis button.
 9. Review Model Analysis comparison, EDA, metrics and limitations. Repeat in the
    Streamlit wrapper and inspect the console for errors. Capture screenshots.
 10. At the bottom of Understand Result, inspect Research Takeaway. It is a
@@ -44,6 +50,8 @@ Static DOM tests and HTTP checks do not verify visual layout or iframe behavior.
 See [Research Takeaway verification](audits/sprint6-research-takeaway.md) for
 automated and live-response checks, including a partially supported triple.
 
-Do not interpret untriggered rules as safety: configured class/literal tokens
-are not yet mapped to canonical Compound::DB identifiers. Public deployment
+Do not interpret untriggered rules as safety: nine canonical compounds have
+reviewed positive category mappings, but class nonmembership remains unknown.
+See [navigation and coverage remediation](audits/sprint6-navigation-and-rule-coverage-remediation.md)
+for the measured improvement and remaining gaps. Public deployment
 remains blocked by the separate security findings in the historical audit.
