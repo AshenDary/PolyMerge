@@ -88,21 +88,20 @@ jobs:
       - name: Container liveness without production secrets or model
         env:
           SERVICE: ${{ matrix.service }}
-        run: |
-          id=$(docker run -d "polymerge-$SERVICE:ci")
-          trap 'docker logs "$id"; docker rm -f "$id"' EXIT
-          for attempt in $(seq 1 30); do
-            running=$(docker inspect --format '{{.State.Running}}' "$id")
-            if [ "$running" != true ]; then exit 1; fi
-            state=$(docker inspect --format '{{.State.Health.Status}}' "$id")
-            if [ "$state" = healthy ]; then exit 0; fi
-            sleep 5
-          done
-          exit 1
+        run: bash scripts/check_container_runtime.sh "polymerge-$SERVICE:ci" "$SERVICE"
       - name: Scan runtime image vulnerabilities without suppressions
         env:
           SERVICE: ${{ matrix.service }}
         run: |
-          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock:ro \
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock:ro -v "$PWD:/reports" \
             aquasec/trivy@sha256:2416d1f74045b57274df1a340eee6b510cacd73c66a6ccb8da092b117eb7d222 \
-            image --scanners vuln --severity HIGH,CRITICAL --exit-code 1 --no-progress "polymerge-$SERVICE:ci"
+            image --scanners vuln --severity HIGH,CRITICAL --exit-code 1 --no-progress \
+            --list-all-pkgs --format json --output "/reports/security-$SERVICE.json" "polymerge-$SERVICE:ci"
+      - name: Retain complete package inventory and vulnerability evidence
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: security-${{ matrix.service }}
+          path: security-${{ matrix.service }}.json
+          if-no-files-found: error
+          retention-days: 30

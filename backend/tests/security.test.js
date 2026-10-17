@@ -62,6 +62,24 @@ test('public analysis settings cannot expand the reviewed demo workload', async 
   }
 });
 
+test('spoofed forwarding headers cannot reset anonymous analysis quotas', async (t) => {
+  const app = await fixture(t, { ANALYSIS_RATE_LIMIT_MAX: '1' });
+  const request = { method: 'POST', url: '/api/candidate-sets/search', payload: {}, remoteAddress: '192.0.2.1' };
+  assert.equal((await app.inject({ ...request, headers: { 'x-forwarded-for': '198.51.100.1' } })).statusCode, 200);
+  assert.equal((await app.inject({ ...request, headers: { 'x-forwarded-for': '198.51.100.2' } })).statusCode, 429);
+  assert.equal((await app.inject({ ...request, remoteAddress: '192.0.2.2' })).statusCode, 200);
+});
+
+test('restart does not restore history or reopen legacy routes', async (t) => {
+  for (let restart = 0; restart < 2; restart += 1) {
+    const app = await fixture(t);
+    assert.equal((await app.inject({ method: 'POST', url: '/api/candidate-sets/search', payload: {} })).statusCode, 200);
+    assert.equal((await app.inject('/api/history')).statusCode, 404);
+    assert.equal((await app.inject('/api/drugs/test')).statusCode, 404);
+    await app.close();
+  }
+});
+
 test('concurrent analysis is bounded and failures never expose upstream secrets', async (t) => {
   let finish;
   let entered;
