@@ -1,7 +1,7 @@
 name: PolyMerge CI
 on:
   pull_request:
-    branches: [main]
+    branches: [main, 'integration/pre-deployment-main-sync']
   push:
     branches: [main, 'sprint6/jared/final-audit-cicd', 'sprint6/jared/performance-guided-ux', 'fix/polymerge-availability-and-rule-mapping']
   workflow_dispatch:
@@ -32,7 +32,7 @@ jobs:
         working-directory: backend
       - run: npm test
         working-directory: backend
-      - run: pip install -r ml_engine/requirements.txt
+      - run: pip install --require-hashes -r ml_engine/requirements-dev.lock
       - run: python -m pytest -q
         working-directory: ml_engine
       - run: python scripts/validate_sprint4_contract.py
@@ -65,7 +65,11 @@ jobs:
       - if: ${{ !cancelled() }}
         run: pip install pip-audit==2.9.0
       - if: ${{ !cancelled() }}
-        run: pip-audit -r ml_engine/requirements.txt -r requirements-streamlit.txt
+        run: pip-audit -r ml_engine/requirements.lock
+      - if: ${{ !cancelled() }}
+        run: pip-audit -r requirements-streamlit.lock
+      - if: ${{ !cancelled() }}
+        run: pip-audit -r ml_engine/requirements-dev.lock
   containers:
     runs-on: ubuntu-latest
     timeout-minutes: 25
@@ -94,3 +98,10 @@ jobs:
             sleep 5
           done
           exit 1
+      - name: Scan runtime image vulnerabilities without suppressions
+        env:
+          SERVICE: ${{ matrix.service }}
+        run: |
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock:ro \
+            aquasec/trivy@sha256:2416d1f74045b57274df1a340eee6b510cacd73c66a6ccb8da092b117eb7d222 \
+            image --scanners vuln --severity HIGH,CRITICAL --exit-code 1 --no-progress "polymerge-$SERVICE:ci"

@@ -41,6 +41,7 @@ class Neo4jClient:
         self.uri = uri or os.getenv("NEO4J_URI")
         self.user = user or os.getenv("NEO4J_USER") or os.getenv("NEO4J_USERNAME")
         self.password = password or os.getenv("NEO4J_PASSWORD")
+        self.database = os.getenv("NEO4J_DATABASE", "neo4j")
 
         missing = [
             name
@@ -68,7 +69,7 @@ class Neo4jClient:
 
     def query(self, cypher: str, **params: Any) -> list[dict[str, Any]]:
         try:
-            with self.driver.session() as session:
+            with self.driver.session(database=self.database) as session:
                 result = session.run(cypher, **params)
                 return [record.data() for record in result]
         except (Neo4jError, ServiceUnavailable) as error:
@@ -85,7 +86,7 @@ class Neo4jClient:
         nodes_by_kind = _group_csv_rows_by_column(Path(nodes_csv), "kind")
         edges_by_metaedge = _group_csv_rows_by_column(Path(edges_csv), "metaedge")
 
-        with self.driver.session() as session:
+        with self.driver.session(database=self.database) as session:
             for kind, rows in sorted(nodes_by_kind.items()):
                 label = _quote_cypher_identifier(kind)
                 for batch in _batched(rows):

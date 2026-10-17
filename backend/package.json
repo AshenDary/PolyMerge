@@ -14,10 +14,11 @@
     "test": "node --test"
   },
   "dependencies": {
+    "@fastify/rate-limit": "11.2.1",
     "@fastify/cors": "^11.3.0",
     "@prisma/client": "^5.9.1",
     "dotenv": "^16.4.1",
-    "fastify": "^5.12.1"
+    "fastify": "^5.12.7"
   },
   "devDependencies": {
     "prisma": "^5.9.1"

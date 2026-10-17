@@ -12,6 +12,7 @@ from typing import Any
 
 import joblib
 import pandas as pd
+import sklearn
 
 from app.data.ddinter_dataset import ALLOWED_LABELS, FEATURE_COLUMNS
 from app.models.final_evaluation import (
@@ -79,6 +80,8 @@ class DDIModelService:
                 metadata = self._read_json(self.metadata_path, "model metadata")
                 contract = self._read_json(self.feature_contract_path, "feature contract")
                 self._validate_metadata(metadata, contract)
+                if sklearn.__version__ != metadata["scikit_learn_version"]:
+                    raise ValueError("Runtime scikit-learn differs from frozen model provenance")
                 if not self.artifact_path.is_file():
                     raise FileNotFoundError(
                         f"Frozen model artifact is not installed at {self.artifact_path}"
@@ -177,7 +180,7 @@ class DDIModelService:
                 "mlStatus": "not_applied",
                 "modelVersion": metadata.get("model_version") if metadata else None,
                 "artifactSha256": metadata.get("artifact_sha256") if metadata else None,
-                "reason": self._load_error,
+                "reason": "Frozen model unavailable",
             }
         assert self._metadata is not None
         return {
@@ -201,7 +204,7 @@ class DDIModelService:
                     metadata.get("feature_contract_sha256") if metadata else None
                 ),
             },
-            "error": reason or self._load_error or "Frozen model unavailable",
+            "error": "Frozen model unavailable",
         }
 
     @staticmethod

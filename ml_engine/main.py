@@ -16,11 +16,11 @@ from starlette.concurrency import run_in_threadpool
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
+from fastapi import Request
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
-from app.services.candidate_generator import build_graph_candidates
+from app.services.candidate_generator import build_graph_candidates, CandidateBudgetExceeded
 from app.services.ddi_feature_builder import PairFeatureBuilder, PairFeatureUnavailableError
 from app.services.candidate_ranker import rank_candidates
 from app.services.knowledge_graph import get_available_diseases, get_drug_metadata
@@ -45,7 +45,8 @@ async def lifespan(_: FastAPI):
     yield
 
 
-app = FastAPI(title="PolyMerge ML Engine", version="0.1.0", lifespan=lifespan)
+app = FastAPI(title="PolyMerge ML Engine", version="0.1.0", lifespan=lifespan,
+              docs_url=None, redoc_url=None, openapi_url=None)
 _analysis_slot = BoundedSemaphore(1)
 
 
@@ -63,12 +64,21 @@ async def _bounded_analysis(function: Callable[..., Any], *args: Any) -> Any:
     with anyio.CancelScope(shield=True):
         return await run_in_threadpool(execute)
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[os.getenv("CORS_ORIGIN", "*")],
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+@app.middleware("http")
+async def private_request_guard(request: Request, call_next: Callable[..., Any]) -> Any:
+    # This service is server-to-server only, with no browser CORS surface.
+    if request.headers.get("origin"):
+        return JSONResponse(status_code=403, content={"error": "Browser access is not permitted"})
+    body = bytearray()
+    async for chunk in request.stream():
+        body.extend(chunk)
+        if len(body) > 32768:
+            return JSONResponse(status_code=413, content={"error": "Request body too large"})
+    request._body = bytes(body)
+    try:
+        return await call_next(request)
+    except Exception:
+        return JSONResponse(status_code=503, content={"error": "Analysis is temporarily unavailable. Please try again."})
 
 
 class OptimizationConfig(BaseModel):
@@ -214,6 +224,18 @@ async def model_health():
     )
 
 
+@app.get("/ready")
+async def readiness() -> JSONResponse:
+    try:
+        ddi_model_service.load()
+        catalog = await run_in_threadpool(get_available_diseases)
+        if not catalog:
+            raise RuntimeError("Graph catalog unavailable")
+        return JSONResponse({"status": "ready"})
+    except Exception:
+        return JSONResponse({"status": "unavailable"}, status_code=503)
+
+
 @app.get("/api/diseases")
 async def diseases():
     return {"diseases": get_available_diseases()}
@@ -244,7 +266,7 @@ async def predict_ddi_severity(payload: DDISeverityRequest):
     except ModelUnavailableError as error:
         return JSONResponse(
             status_code=503,
-            content=ddi_model_service.unavailable_response(str(error)),
+            content=ddi_model_service.unavailable_response(),
         )
 
 
@@ -365,7 +387,8 @@ def _apply_pair_predictions(candidate: dict[str, Any], context: Optional[dict[st
             })
         except (PairFeatureUnavailableError, FeatureSchemaError, ModelUnavailableError) as error:
             code = error.code if isinstance(error, PairFeatureUnavailableError) else "feature_validation_failure" if isinstance(error, FeatureSchemaError) else getattr(error, "code", "model_unavailable")
-            failure = {"drugPair": [drug_a, drug_b], "reasonCode": code, "reason": str(error),
+            reason = str(error) if isinstance(error, PairFeatureUnavailableError) else "Pair prediction is temporarily unavailable."
+            failure = {"drugPair": [drug_a, drug_b], "reasonCode": code, "reason": reason,
                        "missingDrugIds": getattr(error, "missing_drug_ids", [])}
             failures[key] = failure
             unavailable_pairs.append(failure)
@@ -386,7 +409,10 @@ def _apply_pair_predictions(candidate: dict[str, Any], context: Optional[dict[st
 @app.post("/predict/candidate-sets", response_model=CandidateSetResponse)
 async def predict_candidate_sets(payload: CandidateSetRequest) -> CandidateSetResponse:
     """Return graph-derived multi-drug research candidate sets."""
-    return await _bounded_analysis(_execute_candidate_sets, payload)
+    try:
+        return await _bounded_analysis(_execute_candidate_sets, payload)
+    except CandidateBudgetExceeded as error:
+        raise HTTPException(status_code=422, detail="Analysis work limit exceeded; select fewer diseases or drugs") from error
 
 
 def _execute_candidate_sets(payload: CandidateSetRequest) -> CandidateSetResponse:
@@ -400,7 +426,7 @@ def _execute_candidate_sets(payload: CandidateSetRequest) -> CandidateSetRespons
             status_code=503,
             detail={
                 "error": "Graph service unavailable",
-                "warning": result["metadata"].get("warning"),
+                "warning": "Graph analysis is temporarily unavailable.",
             },
         )
     missing_disease_ids = result["metadata"].get("missingDiseases", [])
