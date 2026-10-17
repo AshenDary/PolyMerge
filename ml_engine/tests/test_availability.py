@@ -8,7 +8,7 @@ import subprocess
 import pytest
 
 import main
-from app.services.safety_filter import resolve_rule_identity, evaluate_rule_applicability, check_hard_contraindications
+from app.services.safety_filter import RULE_MAPPING, TOKENS, resolve_rule_identity, evaluate_rule_applicability, check_hard_contraindications
 from app.services.set_cover_optimizer import optimize_candidate_sets, greedy_set_cover
 from app.services.ddi_feature_builder import PairFeatureBuilder, PairFeatureUnavailableError
 from app.services.model_serving import FeatureSchemaError, ModelUnavailableError, ModelInferenceError
@@ -32,6 +32,8 @@ def test_mapping_fact_exists_in_checked_in_graph():
 @pytest.mark.skipif(shutil.which("node") is None, reason="Node required for cross-runtime parity check")
 def test_python_javascript_rule_mapping_parity():
     cases = [["Compound::DB00945"], ["DB00945", "warfarin"], ["Compound::DB99999"], ["maoi", "ssri"], []]
+    cases += [[identifier] for identifier in RULE_MAPPING["mappings"]]
+    cases += [["DB00722", "DB00594"], ["DB00178", "DB00384", "DB00177"]]
     script = "import {evaluateRuleApplicability} from './backend/src/rules/contraindications.js'; console.log(JSON.stringify(JSON.parse(process.argv[1]).map(evaluateRuleApplicability)));"
     actual = subprocess.check_output(["node", "--input-type=module", "-e", script, json.dumps(cases)], cwd=Path(__file__).resolve().parents[2], text=True)
     assert json.loads(actual) == [evaluate_rule_applicability(case) for case in cases]
@@ -95,3 +97,48 @@ def test_absent_feature_source_is_explicit(tmp_path):
     with pytest.raises(PairFeatureUnavailableError) as caught:
         PairFeatureBuilder(hetionet_mapping_path=tmp_path / "missing.csv")
     assert caught.value.code == "missing_feature_source"
+
+
+@pytest.mark.parametrize("identifier", list(RULE_MAPPING["mappings"]))
+def test_reviewed_membership_provenance_and_graph_identity(identifier: str) -> None:
+    root = Path(__file__).resolve().parents[2]
+    with (root / "data/processed/fragment_nodes.csv").open() as stream:
+        compounds = {row["id"]: row["name"] for row in csv.DictReader(stream) if row["kind"] == "Compound"}
+    identity = resolve_rule_identity(identifier)
+    assert identity["name"] == compounds[identifier]
+    assert identity["complete"] is False
+    assert identity["source"] and identity["verifiedOn"]
+    assert identity.get("reference", identity.get("corroboratingSource", "")).startswith("https://")
+    evidence = evaluate_rule_applicability([identifier])["identities"][0]["categoryEvidence"]
+    assert set(evidence) == TOKENS
+    assert {key for key, value in evidence.items() if value == "verified_member"} == set(identity["tokens"])
+    assert all(evidence[token] == "unknown" for token in TOKENS - set(identity["tokens"]))
+    assert evaluate_rule_applicability([identifier])["status"] == "partially_evaluated"
+
+
+def test_canonical_complete_flag_cannot_invent_negative_membership(monkeypatch: pytest.MonkeyPatch) -> None:
+    record = {**RULE_MAPPING["mappings"]["Compound::DB00722"], "complete": True}
+    monkeypatch.setitem(RULE_MAPPING["mappings"], "Compound::DB00722", record)
+    result = evaluate_rule_applicability(["Compound::DB00722"])
+    assert result["status"] == "partially_evaluated"
+    assert result["rules"][0]["status"] == "not_evaluable"
+
+
+def test_reviewed_canonical_trigger_and_merged_optimizer_selection() -> None:
+    from app.services.candidate_generator import generate_candidate_sets
+    pair = ["Compound::DB00722", "Compound::DB00594"]
+    result = evaluate_rule_applicability(pair)
+    assert result["rules"][2] == {"pair": ["ace_inhibitor", "potassium_sparing_diuretic"], "status": "evaluated", "triggered": True}
+    assert result["status"] == "partially_evaluated"
+    assert check_hard_contraindications(pair)["pair"] == result["rules"][2]["pair"]
+    candidates = [{"candidateSetId": str(i), "drugs": [drug], "treatedDiseaseIds": [disease], "status": "accepted", "coverage": .5}
+                  for i, (drug, disease) in enumerate(zip(pair, ["d1", "d2"]))]
+    optimized = optimize_candidate_sets(candidates, ["d1", "d2"], {"minimumCoverage": 1})
+    assert len(optimized["selectedDrugs"]) == 1
+    assert optimized["ruleEvaluation"]["status"] == "partially_evaluated"
+    generated = generate_candidate_sets(
+        [{"drugId": drug, "treatedDiseaseIds": ["d1"]} for drug in [*pair, "Compound::DB00177"]],
+        ["d1"], max_drug_count=2)
+    assert generated[-1]["status"] == "rejected"
+    assert set(generated[-1]["drugs"]) == set(pair)
+    assert all(candidate["status"] == "accepted" for candidate in generated[:-1])

@@ -11,7 +11,7 @@ test('canonical mapping is positive, versioned, incomplete and not inferred from
     const evaluation = evaluateRuleApplicability([id]);
     assert.equal(evaluation.status, 'partially_evaluated');
     assert.equal(evaluation.clinicallyValidated, false);
-    assert.match(evaluation.mappingVersion, /2026-10-16/);
+    assert.match(evaluation.mappingVersion, /2026-10-17-v2/);
   }
   for (const id of ['Compound::DB00177', 'Compound::DB99999', 'aspirin', 'lisinopril']) {
     assert.equal(evaluateRuleApplicability([id]).status, 'not_evaluable');
@@ -19,6 +19,24 @@ test('canonical mapping is positive, versioned, incomplete and not inferred from
   }
   assert.deepEqual(checkHardContraindications(['Compound::DB00945', 'warfarin']).pair, ['warfarin', 'nsaid']);
   assert.equal(evaluateRuleApplicability(['maoi', 'ssri']).status, 'evaluated');
+});
+
+test('reviewed canonical category evidence remains open-world while real exclusions trigger', () => {
+  for (const id of ['DB00178', 'DB00542', 'DB00584', 'DB00722', 'DB01197', 'DB00594', 'DB00384', 'DB00421']) {
+    const evaluation = evaluateRuleApplicability([id]);
+    assert.equal(evaluation.status, 'partially_evaluated');
+    const identity = evaluation.identities[0];
+    assert.equal(identity.complete, false);
+    assert.equal(identity.categoryEvidence[identity.tokens[0]], 'verified_member');
+    assert.equal(identity.categoryEvidence.maoi, 'unknown');
+    assert.ok(identity.sourceId && identity.reference && identity.identityReview);
+  }
+  const evaluation = evaluateRuleApplicability(['DB00722', 'DB00594']);
+  assert.equal(evaluation.status, 'partially_evaluated');
+  assert.equal(evaluation.rules[2].triggered, true);
+  assert.equal(evaluation.rules[2].status, 'evaluated');
+  assert.deepEqual(checkHardContraindications(['DB00722', 'DB00594']).pair, ['ace_inhibitor', 'potassium_sparing_diuretic']);
+  assert.ok(Object.values(evaluateRuleApplicability(['DB99999']).identities[0].categoryEvidence).every(value => value === 'unknown'));
 });
 
 const pair = { drugPair: ['Compound::DB00177', 'Compound::DB00187'], predictedSeverity: 'Moderate',

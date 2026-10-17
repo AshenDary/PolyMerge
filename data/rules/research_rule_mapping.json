@@ -1,13 +1,149 @@
 {
-  "version": "polymerge-research-rules-2026-10-16-v1",
+  "version": "polymerge-research-rules-2026-10-17-v2",
+  "evidencePolicy": "Positive ingredient-category evidence only. Missing memberships remain unknown; no reviewed closed-world nonmembership evidence is available. Source terms retained in data/rules/README.md.",
   "scope": "research_only",
   "clinicallyValidated": false,
   "ruleSource": "Existing PolyMerge configured research exclusions; clinical hard-exclusion provenance not established",
-  "pairs": [["maoi", "ssri"], ["warfarin", "nsaid"], ["ace_inhibitor", "potassium_sparing_diuretic"]],
+  "pairs": [
+    [
+      "maoi",
+      "ssri"
+    ],
+    [
+      "warfarin",
+      "nsaid"
+    ],
+    [
+      "ace_inhibitor",
+      "potassium_sparing_diuretic"
+    ]
+  ],
   "mappings": {
+    "Compound::DB00178": {
+      "name": "Ramipril",
+      "tokens": [
+        "ace_inhibitor"
+      ],
+      "complete": false,
+      "source": "DailyMed",
+      "sourceId": "SPL:d5c58fb5-b415-4567-9790-55631705c5cd",
+      "reference": "https://www.dailymed.nlm.nih.gov/dailymed/fda/fdaDrugXsl.cfm?setid=d5c58fb5-b415-4567-9790-55631705c5cd&type=display",
+      "verifiedOn": "2026-10-17",
+      "identitySource": "data/processed/fragment_nodes.csv",
+      "identityReview": "Single-ingredient ramipril capsule; label explicitly identifies an ACE inhibitor. No brand or combination-product mapping.",
+      "membershipEvidence": "verified_member",
+      "otherMemberships": "unknown"
+    },
+    "Compound::DB00542": {
+      "name": "Benazepril",
+      "tokens": [
+        "ace_inhibitor"
+      ],
+      "complete": false,
+      "source": "DailyMed",
+      "sourceId": "SPL:0653322d-70c6-45f7-a9d1-41efee1d7387",
+      "reference": "https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=0653322d-70c6-45f7-a9d1-41efee1d7387",
+      "verifiedOn": "2026-10-17",
+      "identitySource": "data/processed/fragment_nodes.csv",
+      "identityReview": "Single-ingredient benazepril hydrochloride label; category mapped at benazepril active-moiety level, not salt/formulation equivalence.",
+      "membershipEvidence": "verified_member",
+      "otherMemberships": "unknown"
+    },
+    "Compound::DB00584": {
+      "name": "Enalapril",
+      "tokens": [
+        "ace_inhibitor"
+      ],
+      "complete": false,
+      "source": "DailyMed",
+      "sourceId": "SPL:8fe8dc52-dee6-4d33-b798-e90128011f46",
+      "reference": "https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=8fe8dc52-dee6-4d33-b798-e90128011f46",
+      "verifiedOn": "2026-10-17",
+      "identitySource": "data/processed/fragment_nodes.csv",
+      "identityReview": "Label explicitly identifies the maleate salt of enalapril and ACE inhibition after activation to enalaprilat. Category applies to enalapril prodrug; no identity substitution with enalaprilat.",
+      "membershipEvidence": "verified_member",
+      "otherMemberships": "unknown"
+    },
+    "Compound::DB00722": {
+      "name": "Lisinopril",
+      "tokens": [
+        "ace_inhibitor"
+      ],
+      "complete": false,
+      "source": "DailyMed",
+      "sourceId": "SPL:b62815f3-77fc-4074-a28a-918ab5cc32db",
+      "reference": "https://www.dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=b62815f3-77fc-4074-a28a-918ab5cc32db",
+      "verifiedOn": "2026-10-17",
+      "identitySource": "data/processed/fragment_nodes.csv",
+      "identityReview": "Single-ingredient lisinopril tablet label explicitly identifies an ACE inhibitor.",
+      "membershipEvidence": "verified_member",
+      "otherMemberships": "unknown"
+    },
+    "Compound::DB01197": {
+      "name": "Captopril",
+      "tokens": [
+        "ace_inhibitor"
+      ],
+      "complete": false,
+      "source": "DailyMed",
+      "sourceId": "SPL:1a91ac7f-b75d-d111-e063-6394a90a2a93",
+      "reference": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=1a91ac7f-b75d-d111-e063-6394a90a2a93",
+      "verifiedOn": "2026-10-17",
+      "identitySource": "data/processed/fragment_nodes.csv",
+      "identityReview": "Single-ingredient captopril tablet label explicitly identifies ACE inhibition.",
+      "membershipEvidence": "verified_member",
+      "otherMemberships": "unknown"
+    },
+    "Compound::DB00594": {
+      "name": "Amiloride",
+      "tokens": [
+        "potassium_sparing_diuretic"
+      ],
+      "complete": false,
+      "source": "DailyMed",
+      "sourceId": "SPL:60e8e566-28c6-99ba-e053-2a91aa0a8dbe",
+      "reference": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=60e8e566-28c6-99ba-e053-2a91aa0a8dbe",
+      "verifiedOn": "2026-10-17",
+      "identitySource": "data/processed/fragment_nodes.csv",
+      "identityReview": "Single-ingredient amiloride hydrochloride label identifies potassium-sparing diuretic activity. Active-moiety category only; no salt/formulation equivalence.",
+      "membershipEvidence": "verified_member",
+      "otherMemberships": "unknown"
+    },
+    "Compound::DB00384": {
+      "name": "Triamterene",
+      "tokens": [
+        "potassium_sparing_diuretic"
+      ],
+      "complete": false,
+      "source": "DailyMed",
+      "sourceId": "SPL:fea50328-b3d5-4300-8c67-82cda0a975b7",
+      "reference": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=fea50328-b3d5-4300-8c67-82cda0a975b7",
+      "verifiedOn": "2026-10-17",
+      "identitySource": "data/processed/fragment_nodes.csv",
+      "identityReview": "Single-ingredient triamterene capsule label explicitly identifies a potassium-sparing diuretic; not triamterene/hydrochlorothiazide.",
+      "membershipEvidence": "verified_member",
+      "otherMemberships": "unknown"
+    },
+    "Compound::DB00421": {
+      "name": "Spironolactone",
+      "tokens": [
+        "potassium_sparing_diuretic"
+      ],
+      "complete": false,
+      "source": "NLM MeSH",
+      "sourceId": "MeSH:D013148",
+      "reference": "https://www.ncbi.nlm.nih.gov/mesh/?term=D013148",
+      "verifiedOn": "2026-10-17",
+      "identitySource": "data/processed/fragment_nodes.csv",
+      "identityReview": "NLM controlled-vocabulary scope identifies spironolactone as a potassium-sparing diuretic; not inferred from aldosterone antagonism alone.",
+      "membershipEvidence": "verified_member",
+      "otherMemberships": "unknown"
+    },
     "Compound::DB00945": {
       "name": "Acetylsalicylic acid",
-      "tokens": ["nsaid"],
+      "tokens": [
+        "nsaid"
+      ],
       "complete": false,
       "source": "Hetionet v1.0 filtered PolyMerge fragment",
       "relationship": "PCiC",

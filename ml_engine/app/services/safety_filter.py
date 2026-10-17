@@ -36,8 +36,12 @@ def resolve_rule_identity(drug: str) -> dict[str, Any]:
 
 def evaluate_rule_applicability(drug_set: list[str]) -> dict[str, Any]:
     identities = [resolve_rule_identity(drug) for drug in drug_set]
+    for identity in identities:
+        identity["categoryEvidence"] = {token: "verified_member" if token in identity["tokens"] else "unknown"
+                                        for token in sorted(TOKENS)}
     tokens = {token for identity in identities for token in identity["tokens"]}
-    complete = bool(identities) and all(identity["complete"] for identity in identities)
+    # Closed-world literals exist only for historical fixtures, never canonical compounds.
+    complete = bool(identities) and all(identity["source"] == "legacy_literal" for identity in identities)
     rules = []
     for first, second in ABSOLUTE_CONTRAINDICATION_PAIRS:
         triggered = first in tokens and second in tokens

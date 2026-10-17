@@ -21,8 +21,12 @@ export function resolveRuleIdentity(drug) {
 
 export function evaluateRuleApplicability(drugSet) {
   const identities = drugSet.map(resolveRuleIdentity);
+  for (const identity of identities) {
+    identity.categoryEvidence = Object.fromEntries([...tokens].sort().map(token => [token, identity.tokens.includes(token) ? 'verified_member' : 'unknown']));
+  }
   const known = new Set(identities.flatMap(identity => identity.tokens));
-  const complete = identities.length > 0 && identities.every(identity => identity.complete);
+  // Closed-world literals exist only for historical fixtures, never canonical compounds.
+  const complete = identities.length > 0 && identities.every(identity => identity.source === 'legacy_literal');
   const rules = mapping.pairs.map(pair => {
     const triggered = pair.every(token => known.has(token));
     return { pair, status: triggered || complete ? 'evaluated'
