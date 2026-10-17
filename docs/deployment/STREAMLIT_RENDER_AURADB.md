@@ -1,5 +1,21 @@
 # Streamlit, Render and AuraDB Deployment
 
+Latest release gate: [assessment](../audits/sprint6-final-release-gate-assessment.md).
+The private ML template requires `POLYMERGE_REQUIRE_NEO4J_TLS=true` and a
+certificate-verified `neo4j+s` URI without embedded credentials. The shared
+driver has a 10-connection maximum **per process**; account for every worker
+and replica when reviewing Aura limits. Connection/acquisition timeout is
+5 seconds, query timeout 30 seconds, connection lifetime 300 seconds.
+Shutdown closes the shared driver; individual queries retain private sessions.
+
+Render private addressing is not backend-only authorization: other eligible
+same-workspace/region services may reach the ML service. Review workspace
+isolation and service authentication before provisioning. Local proxy tests
+verify quota spoof resistance only for the configured test chain. Establish
+Render's actual proxy source ranges and header behavior before setting trust;
+provider TLS, forwarded headers, iframe/browser behavior and live graph
+connectivity still require separately authorized acceptance testing.
+
 Prepared 2026-10-18 (Asia/Manila). **Not deployed; no approved release SHA.**
 Security acceptance, main merge, provider accounts and explicit cloud approvals
 are required. `deploy/render.blueprint.yaml.disabled` is a review template, not
@@ -88,7 +104,8 @@ Fastify variables:
 - `STREAMLIT_ORIGIN=https://<approved-app>.streamlit.app` for CSP frame ancestors.
 - `RATE_LIMIT_MAX=120`, `ANALYSIS_RATE_LIMIT_MAX=6`,
   `ML_CANDIDATE_TIMEOUT_MS=120000`; one instance only.
-- Optional `TRUST_PROXY_CIDRS`: only verified provider proxy ranges. Test spoofed
+- Optional `TRUST_PROXY_CIDRS`: explicit IP/CIDR entries only; universal networks,
+  symbolic aliases and malformed values fail startup. Only verified provider proxy ranges. Test spoofed
   forwarding headers before enabling. Default false is safe but can aggregate
   quotas behind the provider proxy; resolving this is a launch acceptance item.
 

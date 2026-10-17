@@ -1,5 +1,9 @@
 # Final Container Security Review
 
+Latest follow-up: [Final release gate assessment](sprint6-final-release-gate-assessment.md).
+Independent scanning expands the HIGH union to 15 OS CVEs; deployment remains
+blocked. The dated results below are historical evidence, not release approval.
+
 Review date: 2026-10-18 Asia/Manila. **Blocked: required security policy still fails.**
 Implementation: `3b5a355f0ea7de0a332809235dd8cf1e0433fbbe`.
 No merge, deployment, cloud provisioning, model transfer, or graph import authorized or performed.

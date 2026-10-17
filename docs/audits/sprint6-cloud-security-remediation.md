@@ -1,5 +1,9 @@
 # Cloud Security Remediation
 
+Latest follow-up: [Final release gate assessment](sprint6-final-release-gate-assessment.md).
+Independent scanning expands the HIGH union to 15 OS CVEs; deployment remains
+blocked. The dated results below are historical evidence, not release approval.
+
 Review date: 2026-10-18, Asia/Manila. Status: **release blocked**.
 
 ## Final Container Follow-up
