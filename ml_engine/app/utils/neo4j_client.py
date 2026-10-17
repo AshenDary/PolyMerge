@@ -7,10 +7,12 @@ import os
 import re
 from collections import defaultdict
 from pathlib import Path
+from threading import Lock
 from typing import Any, Iterable, Optional, Union
+from urllib.parse import urlsplit
 
 from dotenv import load_dotenv
-from neo4j import GraphDatabase, ManagedTransaction
+from neo4j import GraphDatabase, ManagedTransaction, Query
 from neo4j.exceptions import Neo4jError, ServiceUnavailable
 
 
@@ -57,11 +59,19 @@ class Neo4jClient:
                 f"Missing Neo4j environment variable(s): {', '.join(missing)}"
             )
 
+        if os.getenv("POLYMERGE_REQUIRE_NEO4J_TLS") == "true":
+            parsed = urlsplit(self.uri)
+            if parsed.scheme != "neo4j+s" or not parsed.hostname or parsed.username or parsed.password:
+                raise Neo4jConnectionError("Cloud graph requires a certificate-verified neo4j+s URI")
+
         self.driver = GraphDatabase.driver(
             self.uri,
             auth=(self.user, self.password),
             connection_timeout=5,
             max_transaction_retry_time=5,
+            max_connection_pool_size=10,
+            connection_acquisition_timeout=5,
+            max_connection_lifetime=300,
         )
 
     def close(self) -> None:
@@ -70,7 +80,7 @@ class Neo4jClient:
     def query(self, cypher: str, **params: Any) -> list[dict[str, Any]]:
         try:
             with self.driver.session(database=self.database) as session:
-                result = session.run(cypher, **params)
+                result = session.run(Query(cypher, timeout=30), **params)
                 return [record.data() for record in result]
         except (Neo4jError, ServiceUnavailable) as error:
             raise Neo4jConnectionError("Neo4j query failed") from error
@@ -152,3 +162,24 @@ def _group_csv_rows_by_column(path: Path, column: str) -> dict[str, list[dict[st
 
 class Neo4jConnectionError(RuntimeError):
     """Raised when the Neo4j dependency is unavailable or misconfigured."""
+
+
+_client: Neo4jClient | None = None
+_client_lock = Lock()
+
+
+def get_neo4j_client() -> Neo4jClient:
+    """Share the thread-safe driver; each query still owns its own session."""
+    global _client
+    with _client_lock:
+        if _client is None:
+            _client = Neo4jClient()
+        return _client
+
+
+def close_neo4j_client() -> None:
+    global _client
+    with _client_lock:
+        if _client is not None:
+            _client.close()
+            _client = None

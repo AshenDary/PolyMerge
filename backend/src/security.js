@@ -1,7 +1,27 @@
 import cors from '@fastify/cors';
 import rateLimit from '@fastify/rate-limit';
+import { BlockList, isIP } from 'node:net';
 
 export const PUBLIC_ERROR = 'Analysis is temporarily unavailable. Please try again.';
+
+export function proxyTrust(env = process.env) {
+  if (!env.TRUST_PROXY_CIDRS?.trim()) return false;
+  const entries = env.TRUST_PROXY_CIDRS.split(',').map(value => value.trim());
+  for (const entry of entries) {
+    const [address, prefix, ...extra] = entry.split('/');
+    const family = isIP(address);
+    if (!family || extra.length || (prefix !== undefined &&
+        (!/^\d+$/.test(prefix) || Number(prefix) < 1 || Number(prefix) > (family === 4 ? 32 : 128)))) {
+      throw new Error('TRUST_PROXY_CIDRS requires explicit IP addresses or non-universal CIDRs');
+    }
+    const network = new BlockList();
+    network.addSubnet(address, Number(prefix ?? (family === 4 ? 32 : 128)), family === 4 ? 'ipv4' : 'ipv6');
+    if (network.check('0.0.0.0', 'ipv4') && network.check('255.255.255.255', 'ipv4')) {
+      throw new Error('TRUST_PROXY_CIDRS requires explicit IP addresses or non-universal CIDRs');
+    }
+  }
+  return entries;
+}
 
 function origins(value, production) {
   return (value || '').split(',').filter(Boolean).map((value) => {

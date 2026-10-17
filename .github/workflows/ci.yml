@@ -93,15 +93,33 @@ jobs:
         env:
           SERVICE: ${{ matrix.service }}
         run: |
+          mkdir -p "$RUNNER_TEMP/trivy-cache"
           docker run --rm -v /var/run/docker.sock:/var/run/docker.sock:ro -v "$PWD:/reports" \
+            -v "$RUNNER_TEMP/trivy-cache:/root/.cache/trivy" \
             aquasec/trivy@sha256:2416d1f74045b57274df1a340eee6b510cacd73c66a6ccb8da092b117eb7d222 \
             image --scanners vuln --severity HIGH,CRITICAL --exit-code 1 --no-progress \
             --list-all-pkgs --format json --output "/reports/security-$SERVICE.json" "polymerge-$SERVICE:ci"
+      - name: Retain primary scanner database timestamps
+        if: ${{ !cancelled() }}
+        env:
+          SERVICE: ${{ matrix.service }}
+        run: cp "$RUNNER_TEMP/trivy-cache/db/metadata.json" "trivy-db-$SERVICE.json"
+      - name: Independent Grype policy check
+        if: ${{ !cancelled() }}
+        env:
+          SERVICE: ${{ matrix.service }}
+        run: |
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock:ro -v "$PWD:/reports" \
+            anchore/grype@sha256:e4a44ef45d285b829ce6efe2642980329661bd2d18eab5fc539138d4adaebbbe \
+            "docker:polymerge-$SERVICE:ci" --fail-on high -o json --file "/reports/security-grype-$SERVICE.json"
       - name: Retain complete package inventory and vulnerability evidence
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: security-${{ matrix.service }}
-          path: security-${{ matrix.service }}.json
+          path: |
+            security-${{ matrix.service }}.json
+            security-grype-${{ matrix.service }}.json
+            trivy-db-${{ matrix.service }}.json
           if-no-files-found: error
           retention-days: 30

@@ -30,6 +30,7 @@ from app.services.model_serving import (
     ddi_model_service,
 )
 from app.services.set_cover_optimizer import optimize_candidate_sets
+from app.utils.neo4j_client import close_neo4j_client
 
 # Single shared .env lives at the repo root, not inside ml_engine/.
 load_dotenv(Path(__file__).resolve().parent.parent / ".env")
@@ -42,7 +43,10 @@ async def lifespan(_: FastAPI):
         ddi_model_service.load()
     except ModelUnavailableError:
         pass
-    yield
+    try:
+        yield
+    finally:
+        await run_in_threadpool(close_neo4j_client)
 
 
 app = FastAPI(title="PolyMerge ML Engine", version="0.1.0", lifespan=lifespan,

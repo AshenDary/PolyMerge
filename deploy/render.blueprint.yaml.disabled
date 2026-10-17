@@ -30,6 +30,8 @@ services:
         sync: false
       - key: NEO4J_DATABASE
         value: neo4j
+      - key: POLYMERGE_REQUIRE_NEO4J_TLS
+        value: "true"
   - type: web
     name: polymerge-web
     runtime: docker

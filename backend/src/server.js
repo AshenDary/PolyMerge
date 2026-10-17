@@ -4,7 +4,7 @@ import { promises as fs } from 'node:fs';
 
 import Fastify from 'fastify';
 import dotenv from 'dotenv';
-import { installSecurity, PUBLIC_ERROR } from './security.js';
+import { installSecurity, proxyTrust, PUBLIC_ERROR } from './security.js';
 
 import { checkHardContraindications, evaluateRuleApplicability } from './rules/contraindications.js';
 
@@ -612,7 +612,7 @@ async function fetchCandidateSetResult(
 
 export const app = Fastify({ logger: process.env.NODE_ENV !== 'test', bodyLimit: 32768,
   requestTimeout: 15000, connectionTimeout: 150000,
-  trustProxy: process.env.TRUST_PROXY_CIDRS?.split(',').map(value => value.trim()) || false });
+  trustProxy: proxyTrust() });
 await installSecurity(app);
 
 app.get('/health', async () => ({ status: 'ok', service: 'polymerge-backend' }));
