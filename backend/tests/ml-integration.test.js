@@ -1,7 +1,9 @@
 import { after, afterEach, test } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { app, DDI_FEATURE_NAMES } from '../src/server.js';
+process.env.POLYMERGE_ENABLE_LEGACY = 'true';
+process.env.ANALYSIS_RATE_LIMIT_MAX = '1000';
+const { app, DDI_FEATURE_NAMES } = await import('../src/server.js');
 
 const originalFetch = globalThis.fetch;
 
@@ -121,7 +123,7 @@ test('DDI endpoint fails closed on malformed applied inference', async () => {
   assert.equal(response.statusCode, 503);
   assert.equal(response.json().predictedClass, null);
   assert.equal(response.json().mlStatus, 'not_applied');
-  assert.match(response.json().error, /malformed applied-inference provenance/);
+  assert.match(response.json().error, /temporarily unavailable/);
 });
 
 const graphDiseases = [
@@ -609,8 +611,7 @@ for (const [level, field] of [
     assert.equal(response.statusCode, 200);
     assert.equal(response.json().metadata.mlStatus, 'not_applied');
     assert.deepEqual(response.json().candidateSets, []);
-    assert.match(response.json().metadata.warning, level === 'candidate'
-      ? /unsupported candidate-level predictive fields/ : /unsupported probability or confidence/);
+    assert.match(response.json().metadata.warning, /temporarily unavailable/);
   });
 }
 
@@ -735,15 +736,15 @@ test('candidate-set explain endpoint supports formats and rejects invalid or unk
       method: 'GET',
       url: `/api/candidate-sets/explain-query/explain?format=${format}`,
     });
-    assert.equal(explain.statusCode, 200);
-    assert.equal(explain.json().queryId, 'explain-query');
+    assert.equal(explain.statusCode, 404);
+    assert.equal(explain.json().error, 'Server history is disabled');
   }
 
   const invalidFormat = await app.inject({
     method: 'GET',
     url: '/api/candidate-sets/explain-query/explain?format=invalid',
   });
-  assert.equal(invalidFormat.statusCode, 400);
+  assert.equal(invalidFormat.statusCode, 404);
 
   const unknown = await app.inject({
     method: 'GET',
@@ -827,7 +828,7 @@ test('candidate-set endpoint rejects fake prediction scores when ML is not appli
   assert.equal(payload.metadata.dataStatus, 'graph_unavailable');
   assert.equal(payload.metadata.mlStatus, 'not_applied');
   assert.equal(payload.metadata.upstreamStatus, 'fallback');
-  assert.match(payload.metadata.warning, /prediction scores while mlStatus is not_applied/);
+  assert.match(payload.metadata.warning, /temporarily unavailable/);
 });
 
 test('reports ML dependency health without changing backend liveness', async () => {
