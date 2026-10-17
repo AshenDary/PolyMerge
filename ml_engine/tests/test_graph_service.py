@@ -223,6 +223,8 @@ def test_coverage_calculation_uses_represented_diseases():
     )
     assert valsartan["coverage"] == 1.0
     assert amlodipine["coverage"] == 0.5
+    for candidate in result["candidates"]:
+        assert not {"confidence", "probability", "probabilities", "safetyScore"} & candidate.keys()
 
 
 def test_each_covered_disease_has_matching_ctd_evidence():

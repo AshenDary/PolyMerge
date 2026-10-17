@@ -31,7 +31,7 @@ function renderGraphContent(content) {
 function renderRulesContent(rules) {
   if (!rules?.length) return '<p class="muted">No deterministic rule details were returned.</p>';
   return `<ul class="rule-list">${rules.map((rule) => `<li class="rule-item rule-${escapeExplanation(rule.status)}">
-    <strong>${rule.status === 'rejected' ? 'Rejected' : 'Accepted'} · ${escapeExplanation(rule.type)}</strong>
+    <strong>${escapeExplanation(rule.status === 'rejected' ? 'Rejected by research rule' : rule.status)} · ${escapeExplanation(rule.type)}</strong>
     <p>${escapeExplanation(rule.message)}</p>
     ${rule.affectedDrugs?.length ? `<small>Affected pair: ${rule.affectedDrugs.map(escapeExplanation).join(' + ')}</small>` : ''}
     <small>Stage: ${escapeExplanation(rule.stage ?? 'Not provided')} · Source: ${escapeExplanation(rule.source ?? 'Not provided')}</small>
@@ -39,16 +39,18 @@ function renderRulesContent(rules) {
 }
 
 function renderPredictionsContent(content) {
-  if (!content || content.status !== 'available' || !content.pairs?.length) {
-    return `<div class="predictions-unavailable"><strong>Interaction prediction unavailable</strong>
+  const failures = (content?.unavailablePairs ?? []).map(pair => `<li>${pair.drugPair.map(escapeExplanation).join(' + ')}: ${escapeExplanation(pair.reason)} (${escapeExplanation(pair.reasonCode)})</li>`).join('');
+  if (!content || !['available', 'partial'].includes(content.status) || !content.pairs?.length) {
+    return `<div class="predictions-unavailable"><strong>${content?.status === 'not_applicable' ? 'Not applicable' : 'Prediction unavailable'}</strong>
       <p>${escapeExplanation(content?.message ?? 'No research prediction was returned for this candidate.')}</p>
-      <small>This is not a clinical recommendation. No severity has been inferred.</small></div>`;
+      ${failures ? `<ul>${failures}</ul>` : ''}</div>`;
   }
-  return `<ul class="prediction-list">${content.pairs.map((prediction) => `<li class="prediction-item">
+  return `<p>${content.status === 'partial' ? 'Partial predictions available' : 'Prediction available'}</p><ul class="prediction-list">${content.pairs.map((prediction) => `<li class="prediction-item">
     <div><strong>${prediction.drugs?.map(escapeExplanation).join(' + ') ?? 'Drug pair not provided'}</strong>
       <span class="severity-badge severity-${escapeExplanation(prediction.severity).toLowerCase()}">${escapeExplanation(prediction.severity ?? 'Class not provided')}</span></div>
-    <small>Research prediction · ${escapeExplanation(prediction.model?.name ?? 'Model not provided')} · ${escapeExplanation(prediction.model?.version ?? 'Version not provided')} · ${escapeExplanation(prediction.inferenceStatus ?? 'Status not provided')}</small>
-  </li>`).join('')}</ul>`;
+    <small>Research prediction · ${escapeExplanation(prediction.model?.name === 'RandomForestClassifier' ? 'Random Forest' : prediction.model?.name ?? 'Model not provided')}</small>
+    <details><summary>Technical model details</summary><small>${escapeExplanation(prediction.model?.name ?? 'Model not provided')} · ${escapeExplanation(prediction.model?.version ?? 'Version not provided')} · ${escapeExplanation(prediction.inferenceStatus ?? 'Status not provided')}</small></details>
+  </li>`).join('')}</ul>${failures ? `<ul>${failures}</ul>` : ''}`;
 }
 
 function renderCandidateExplanation(explanation, container) {
@@ -61,13 +63,13 @@ function renderCandidateExplanation(explanation, container) {
   </section>`).join('');
   container.innerHTML = `<article class="candidate-explanation">
     <header class="candidate-header"><div><span class="rank-badge">#${escapeExplanation(explanation.rank ?? '—')}</span>
-    <strong>Candidate explanation</strong><span class="status-badge status-${explanation.status === 'rejected' ? 'rejected' : 'accepted'}">${escapeExplanation(explanation.status)}</span></div>
+    <strong>Candidate explanation</strong><span class="status-badge status-${explanation.status === 'rejected' ? 'rejected' : explanation.ruleEvaluation?.status === 'evaluated' ? 'accepted' : 'unknown'}">${explanation.status === 'rejected' ? 'Rejected by research rule' : 'Not rejected; check mapping coverage'}</span></div>
     <div class="drug-list">${(explanation.drugs ?? []).map((drug) => `<code>${escapeExplanation(drug)}</code>`).join('')}</div></header>
     <div class="evidence-sections">${sectionMarkup}</div>
     <p class="overall-disclaimer">${escapeExplanation(explanation.overallDisclaimer ?? 'PolyMerge is a research decision-support prototype and does not provide clinical recommendations.')}</p>
   </article>`;
   const button = container.querySelector('[data-visualization]');
-  button.addEventListener('click', async () => {
+  button?.addEventListener('click', async () => {
     const visualization = container.querySelector('.graph-visualization');
     visualization.hidden = false;
     setText(visualization, 'Loading graph visualization…');

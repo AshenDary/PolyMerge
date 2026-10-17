@@ -28,6 +28,12 @@ class ModelUnavailableError(RuntimeError):
     """Raised when the verified frozen model cannot be used."""
 
 
+class ModelInferenceError(ModelUnavailableError):
+    """A loaded model failed inference, distinct from absent model artifacts."""
+
+    code = "inference_error"
+
+
 class FeatureSchemaError(ValueError):
     """Raised before inference when a feature payload violates the contract."""
 
@@ -114,9 +120,9 @@ class DDIModelService:
                 self._pipeline.predict(pd.DataFrame([normalized], columns=FEATURE_COLUMNS))[0]
             )
         except Exception as error:
-            raise ModelUnavailableError(f"Frozen model inference failed: {error}") from error
+            raise ModelInferenceError(f"Frozen model inference failed: {error}") from error
         if predicted_class not in ALLOWED_LABELS:
-            raise ModelUnavailableError(
+            raise ModelInferenceError(
                 f"Frozen model returned an unsupported class: {predicted_class}"
             )
         return {

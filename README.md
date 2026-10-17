@@ -149,18 +149,58 @@ Open the Fastify frontend at `http://127.0.0.1:3000`.
 
 1. Start on Home and choose **Start Simulation**.
 2. Search for `hypertension` and select `Disease::DOID:10763`.
-3. Clear the search; the full catalog returns while the selected disease stays
-   selected.
-4. Search for `type 2 diabetes mellitus` and select `Disease::DOID:9352`.
-5. Run **Search Candidate Sets** and wait for the synchronous research pipeline.
-   Local graph retrieval, candidate generation, optimization, and ML analysis
-   may take about a minute.
-6. Inspect the workflow summaries, candidate cards, and an ML-applied candidate
-   when present.
-7. Open Explainability for the selected candidate to review graph paths,
-   deterministic rules, ML state, and the graph visualization.
-8. Open Model Analysis to review preserved validation metrics, final selected
-   model metrics, limitations, and tracked Sprint 3 EDA figures.
+3. Choose **Analyze Candidates**. The Analyze step shows elapsed time, not
+   invented stage progress. Completion opens Review Candidates.
+4. Read the compact summary of selected diseases, returned candidate sets, and
+   candidates with predictions. These counts describe the full response.
+5. Review the first five candidates in backend rank order. **Show next 5** pages
+   through the response without fetching again. Single-drug predictions remain
+   **Not applicable**. Choose **Understand this candidate** to enter step 4.
+6. Simple View shows a short grounded explanation and treatment connections.
+   Expand research details for the full evidence. **Researcher View** exposes
+   IDs, provenance, technical pipeline and optional all-results display using
+   the same response; switching modes never reruns analysis.
+7. Ranking uses configured rule status, graph coverage, fewer drugs, then ID.
+   Backend validation can add rejections without reranking. ML remains separate.
+   Rule applicability to canonical graph drug IDs is still an audit blocker;
+   "No configured rule triggered" is not a clinical safety assessment.
+8. Choose **New Simulation** from Simulation or Explainability. It clears
+   selection, search, results, explanations, and timers while keeping the catalog.
+   Select hypertension and `type 2 diabetes mellitus` (`Disease::DOID:9352`),
+   then run the two-disease analysis.
+9. Inspect the transformation counts and select an ML-applied candidate. Its
+   severity, graph evidence, and rule details update from the existing response.
+10. Open Model Analysis and review EDA interpretations, preserved comparison
+    metrics, final model results, and limitations.
+
+**New Simulation** also works during a request: the browser request is aborted
+and late responses/errors are ignored. This does not cancel server-side graph
+work; a new analysis receives a clear busy response while the single worker
+remains occupied. If catalog
+loading failed, its retry control remains available after reset.
+
+For local Streamlit validation, set `POLYMERGE_FRONTEND_URL` to the actual
+Fastify origin, open Streamlit, and repeat navigation, analysis, and reset.
+HTTP and script checks do not replace manual browser/iframe acceptance.
+
+Demo sequence: Select Diseases → Analyze → Review Candidates → Understand Result.
+Model Analysis retains the frozen metrics and EDA assets. Sprint 6 remains
+pending manual presentation review. See [guided demo acceptance](docs/sprint6-guided-demo.md).
+
+Local profiling reduced median single-disease latency from 20,147.848 ms to
+925.607 ms and two-disease latency from 57,893.834 ms to 1,051.950 ms across
+three sequential runs per case on the same dataset. Full canonical response
+equivalence was checked excluding request IDs/timestamps. These are local
+observations, not production guarantees. See the
+[performance investigation](docs/audits/sprint6-performance-investigation.md).
+
+Availability follow-up: single-drug results are **Not applicable**, supported
+pairs retain real predictions, and partially supported multi-drug sets retain
+their available pairs with explicit missing-mapping reasons. Rule evaluation
+now reports verified mapping coverage separately from candidate eligibility;
+no rejection is not a passed safety assessment. See the
+[availability remediation audit](docs/audits/sprint6-availability-remediation.md)
+for reproduced cases, sources, limitations and manual review instructions.
 
 If the ML/Graph service is unavailable or violates the response contract, the backend returns an explicitly labeled fallback:
 

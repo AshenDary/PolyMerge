@@ -6,7 +6,7 @@ import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import dotenv from 'dotenv';
 
-import { checkHardContraindications } from './rules/contraindications.js';
+import { checkHardContraindications, evaluateRuleApplicability } from './rules/contraindications.js';
 import { buildExplainabilityResponse } from './explainability/presentation.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -487,18 +487,39 @@ export function validateCandidateSetResult(payload) {
       throw new Error('ML engine returned duplicate candidate-set IDs');
     }
     candidateSetIds.add(candidateSet.candidateSetId);
+    if (candidateSet.dataStatus === 'real_graph'
+      && ['confidence', 'probability', 'probabilities', 'safetyScore', 'combinedSafetyScore']
+        .some((field) => Object.hasOwn(candidateSet, field))) {
+      throw new Error('ML candidate-set response included unsupported candidate-level predictive fields');
+    }
     if (candidateSet.mlStatus === 'not_applied'
       && (candidateSet.interactionRisk != null || candidateSet.synergyScore != null)) {
       throw new Error('ML engine returned prediction scores while mlStatus is not_applied');
     }
-    if (candidateSet.mlStatus === 'applied') {
+    if (!['applied', 'partial', 'not_applied'].includes(candidateSet.mlStatus)) {
+      throw new Error('ML candidate-set response has unknown availability status');
+    }
+    const unavailable = candidateSet.mlPrediction?.unavailablePairs ?? [];
+    if (!Array.isArray(unavailable) || unavailable.some(pair => !Array.isArray(pair?.drugPair)
+      || pair.drugPair.length !== 2 || new Set(pair.drugPair).size !== 2
+      || pair.drugPair.some(id => !candidateSet.drugs.includes(id))
+      || typeof pair.reason !== 'string' || typeof pair.reasonCode !== 'string'
+      || ['predictedSeverity', 'predictedClass', 'probability', 'probabilities', 'confidence', 'safetyScore'].some(field => Object.hasOwn(pair, field)))) {
+      throw new Error('ML candidate-set response has malformed unavailable pairs');
+    }
+    if (candidateSet.mlStatus === 'not_applied' && candidateSet.mlPrediction?.pairs?.length) {
+      throw new Error('ML candidate-set response contains predictions marked not_applied');
+    }
+    if (candidateSet.mlStatus === 'applied' || candidateSet.mlStatus === 'partial') {
       const prediction = candidateSet.mlPrediction;
       if (prediction === null || typeof prediction !== 'object' || Array.isArray(prediction)
-        || prediction.status !== 'applied' || !Array.isArray(prediction.pairs)
+        || prediction.status !== candidateSet.mlStatus || !Array.isArray(prediction.pairs)
         || prediction.pairs.length === 0
         || prediction.pairs.some((pair) => pair === null || typeof pair !== 'object'
           || !Array.isArray(pair.drugPair) || pair.drugPair.length !== 2
           || pair.drugPair.some((drugId) => typeof drugId !== 'string')
+          || new Set(pair.drugPair).size !== 2
+          || pair.drugPair.some(id => !candidateSet.drugs.includes(id))
           || !DDI_CLASSES.has(pair.predictedSeverity)
           || pair.inferenceStatus !== 'applied'
           || pair.model === null || typeof pair.model !== 'object'
@@ -507,9 +528,17 @@ export function validateCandidateSetResult(payload) {
         throw new Error('ML candidate-set response has malformed pair prediction data');
       }
       if (prediction.pairs.some((pair) => (
-        Object.hasOwn(pair, 'probabilities') || Object.hasOwn(pair, 'confidence')
+        Object.hasOwn(pair, 'probabilities') || Object.hasOwn(pair, 'probability')
+        || Object.hasOwn(pair, 'confidence')
       ))) {
         throw new Error('ML candidate-set response included unsupported probability or confidence fields');
+      }
+      const allPairs = [...prediction.pairs, ...unavailable].map(pair => [...pair.drugPair].sort().join('|'));
+      if (new Set(allPairs).size !== allPairs.length
+        || (candidateSet.mlStatus === 'partial' && (!unavailable.length
+          || allPairs.length !== candidateSet.drugs.length * (candidateSet.drugs.length - 1) / 2))
+        || (candidateSet.mlStatus === 'applied' && unavailable.length)) {
+        throw new Error('ML candidate-set response has inconsistent pair coverage');
       }
     }
     if (candidateSet.dataStatus !== payload.metadata.dataStatus) {
@@ -542,6 +571,8 @@ async function fetchMlResult(diseases, optimizationConfig = {}, options = {}) {
   }
 }
 
+class AnalysisBusyError extends Error {}
+
 async function fetchCandidateSetResult(
   diseaseIds,
   candidateSetConfig = {},
@@ -558,11 +589,15 @@ async function fetchCandidateSetResult(
       body: JSON.stringify({ diseaseIds, candidateSetConfig, optimizationConfig }),
       signal: AbortSignal.timeout(timeoutMs),
     });
+    if (response.status === 503 && response.headers?.get('retry-after') === '2') {
+      throw new AnalysisBusyError('Analysis busy. Server processing may still be finishing; try again shortly.');
+    }
     if (!response.ok) {
       throw new Error(`ML candidate-set service responded ${response.status}`);
     }
     return validateCandidateSetResult(await response.json());
   } catch (error) {
+    if (error instanceof AnalysisBusyError) throw error;
     options.logger?.warn({ error: error.message }, 'ML candidate-set request failed; using empty fallback');
     return createCandidateSetFallback(options.resolvedDiseases ?? diseaseIds, error.message);
   }
@@ -761,12 +796,20 @@ app.post('/api/candidate-sets/search', async (request, reply) => {
   }
 
   const resolvedDiseaseIds = resolved.diseases.map((disease) => disease.id);
-  const mlResult = await fetchCandidateSetResult(
-    resolvedDiseaseIds,
-    normalizedCandidateConfig.candidateSetConfig,
-    normalizedOptimization.optimizationConfig,
-    { logger: request.log, resolvedDiseases: resolved.diseases },
-  );
+  let mlResult;
+  try {
+    mlResult = await fetchCandidateSetResult(
+      resolvedDiseaseIds,
+      normalizedCandidateConfig.candidateSetConfig,
+      normalizedOptimization.optimizationConfig,
+      { logger: request.log, resolvedDiseases: resolved.diseases },
+    );
+  } catch (error) {
+    if (error instanceof AnalysisBusyError) {
+      return reply.code(503).header('Retry-After', '2').send({ error: error.message });
+    }
+    throw error;
+  }
   const dataStatus = mlResult.metadata.dataStatus;
   const mlStatus = mlResult.metadata.mlStatus;
   const candidateSets = (mlResult.candidateSets ?? []).map((candidateSet, index) => {
@@ -782,6 +825,7 @@ app.post('/api/candidate-sets/search', async (request, reply) => {
     }
     return {
       ...candidateSet,
+      ruleEvaluation: evaluateRuleApplicability(candidateSet.drugs),
       rank: candidateSet.rank ?? index + 1,
       status: violation ? 'rejected' : candidateSet.status,
       rejectionReasons,

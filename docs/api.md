@@ -437,8 +437,9 @@ include corresponding treatment evidence where:
 - `source`, `graphVersion`, `metaedge`, `targetName`, and `evidenceType`
   preserve graph provenance.
 
-`interactionRisk`, `synergyScore`, confidence, probabilities, and a combined
-safety score are not emitted for real graph-backed candidates.
+`interactionRisk` and `synergyScore` remain `null` for compatibility. Confidence,
+probability fields, and a combined safety score are not emitted for real
+graph-backed candidates.
 
 An empty context array means no corresponding relationship is represented in
 the current graph fragment. It is not a known negative biomedical fact. See

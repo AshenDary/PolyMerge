@@ -52,7 +52,7 @@ export function formatRules(rules) {
     message: rule.message,
     affectedDrugs: rule.affectedDrugs,
     source: rule.source,
-    visualStyle: rule.status === 'rejected' ? 'error' : 'success',
+    visualStyle: rule.status === 'rejected' ? 'error' : rule.status === 'evaluated' ? 'success' : 'warning',
   }));
 }
 
@@ -60,16 +60,18 @@ export function formatRules(rules) {
  * Format ML predictions for display
  */
 export function formatMLPredictions(predictions) {
-  if (!predictions || predictions.status !== 'applied' || predictions.pairs.length === 0) {
+  if (!predictions || !['applied', 'partial'].includes(predictions.status) || predictions.pairs.length === 0) {
     return {
-      status: 'not_available',
+      status: predictions?.status === 'not_applicable' ? 'not_applicable' : 'not_available',
       message: predictions?.reason ?? 'ML predictions are unavailable for this candidate.',
       pairs: [],
+      unavailablePairs: predictions?.unavailablePairs ?? [],
     };
   }
   
   return {
-    status: 'available',
+    status: predictions.status === 'partial' ? 'partial' : 'available',
+    unavailablePairs: predictions.unavailablePairs ?? [],
     pairs: predictions.pairs.map((pred) => ({
       drugs: pred.drugPair,
       severity: pred.predictedSeverity,
@@ -97,7 +99,7 @@ export function createComparisonView(candidates) {
         drugs: candidate.drugs.join(', '),
         coverage: `${Math.round((candidate.graphEvidence?.coverage ?? 0) * 100)}%`,
         status: candidate.status,
-        rulesStatus: candidate.deterministicRules.some((r) => r.status === 'rejected') ? 'Rejected' : 'Accepted',
+        rulesStatus: candidate.deterministicRules.some((r) => r.status === 'rejected') ? 'Rejected' : candidate.ruleEvaluation?.status ?? 'not_evaluable',
         mlStatus: candidate.mlStatus,
         visualStyle: candidate.status === 'accepted' ? 'success' : 'error',
       })),
@@ -119,6 +121,7 @@ export function createDetailedExplanation(candidate) {
     rank: candidate.rank,
     drugs: candidate.drugs,
     status: candidate.status,
+    ruleEvaluation: candidate.ruleEvaluation,
     
     sections: [
       {
