@@ -8,7 +8,9 @@ Date: 2026-10-18 (Asia/Manila). **DEPLOYMENT BLOCKED; NOT LIVE.**
 - Integration PR: [#57](https://github.com/AshenDary/PolyMerge/pull/57), open.
 - Security work: `fix/pre-deployment-security-and-cloud`, based on integration
   `d0a8df3b50d460ef5fd7cb59851338172e9c15ee`.
-- Security PR URL and final hosted checks are recorded in the PR handoff once run.
+- Security PR: [#58](https://github.com/AshenDary/PolyMerge/pull/58), open; final
+  hosted run and exact head are recorded in its verification comment after push.
+- Final container-hardening code commit: `3b5a355f0ea7de0a332809235dd8cf1e0433fbbe`.
 - Approved deployment SHA: **none**. Main merge approval: **not granted**.
 - Cloud accounts/budgets, model destination/upload, graph target/import,
   public exposure and continuous deployment approvals: **not granted**.
@@ -17,22 +19,22 @@ Date: 2026-10-18 (Asia/Manila). **DEPLOYMENT BLOCKED; NOT LIVE.**
 
 | Check | Result |
 | --- | --- |
-| Backend and frontend behavior | 120 passed |
+| Backend and frontend behavior | 122 passed |
 | Updated Python 3.11 ML suite | 127 passed, two dependency warnings retained |
-| Script tests | 10 passed |
+| Script tests | 13 passed |
 | Feature contract, metadata, frontend syntax, diff whitespace | PASS |
 | Frozen artifact | Required SHA-256 verified; unchanged |
 | Runtime parity | Exact classes/probabilities across old, updated and Linux runtimes |
 | Five live scenarios | Exact candidate and optimizer payload equality |
 | All three Docker builds | PASS, Linux ARM64 |
-| All three isolated container liveness checks | Healthy; temporary containers removed |
+| All three isolated container liveness checks | Non-root/read-only/no capabilities; restart checks passed |
 | Live graph identities and edges | Exact 3,415-node / 16,230-edge CSV parity |
 | Streamlit AppTest | HTTPS iframe-source check passed |
 | Browser discovery | No browser available; visual/keyboard/mobile acceptance pending |
 | npm production audit | Zero findings |
 | ML/development audit | One unresolved scikit-learn advisory each |
 | Streamlit dependency audit | Zero findings |
-| Runtime-image scan | Remaining HIGH/CRITICAL OS findings; not accepted |
+| Runtime-image scan | Backend 43 HIGH; ML/Streamlit 44 HIGH each; zero CRITICAL; not accepted |
 
 Local hardened services were exercised on loopback ports 3004/8004, not published
 to a cloud provider. Original local services were left untouched. Evidence:
@@ -40,6 +42,12 @@ to a cloud provider. Original local services were left untouched. Evidence:
 `/tmp/polymerge-frozen-baseline.json`, `/tmp/polymerge-frozen-py311.json`,
 `/tmp/polymerge-container-security`. These machine-local files are not cloud
 acceptance records. No held-out model evaluation was run.
+
+Final follow-up evidence is in `/tmp/polymerge-final-security` and
+[the container review](sprint6-final-container-security-review.md), including
+the scanner freshness limitation, exact package CSV, and 313-row Trixie parity.
+Experimental sklearn 1.5.2 numerical parity passed, but estimator compatibility
+failed; it was not adopted. Production scientific requirements remain unchanged.
 
 ## Provider State
 

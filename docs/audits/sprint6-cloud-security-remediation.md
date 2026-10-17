@@ -2,6 +2,23 @@
 
 Review date: 2026-10-18, Asia/Manila. Status: **release blocked**.
 
+## Final Container Follow-up
+
+The subsequent review at code commit `3b5a355` is documented in
+[Final Container Security Review](sprint6-final-container-security-review.md).
+Pinned Trixie bases replace Bookworm without changing Python/Node major versions
+or scientific dependencies. Current local scan counts are 43 HIGH / 0 CRITICAL
+for backend and 44 HIGH / 0 CRITICAL each for ML/Streamlit, down from 57/63/63.
+Those remaining findings are not waived, and scanner DB freshness has a documented
+limitation. Exact package evidence is in the linked report and CSV.
+
+Patched sklearn 1.5.2 matches 313 numerical probe rows exactly but has estimator
+version warnings and a concrete ColumnTransformer API incompatibility. Production
+remains 1.4.0; its advisory is unresolved. Backend tests now total 122; script tests
+13; local ML remains 127. Hardened read-only/non-root restart checks were added.
+The original investigation below is retained as historical evidence, not current
+container counts. No merge or cloud action occurred.
+
 ## Starting Point
 
 PR #57 remains open against main. Main was verified at
