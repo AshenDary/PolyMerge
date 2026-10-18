@@ -23,11 +23,11 @@ export function proxyTrust(env = process.env) {
   return entries;
 }
 
-function origins(value, production) {
+function origins(value, production, localDemo = false) {
   return (value || '').split(',').filter(Boolean).map((value) => {
     const url = new URL(value.trim());
     if (url.origin !== value.trim() || url.username || url.password
-        || (production ? url.protocol !== 'https:' : !['http:', 'https:'].includes(url.protocol))) {
+        || (production ? !(url.protocol === 'https:' || (localDemo && url.protocol === 'http:' && url.hostname === '127.0.0.1')) : !['http:', 'https:'].includes(url.protocol))) {
       throw new Error('Allowed origins must be exact origins; production requires HTTPS');
     }
     return url.origin;
@@ -36,8 +36,10 @@ function origins(value, production) {
 
 export async function installSecurity(app, env = process.env) {
   const production = env.NODE_ENV === 'production';
-  const allowed = origins(env.CORS_ORIGIN, production);
-  const frames = origins(env.STREAMLIT_ORIGIN, production);
+  const localDemo = env.POLYMERGE_LOCAL_DEMO === 'true';
+  if (localDemo && env.HOST !== '127.0.0.1') throw new Error('Local demo requires an explicit loopback bind');
+  const allowed = origins(env.CORS_ORIGIN, production, localDemo);
+  const frames = origins(env.STREAMLIT_ORIGIN, production, localDemo);
   const legacy = !production && env.POLYMERGE_ENABLE_LEGACY === 'true';
   let active = 0;
   await app.register(cors, { origin: allowed, credentials: false, methods: ['GET', 'POST'] });
