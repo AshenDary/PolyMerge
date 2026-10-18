@@ -440,6 +440,51 @@
 }
 
 .candidate-explanation { border-color: var(--line); box-shadow: none; }
+.candidate-explanation.candidate-overview {
+  display: block;
+  min-width: 0;
+  max-width: 100%;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  overflow-wrap: anywhere;
+}
+.candidate-overview .overview-heading { padding-bottom: 20px; }
+.candidate-overview .overview-heading h3 { font-size: 22px; line-height: 1.4; margin: 6px 0 0; max-width: 55ch; }
+.candidate-overview .overview-section { padding: 18px 0; border-top: 1px solid var(--line); }
+.candidate-overview h4 { font-size: 15px; margin: 0 0 10px; }
+.candidate-overview h5 { font-size: 13px; margin: 16px 0 8px; }
+.candidate-overview p { max-width: 72ch; line-height: 1.55; margin: 8px 0; }
+.candidate-overview .covered-diseases { display: flex; flex-wrap: wrap; gap: 8px 18px; padding: 0; margin: 12px 0; list-style: none; }
+.candidate-overview .covered-diseases li { border-left: 2px solid #7b9f94; padding-left: 8px; font-size: 14px; }
+.coverage-measure { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; font-size: 13px; margin-block: 12px; }
+.coverage-measure meter { width: 160px; max-width: 100%; height: 12px; }
+.candidate-overview .uncovered-diseases { font-size: 13px; margin-top: 10px; }
+.candidate-overview .rule-coverage { font-size: 13px; }
+.candidate-overview .rule-triggered { color: #8e2929; }
+.pair-results { list-style: none; padding: 0; margin: 0; max-width: 840px; }
+.pair-result { display: grid; grid-template-columns: minmax(0, 1fr) minmax(85px, 120px); gap: 6px 16px; align-items: baseline; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.pair-name { min-width: 0; overflow-wrap: anywhere; line-height: 1.5; }
+.pair-severity { text-align: right; font-size: 14px; overflow-wrap: anywhere; }
+.candidate-overview .pair-reason { grid-column: 1 / -1; font-size: 13px; margin: 0; }
+.overview-details { border-top: 1px solid var(--line); padding-top: 8px; }
+.research-takeaway { min-width: 0; overflow-wrap: anywhere; }
+.research-takeaway .takeaway-review { max-width: 72ch; padding-left: 20px; }
+.research-takeaway .takeaway-review li { margin-block: 8px; line-height: 1.55; }
+.research-takeaway .takeaway-scope { color: #586677; font-size: 12px; margin-top: 18px; }
+.overview-details > details { padding: 12px 0; border-bottom: 1px solid var(--line); }
+.overview-details summary { line-height: 1.5; }
+.overview-details ul { padding-left: 20px; }
+.overview-details li { margin-block: 8px; line-height: 1.5; }
+.overview-details .evidence-section { border: 0; border-radius: 0; background: transparent; padding: 12px 0; }
+.overview-details details[open] > summary { margin-bottom: 12px; }
+.candidate-overview summary:focus-visible { outline: 3px solid #5ec3ce; outline-offset: 3px; }
+@media (max-width: 420px) {
+  .pair-result { grid-template-columns: minmax(0, 1fr); }
+  .pair-severity { text-align: left; }
+}
 .candidate-header > div:first-child { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .candidate-header .status-badge { margin-left: auto; }
 .evidence-section { min-width: 0; overflow-wrap: anywhere; }

@@ -12,6 +12,7 @@ from typing import Any
 
 import joblib
 import pandas as pd
+import sklearn
 
 from app.data.ddinter_dataset import ALLOWED_LABELS, FEATURE_COLUMNS
 from app.models.final_evaluation import (
@@ -26,6 +27,12 @@ from app.models.final_evaluation import (
 
 class ModelUnavailableError(RuntimeError):
     """Raised when the verified frozen model cannot be used."""
+
+
+class ModelInferenceError(ModelUnavailableError):
+    """A loaded model failed inference, distinct from absent model artifacts."""
+
+    code = "inference_error"
 
 
 class FeatureSchemaError(ValueError):
@@ -73,6 +80,8 @@ class DDIModelService:
                 metadata = self._read_json(self.metadata_path, "model metadata")
                 contract = self._read_json(self.feature_contract_path, "feature contract")
                 self._validate_metadata(metadata, contract)
+                if sklearn.__version__ != metadata["scikit_learn_version"]:
+                    raise ValueError("Runtime scikit-learn differs from frozen model provenance")
                 if not self.artifact_path.is_file():
                     raise FileNotFoundError(
                         f"Frozen model artifact is not installed at {self.artifact_path}"
@@ -114,9 +123,9 @@ class DDIModelService:
                 self._pipeline.predict(pd.DataFrame([normalized], columns=FEATURE_COLUMNS))[0]
             )
         except Exception as error:
-            raise ModelUnavailableError(f"Frozen model inference failed: {error}") from error
+            raise ModelInferenceError(f"Frozen model inference failed: {error}") from error
         if predicted_class not in ALLOWED_LABELS:
-            raise ModelUnavailableError(
+            raise ModelInferenceError(
                 f"Frozen model returned an unsupported class: {predicted_class}"
             )
         return {
@@ -171,7 +180,7 @@ class DDIModelService:
                 "mlStatus": "not_applied",
                 "modelVersion": metadata.get("model_version") if metadata else None,
                 "artifactSha256": metadata.get("artifact_sha256") if metadata else None,
-                "reason": self._load_error,
+                "reason": "Frozen model unavailable",
             }
         assert self._metadata is not None
         return {
@@ -195,7 +204,7 @@ class DDIModelService:
                     metadata.get("feature_contract_sha256") if metadata else None
                 ),
             },
-            "error": reason or self._load_error or "Frozen model unavailable",
+            "error": "Frozen model unavailable",
         }
 
     @staticmethod

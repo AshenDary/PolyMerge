@@ -54,7 +54,6 @@ def test_predict_combination_graph_pipeline(monkeypatch):
                     "interactionRisk": None,
                     "synergyScore": None,
                     "evidenceLevel": "graph",
-                    "confidence": 1.0,
                     "dataStatus": "real_graph",
                     "status": "accepted",
                     "evidence": [],
@@ -170,6 +169,7 @@ def test_predict_candidate_sets_returns_structured_contract(monkeypatch):
     assert payload["candidateSets"][0]["evidence"][0]["source"] == "Hetionet"
     assert payload["candidateSets"][0]["dataStatus"] == "real_graph"
     assert payload["candidateSets"][0]["mlStatus"] == "not_applied"
+    assert not {"confidence", "probability", "probabilities", "safetyScore"} & payload["candidateSets"][0].keys()
     assert payload["candidateSets"][0]["interactionRisk"] is None
     assert payload["candidateSets"][0]["synergyScore"] is None
 

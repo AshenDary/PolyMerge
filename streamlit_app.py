@@ -1,9 +1,10 @@
 """Host the complete PolyMerge frontend in Streamlit."""
 
 import os
+from pathlib import Path
+from urllib.parse import urlsplit
 
 import streamlit as st
-import streamlit.components.v1 as components
 
 
 FRONTEND_URL = os.environ.get(
@@ -11,7 +12,12 @@ FRONTEND_URL = os.environ.get(
     os.environ.get("POLYMERGE_API_URL", "http://127.0.0.1:3000"),
 ).rstrip("/") + "/"
 
-st.set_page_config(page_title="PolyMerge Research Dashboard", page_icon="🧪", layout="wide", initial_sidebar_state="collapsed")
+st.set_page_config(page_title="PolyMerge Research Dashboard", page_icon=str(Path(__file__).parent / "frontend/apple-touch-icon.png"), layout="wide", initial_sidebar_state="collapsed")
+parsed_url = urlsplit(FRONTEND_URL)
+local = parsed_url.hostname in {"localhost", "127.0.0.1"}
+if (parsed_url.scheme != "https" and not (local and parsed_url.scheme == "http")) or parsed_url.username or parsed_url.password or parsed_url.query or parsed_url.fragment:
+    st.error("The research application URL is not configured securely.")
+    st.stop()
 st.markdown("""
 <style>
 .stApp { background: #eef3ef; }
@@ -25,4 +31,4 @@ iframe { display: block; width: 100%; height: 100vh !important; min-height: 100v
 </style>
 """, unsafe_allow_html=True)
 
-components.iframe(FRONTEND_URL, height=800, scrolling=True)
+st.iframe(FRONTEND_URL, height=800, tab_index=0, alt="PolyMerge research interface")

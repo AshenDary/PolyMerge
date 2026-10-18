@@ -1,5 +1,18 @@
 # PolyMerge API
 
+## Local Demo API Scope
+
+The supervised local demo uses production restrictions with a loopback-only
+HTTP exception. Its active flow uses `/api/diseases`,
+`POST /api/candidate-sets/search`, model-analysis
+metadata and static assets. `/health` is liveness; `/ready` checks dependencies.
+The raw `/api/ddi-severity/predict` proxy, legacy history, combination/demo and stored-query explanation routes documented
+below are retained as development contracts, **not enabled demo capabilities**.
+The launcher sets `POLYMERGE_ENABLE_LEGACY=false`; failures do not become fake
+graph/model results. See [architecture](ARCHITECTURE.md) and
+[backend security configuration](../backend/src/security.js).
+
+
 This document describes the current implemented API contract. It documents
 implemented behavior only.
 
@@ -437,8 +450,9 @@ include corresponding treatment evidence where:
 - `source`, `graphVersion`, `metaedge`, `targetName`, and `evidenceType`
   preserve graph provenance.
 
-`interactionRisk`, `synergyScore`, confidence, probabilities, and a combined
-safety score are not emitted for real graph-backed candidates.
+`interactionRisk` and `synergyScore` remain `null` for compatibility. Confidence,
+probability fields, and a combined safety score are not emitted for real
+graph-backed candidates.
 
 An empty context array means no corresponding relationship is represented in
 the current graph fragment. It is not a known negative biomedical fact. See

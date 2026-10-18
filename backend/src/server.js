@@ -3,11 +3,10 @@ import { fileURLToPath } from 'node:url';
 import { promises as fs } from 'node:fs';
 
 import Fastify from 'fastify';
-import cors from '@fastify/cors';
 import dotenv from 'dotenv';
+import { installSecurity, proxyTrust, PUBLIC_ERROR } from './security.js';
 
-import { checkHardContraindications } from './rules/contraindications.js';
-import { buildExplainabilityResponse } from './explainability/presentation.js';
+import { checkHardContraindications, evaluateRuleApplicability } from './rules/contraindications.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 // Single shared .env lives at the repo root, not inside backend/.
@@ -69,7 +68,7 @@ export function createModelComparisonHandler(readReport = (reportPath) => fs.rea
         disclaimer: 'Research classification results only. Not clinical validation or treatment guidance.',
       };
     } catch (error) {
-      request.log?.error?.({ error: error.message }, 'Unable to load model comparison report');
+      request.log?.error?.({ code: error.code, requestId: request.id }, 'Unable to load model comparison report');
       return reply.code(503).send({ error: 'Model comparison report is unavailable' });
     }
   };
@@ -162,14 +161,12 @@ const DRUGS = {
   },
 };
 
-const history = new Map();
-
 export function normalizeDiseases(diseases) {
   if (!Array.isArray(diseases) || diseases.length === 0) {
     return { error: 'diseases[] is required' };
   }
 
-  if (diseases.length > 10 || diseases.some((disease) => typeof disease !== 'string')) {
+  if (diseases.length > 10 || diseases.some((disease) => typeof disease !== 'string' || disease.length > 200)) {
     return { error: 'diseases[] must contain between 1 and 10 disease names or IDs' };
   }
 
@@ -232,6 +229,9 @@ export function normalizeOptimizationConfig(config) {
   if (config === null || typeof config !== 'object' || Array.isArray(config)) {
     return { error: 'optimizationConfig must be an object' };
   }
+  if (Object.keys(config).some(key => !['maxDrugCount', 'minimumCoverage'].includes(key))) {
+    return { error: 'Unknown optimization setting' };
+  }
 
   const normalized = {};
   if (config.maxDrugCount !== undefined) {
@@ -258,6 +258,9 @@ export function normalizeCandidateSetConfig(config) {
   }
   if (config === null || typeof config !== 'object' || Array.isArray(config)) {
     return { error: 'candidateSetConfig must be an object' };
+  }
+  if (Object.keys(config).some(key => !['maxDrugCount', 'maxCandidateSets'].includes(key))) {
+    return { error: 'Unknown candidate setting' };
   }
 
   const normalized = {};
@@ -487,18 +490,39 @@ export function validateCandidateSetResult(payload) {
       throw new Error('ML engine returned duplicate candidate-set IDs');
     }
     candidateSetIds.add(candidateSet.candidateSetId);
+    if (candidateSet.dataStatus === 'real_graph'
+      && ['confidence', 'probability', 'probabilities', 'safetyScore', 'combinedSafetyScore']
+        .some((field) => Object.hasOwn(candidateSet, field))) {
+      throw new Error('ML candidate-set response included unsupported candidate-level predictive fields');
+    }
     if (candidateSet.mlStatus === 'not_applied'
       && (candidateSet.interactionRisk != null || candidateSet.synergyScore != null)) {
       throw new Error('ML engine returned prediction scores while mlStatus is not_applied');
     }
-    if (candidateSet.mlStatus === 'applied') {
+    if (!['applied', 'partial', 'not_applied'].includes(candidateSet.mlStatus)) {
+      throw new Error('ML candidate-set response has unknown availability status');
+    }
+    const unavailable = candidateSet.mlPrediction?.unavailablePairs ?? [];
+    if (!Array.isArray(unavailable) || unavailable.some(pair => !Array.isArray(pair?.drugPair)
+      || pair.drugPair.length !== 2 || new Set(pair.drugPair).size !== 2
+      || pair.drugPair.some(id => !candidateSet.drugs.includes(id))
+      || typeof pair.reason !== 'string' || typeof pair.reasonCode !== 'string'
+      || ['predictedSeverity', 'predictedClass', 'probability', 'probabilities', 'confidence', 'safetyScore'].some(field => Object.hasOwn(pair, field)))) {
+      throw new Error('ML candidate-set response has malformed unavailable pairs');
+    }
+    if (candidateSet.mlStatus === 'not_applied' && candidateSet.mlPrediction?.pairs?.length) {
+      throw new Error('ML candidate-set response contains predictions marked not_applied');
+    }
+    if (candidateSet.mlStatus === 'applied' || candidateSet.mlStatus === 'partial') {
       const prediction = candidateSet.mlPrediction;
       if (prediction === null || typeof prediction !== 'object' || Array.isArray(prediction)
-        || prediction.status !== 'applied' || !Array.isArray(prediction.pairs)
+        || prediction.status !== candidateSet.mlStatus || !Array.isArray(prediction.pairs)
         || prediction.pairs.length === 0
         || prediction.pairs.some((pair) => pair === null || typeof pair !== 'object'
           || !Array.isArray(pair.drugPair) || pair.drugPair.length !== 2
           || pair.drugPair.some((drugId) => typeof drugId !== 'string')
+          || new Set(pair.drugPair).size !== 2
+          || pair.drugPair.some(id => !candidateSet.drugs.includes(id))
           || !DDI_CLASSES.has(pair.predictedSeverity)
           || pair.inferenceStatus !== 'applied'
           || pair.model === null || typeof pair.model !== 'object'
@@ -507,9 +531,17 @@ export function validateCandidateSetResult(payload) {
         throw new Error('ML candidate-set response has malformed pair prediction data');
       }
       if (prediction.pairs.some((pair) => (
-        Object.hasOwn(pair, 'probabilities') || Object.hasOwn(pair, 'confidence')
+        Object.hasOwn(pair, 'probabilities') || Object.hasOwn(pair, 'probability')
+        || Object.hasOwn(pair, 'confidence')
       ))) {
         throw new Error('ML candidate-set response included unsupported probability or confidence fields');
+      }
+      const allPairs = [...prediction.pairs, ...unavailable].map(pair => [...pair.drugPair].sort().join('|'));
+      if (new Set(allPairs).size !== allPairs.length
+        || (candidateSet.mlStatus === 'partial' && (!unavailable.length
+          || allPairs.length !== candidateSet.drugs.length * (candidateSet.drugs.length - 1) / 2))
+        || (candidateSet.mlStatus === 'applied' && unavailable.length)) {
+        throw new Error('ML candidate-set response has inconsistent pair coverage');
       }
     }
     if (candidateSet.dataStatus !== payload.metadata.dataStatus) {
@@ -537,10 +569,13 @@ async function fetchMlResult(diseases, optimizationConfig = {}, options = {}) {
 
     return validateMlResult(await response.json());
   } catch (error) {
-    options.logger?.warn({ error: error.message }, 'ML engine request failed; using demo fallback');
+    options.logger?.warn({ code: error.code }, 'ML engine request failed; using demo fallback');
     return createDemoSearchResult(options.resolvedDiseases ?? diseases, error.message);
   }
 }
+
+class AnalysisBusyError extends Error {}
+class AnalysisBudgetError extends Error {}
 
 async function fetchCandidateSetResult(
   diseaseIds,
@@ -558,23 +593,39 @@ async function fetchCandidateSetResult(
       body: JSON.stringify({ diseaseIds, candidateSetConfig, optimizationConfig }),
       signal: AbortSignal.timeout(timeoutMs),
     });
+    if (response.status === 503 && response.headers?.get('retry-after') === '2') {
+      throw new AnalysisBusyError('Analysis busy. Server processing may still be finishing; try again shortly.');
+    }
+    if (response.status === 422) {
+      throw new AnalysisBudgetError('Analysis request exceeds supported limits. Select fewer diseases or drugs.');
+    }
     if (!response.ok) {
       throw new Error(`ML candidate-set service responded ${response.status}`);
     }
     return validateCandidateSetResult(await response.json());
   } catch (error) {
-    options.logger?.warn({ error: error.message }, 'ML candidate-set request failed; using empty fallback');
-    return createCandidateSetFallback(options.resolvedDiseases ?? diseaseIds, error.message);
+    if (error instanceof AnalysisBusyError || error instanceof AnalysisBudgetError) throw error;
+    options.logger?.warn({ code: error.code }, 'ML candidate-set request failed; using empty fallback');
+    return createCandidateSetFallback(options.resolvedDiseases ?? diseaseIds, PUBLIC_ERROR);
   }
 }
 
-export const app = Fastify({ logger: process.env.NODE_ENV !== 'test' });
-
-await app.register(cors, {
-  origin: process.env.CORS_ORIGIN || true,
-});
+export const app = Fastify({ logger: process.env.NODE_ENV !== 'test', bodyLimit: 32768,
+  requestTimeout: 15000, connectionTimeout: 150000,
+  trustProxy: proxyTrust() });
+await installSecurity(app);
 
 app.get('/health', async () => ({ status: 'ok', service: 'polymerge-backend' }));
+
+app.get('/ready', async (_request, reply) => {
+  try {
+    const response = await fetch(`${ML_SERVICE_URL}/ready`, { signal: AbortSignal.timeout(ML_HEALTH_TIMEOUT_MS) });
+    if (!response.ok || (await response.json()).status !== 'ready') throw new Error('Dependency unavailable');
+    return { status: 'ready' };
+  } catch {
+    return reply.code(503).send({ status: 'unavailable' });
+  }
+});
 
 app.get('/health/dependencies', async (request, reply) => {
   try {
@@ -587,7 +638,7 @@ app.get('/health/dependencies', async (request, reply) => {
     }
     return { status: 'ok', service: 'polymerge-backend', dependencies: { mlEngine: 'ok' } };
   } catch (error) {
-    request.log?.warn?.({ error: error.message }, 'ML engine health check failed');
+    request.log?.warn?.({ code: error.code, requestId: request.id }, 'ML engine health check failed');
     return reply.code(503).send({
       status: 'degraded',
       service: 'polymerge-backend',
@@ -609,12 +660,15 @@ app.get('/frontend/:file', async (request, reply) => {
   const filePath = path.join(__dirname, '../../frontend', safeFile);
 
   try {
-    const contents = await fs.readFile(filePath, 'utf8');
+    const contents = await fs.readFile(filePath);
     const extension = path.extname(safeFile);
     const types = {
       '.css': 'text/css',
       '.js': 'text/javascript',
       '.html': 'text/html',
+      '.svg': 'image/svg+xml',
+      '.ico': 'image/x-icon',
+      '.png': 'image/png',
     };
     return reply.type(types[extension] || 'text/plain').send(contents);
   } catch {
@@ -640,10 +694,10 @@ app.get('/api/diseases', async (request, reply) => {
   try {
     return { diseases: await fetchDiseaseCatalog() };
   } catch (error) {
-    request.log?.warn?.({ error: error.message }, 'Disease catalog request failed');
+    request.log?.warn?.({ code: error.code, requestId: request.id }, 'Disease catalog request failed');
     return reply.code(503).send({
       error: 'Disease catalog unavailable',
-      detail: error.message,
+      detail: PUBLIC_ERROR,
     });
   }
 });
@@ -709,7 +763,7 @@ app.post('/api/ddi-severity/predict', async (request, reply) => {
     }
     throw new Error(`ML DDI service responded ${response.status}`);
   } catch (error) {
-    request.log?.warn?.({ error: error.message }, 'ML DDI prediction request failed');
+    request.log?.warn?.({ code: error.code, requestId: request.id }, 'ML DDI prediction request failed');
     return reply.code(503).send({
       predictedClass: null,
       inferenceStatus: 'unavailable',
@@ -720,7 +774,7 @@ app.post('/api/ddi-severity/predict', async (request, reply) => {
         artifactSha256: null,
         featureContractSha256: null,
       },
-      error: error.message,
+      error: PUBLIC_ERROR,
     });
   }
 });
@@ -728,6 +782,9 @@ app.post('/api/ddi-severity/predict', async (request, reply) => {
 app.post('/api/candidate-sets/search', async (request, reply) => {
   if (request.body === null || typeof request.body !== 'object' || Array.isArray(request.body)) {
     return reply.code(400).send({ error: 'Request body must be a JSON object' });
+  }
+  if (Object.keys(request.body).some(key => !['diseaseIds', 'candidateSetConfig', 'optimizationConfig'].includes(key))) {
+    return reply.code(400).send({ error: 'Unknown request field' });
   }
 
   const { diseaseIds = [], candidateSetConfig, optimizationConfig } = request.body ?? {};
@@ -748,8 +805,8 @@ app.post('/api/candidate-sets/search', async (request, reply) => {
   try {
     diseaseCatalog = await fetchDiseaseCatalog();
   } catch (error) {
-    request.log?.warn?.({ error: error.message }, 'Disease catalog validation failed');
-    return reply.code(503).send({ error: 'Disease catalog unavailable', detail: error.message });
+    request.log?.warn?.({ code: error.code, requestId: request.id }, 'Disease catalog validation failed');
+    return reply.code(503).send({ error: 'Disease catalog unavailable', detail: PUBLIC_ERROR });
   }
 
   const resolved = resolveDiseasesFromCatalog(normalizedDiseases.diseases, diseaseCatalog);
@@ -761,12 +818,21 @@ app.post('/api/candidate-sets/search', async (request, reply) => {
   }
 
   const resolvedDiseaseIds = resolved.diseases.map((disease) => disease.id);
-  const mlResult = await fetchCandidateSetResult(
-    resolvedDiseaseIds,
-    normalizedCandidateConfig.candidateSetConfig,
-    normalizedOptimization.optimizationConfig,
-    { logger: request.log, resolvedDiseases: resolved.diseases },
-  );
+  let mlResult;
+  try {
+    mlResult = await fetchCandidateSetResult(
+      resolvedDiseaseIds,
+      normalizedCandidateConfig.candidateSetConfig,
+      normalizedOptimization.optimizationConfig,
+      { logger: request.log, resolvedDiseases: resolved.diseases },
+    );
+  } catch (error) {
+    if (error instanceof AnalysisBudgetError) return reply.code(422).send({ error: error.message });
+    if (error instanceof AnalysisBusyError) {
+      return reply.code(503).header('Retry-After', '2').send({ error: error.message });
+    }
+    throw error;
+  }
   const dataStatus = mlResult.metadata.dataStatus;
   const mlStatus = mlResult.metadata.mlStatus;
   const candidateSets = (mlResult.candidateSets ?? []).map((candidateSet, index) => {
@@ -782,6 +848,7 @@ app.post('/api/candidate-sets/search', async (request, reply) => {
     }
     return {
       ...candidateSet,
+      ruleEvaluation: evaluateRuleApplicability(candidateSet.drugs),
       rank: candidateSet.rank ?? index + 1,
       status: violation ? 'rejected' : candidateSet.status,
       rejectionReasons,
@@ -806,7 +873,6 @@ app.post('/api/candidate-sets/search', async (request, reply) => {
       disclaimer: 'Research decision-support only. Candidate-set coverage is graph-derived and is not a clinical efficacy, safety, or prescribing claim.',
     },
   };
-  history.set(result.queryId, result);
   return result;
 });
 
@@ -831,10 +897,10 @@ app.post('/api/combinations/search', async (request, reply) => {
   try {
     diseaseCatalog = await fetchDiseaseCatalog();
   } catch (error) {
-    request.log?.warn?.({ error: error.message }, 'Disease catalog validation failed');
+    request.log?.warn?.({ code: error.code, requestId: request.id }, 'Disease catalog validation failed');
     return reply.code(503).send({
       error: 'Disease catalog unavailable',
-      detail: error.message,
+      detail: PUBLIC_ERROR,
     });
   }
 
@@ -890,67 +956,13 @@ app.post('/api/combinations/search', async (request, reply) => {
     },
   };
 
-  history.set(searchResult.queryId, searchResult);
-
   return searchResult;
 });
 
-app.get('/api/combinations/:id', async (request, reply) => {
-  const result = history.get(request.params.id);
-
-  if (!result) {
-    return reply.code(404).send({ error: 'Combination result not found' });
-  }
-
-  return result;
-});
-
-app.get('/api/combinations/:id/explain', async (request, reply) => {
-  const result = history.get(request.params.id);
-
-  if (!result) {
-    return reply.code(404).send({ error: 'Combination result not found' });
-  }
-
-  return {
-    ...buildExplainabilityResponse(
-      result.queryId,
-      result.diseaseIds ?? result.diseases ?? [],
-      result.candidateSets ?? result.candidates ?? [],
-      'structured',
-    ),
-    legacyRoute: true,
-    compatibilityNote: 'Legacy combinations explain route uses canonical evidence channels where represented data is available and does not synthesize graph relationships.',
-  };
-});
-
-app.get('/api/history', async () => ({
-  history: Array.from(history.values()),
-}));
-
-app.get('/api/candidate-sets/:id/explain', async (request, reply) => {
-  const result = history.get(request.params.id);
-  
-  if (!result) {
-    return reply.code(404).send({ error: 'Candidate set result not found' });
-  }
-  
-  const format = request.query.format ?? 'detailed';
-  const validFormats = ['detailed', 'comparison', 'visualization', 'structured'];
-  
-  if (!validFormats.includes(format)) {
-    return reply.code(400).send({ 
-      error: `Invalid format. Must be one of: ${validFormats.join(', ')}` 
-    });
-  }
-  
-  return buildExplainabilityResponse(
-    result.queryId,
-    result.diseaseIds,
-    result.candidateSets ?? [],
-    format
-  );
-});
+// Explanations are rendered from the active simulation response in the browser.
+for (const route of ['/api/history', '/api/combinations/:id', '/api/combinations/:id/explain', '/api/candidate-sets/:id/explain']) {
+  app.get(route, async (_request, reply) => reply.code(404).send({ error: 'Server history is disabled' }));
+}
 
 const isMainModule = process.argv[1]
   && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);

@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 from itertools import combinations
+from heapq import nsmallest
+from math import comb
 from typing import Any, Optional
 
 from app.services.graph_service import (
@@ -12,13 +14,19 @@ from app.services.graph_service import (
     GraphService,
     Neo4jConnectionError,
 )
-from app.services.safety_filter import check_hard_contraindications
+from app.services.safety_filter import check_hard_contraindications, evaluate_rule_applicability
 
 
 DEFAULT_CANDIDATE_SET_CONFIG = {
     "maxDrugCount": 3,
     "maxCandidateSets": 100,
 }
+
+MAX_COMBINATION_EVALUATIONS = 250000
+
+
+class CandidateBudgetExceeded(ValueError):
+    """Reject excessive search work without silently truncating candidate order."""
 
 
 def build_graph_candidates(
@@ -90,24 +98,24 @@ def generate_candidate_sets(
     target_disease_set = set(target_diseases)
     unique_candidates = _unique_candidates(single_drug_candidates)
     max_size = min(max(1, int(max_drug_count)), len(unique_candidates))
-    generated: list[dict[str, Any]] = []
+    work = sum(comb(len(unique_candidates), size) for size in range(1, max_size + 1))
+    if work > MAX_COMBINATION_EVALUATIONS:
+        raise CandidateBudgetExceeded("Analysis work limit exceeded; select fewer diseases or drugs")
+    def ordering(combo: tuple[dict[str, Any], ...]) -> tuple:
+        drug_ids = [candidate["drugId"] for candidate in combo]
+        covered = set().union(*(set(candidate.get("treatedDiseaseIds", [])) for candidate in combo))
+        return (check_hard_contraindications(drug_ids) is not None,
+                -len(covered & target_disease_set), len(combo),
+                "candidate-set:" + "+".join(drug_ids))
 
-    for size in range(1, max_size + 1):
-        for combo in combinations(unique_candidates, size):
-            generated.append(_candidate_set_from_combo(combo, target_diseases))
-
-    generated.sort(
-        key=lambda candidate: (
-            candidate["status"] == "rejected",
-            -len(set(candidate["treatedDiseaseIds"]) & target_disease_set),
-            candidate["drugCount"],
-            candidate["candidateSetId"],
-        )
-    )
+    # Same sort key over every combination; materialize evidence only for winners.
+    pool = (combo for size in range(1, max_size + 1)
+            for combo in combinations(unique_candidates, size))
+    selected = nsmallest(max_candidate_sets, pool, key=ordering)
 
     return [
-        {**candidate, "rank": index}
-        for index, candidate in enumerate(generated[:max_candidate_sets], start=1)
+        {**_candidate_set_from_combo(combo, target_diseases), "rank": index}
+        for index, combo in enumerate(selected, start=1)
     ]
 
 
@@ -188,9 +196,9 @@ def _candidate_set_from_combo(
         "interactionRisk": None,
         "synergyScore": None,
         "evidenceLevel": "graph",
-        "confidence": coverage,
         "dataStatus": "real_graph",
         "status": "accepted",
+        "ruleEvaluation": evaluate_rule_applicability(drug_ids),
         "evidence": evidence,
         "targets": targets,
         "sideEffects": side_effects,

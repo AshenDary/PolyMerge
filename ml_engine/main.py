@@ -9,15 +9,18 @@ import os
 from contextlib import asynccontextmanager
 from itertools import combinations
 from pathlib import Path
-from typing import Any, Literal, Optional
+from typing import Any, Callable, Literal, Optional
+from threading import BoundedSemaphore
+import anyio
+from starlette.concurrency import run_in_threadpool
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
+from fastapi import Request
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
-from app.services.candidate_generator import build_graph_candidates
+from app.services.candidate_generator import build_graph_candidates, CandidateBudgetExceeded
 from app.services.ddi_feature_builder import PairFeatureBuilder, PairFeatureUnavailableError
 from app.services.candidate_ranker import rank_candidates
 from app.services.knowledge_graph import get_available_diseases, get_drug_metadata
@@ -27,6 +30,7 @@ from app.services.model_serving import (
     ddi_model_service,
 )
 from app.services.set_cover_optimizer import optimize_candidate_sets
+from app.utils.neo4j_client import close_neo4j_client
 
 # Single shared .env lives at the repo root, not inside ml_engine/.
 load_dotenv(Path(__file__).resolve().parent.parent / ".env")
@@ -39,17 +43,46 @@ async def lifespan(_: FastAPI):
         ddi_model_service.load()
     except ModelUnavailableError:
         pass
-    yield
+    try:
+        yield
+    finally:
+        await run_in_threadpool(close_neo4j_client)
 
 
-app = FastAPI(title="PolyMerge ML Engine", version="0.1.0", lifespan=lifespan)
+app = FastAPI(title="PolyMerge ML Engine", version="0.1.0", lifespan=lifespan,
+              docs_url=None, redoc_url=None, openapi_url=None)
+_analysis_slot = BoundedSemaphore(1)
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[os.getenv("CORS_ORIGIN", "*")],
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+
+async def _bounded_analysis(function: Callable[..., Any], *args: Any) -> Any:
+    if not _analysis_slot.acquire(blocking=False):
+        raise HTTPException(status_code=503, detail="Analysis busy; try again shortly.", headers={"Retry-After": "2"})
+
+    def execute() -> Any:
+        try:
+            return function(*args)
+        finally:
+            _analysis_slot.release()
+
+    # Hold admission until work actually ends, including when a client disconnects.
+    with anyio.CancelScope(shield=True):
+        return await run_in_threadpool(execute)
+
+@app.middleware("http")
+async def private_request_guard(request: Request, call_next: Callable[..., Any]) -> Any:
+    # This service is server-to-server only, with no browser CORS surface.
+    if request.headers.get("origin"):
+        return JSONResponse(status_code=403, content={"error": "Browser access is not permitted"})
+    body = bytearray()
+    async for chunk in request.stream():
+        body.extend(chunk)
+        if len(body) > 32768:
+            return JSONResponse(status_code=413, content={"error": "Request body too large"})
+    request._body = bytes(body)
+    try:
+        return await call_next(request)
+    except Exception:
+        return JSONResponse(status_code=503, content={"error": "Analysis is temporarily unavailable. Please try again."})
 
 
 class OptimizationConfig(BaseModel):
@@ -134,7 +167,7 @@ class CandidateSetResult(BaseModel):
     rejectionReasons: list[dict[str, Any]] = Field(default_factory=list)
     evidence: list[dict[str, Any]] = Field(default_factory=list)
     dataStatus: Literal["real_graph"]
-    mlStatus: Literal["applied", "not_applied"]
+    mlStatus: Literal["applied", "partial", "not_applied"]
     mlPrediction: dict[str, Any] = Field(default_factory=dict)
     interactionRisk: None = None
     synergyScore: None = None
@@ -195,6 +228,18 @@ async def model_health():
     )
 
 
+@app.get("/ready")
+async def readiness() -> JSONResponse:
+    try:
+        ddi_model_service.load()
+        catalog = await run_in_threadpool(get_available_diseases)
+        if not catalog:
+            raise RuntimeError("Graph catalog unavailable")
+        return JSONResponse({"status": "ready"})
+    except Exception:
+        return JSONResponse({"status": "unavailable"}, status_code=503)
+
+
 @app.get("/api/diseases")
 async def diseases():
     return {"diseases": get_available_diseases()}
@@ -225,7 +270,7 @@ async def predict_ddi_severity(payload: DDISeverityRequest):
     except ModelUnavailableError as error:
         return JSONResponse(
             status_code=503,
-            content=ddi_model_service.unavailable_response(str(error)),
+            content=ddi_model_service.unavailable_response(),
         )
 
 
@@ -264,11 +309,12 @@ def _candidate_set_response(result: dict[str, Any]) -> dict[str, Any]:
     target_disease_ids = [disease["id"] for disease in resolved_diseases]
 
     candidate_sets = []
+    prediction_context: dict[str, Any] = {"builder": None, "pairs": {}}
     any_applied = False
     for candidate in result.get("candidates", []):
         treated_ids = candidate.get("treatedDiseaseIds", [])
-        candidate_with_prediction = _apply_pair_predictions(candidate)
-        any_applied = any_applied or candidate_with_prediction.get("mlStatus") == "applied"
+        candidate_with_prediction = _apply_pair_predictions(candidate, prediction_context)
+        any_applied = any_applied or candidate_with_prediction.get("mlStatus") in ("applied", "partial")
         candidate_sets.append({
             **candidate_with_prediction,
             "uncoveredDiseaseIds": candidate.get(
@@ -305,7 +351,7 @@ def _candidate_set_response(result: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def _apply_pair_predictions(candidate: dict[str, Any]) -> dict[str, Any]:
+def _apply_pair_predictions(candidate: dict[str, Any], context: Optional[dict[str, Any]] = None) -> dict[str, Any]:
     drugs = sorted(candidate.get("drugs", []))
     if len(drugs) < 2:
         return {
@@ -315,38 +361,51 @@ def _apply_pair_predictions(candidate: dict[str, Any]) -> dict[str, Any]:
                 "status": "not_applied",
                 "pairs": [],
                 "reason": "At least two drugs are required for pair-level DDI inference.",
+                "reasonCode": "not_applicable",
+                "unavailablePairs": [],
             },
         }
 
-    try:
-        builder = PairFeatureBuilder()
-        predicted_pairs = []
-        for drug_a, drug_b in combinations(drugs, 2):
-            features = builder.build_features(drug_a, drug_b)
-            prediction = ddi_model_service.predict(features)
+    # Both successful and unsupported outcomes belong only to this request snapshot.
+    context = context if context is not None else {"builder": None, "pairs": {}}
+    predicted_pairs, unavailable_pairs = [], []
+    failures = context.setdefault("failures", {})
+    for drug_a, drug_b in combinations(drugs, 2):
+        key = (drug_a, drug_b)
+        try:
+            if key in failures:
+                unavailable_pairs.append(failures[key])
+                continue
+            if context["builder"] is None:
+                context["builder"] = PairFeatureBuilder()
+            builder = context["builder"]
+            if key not in context["pairs"]:
+                features = builder.build_features(drug_a, drug_b)
+                context["pairs"][key] = ddi_model_service.predict(features)
+            prediction = context["pairs"][key]
             predicted_pairs.append({
                 "drugPair": [drug_a, drug_b],
                 "predictedSeverity": prediction["predictedClass"],
                 "model": prediction["model"],
                 "inferenceStatus": prediction["inferenceStatus"],
             })
-    except (PairFeatureUnavailableError, FeatureSchemaError, ModelUnavailableError) as error:
-        return {
-            **candidate,
-            "mlStatus": "not_applied",
-            "mlPrediction": {
-                "status": "not_applied",
-                "pairs": [],
-                "reason": str(error),
-            },
-        }
+        except (PairFeatureUnavailableError, FeatureSchemaError, ModelUnavailableError) as error:
+            code = error.code if isinstance(error, PairFeatureUnavailableError) else "feature_validation_failure" if isinstance(error, FeatureSchemaError) else getattr(error, "code", "model_unavailable")
+            reason = str(error) if isinstance(error, PairFeatureUnavailableError) else "Pair prediction is temporarily unavailable."
+            failure = {"drugPair": [drug_a, drug_b], "reasonCode": code, "reason": reason,
+                       "missingDrugIds": getattr(error, "missing_drug_ids", [])}
+            failures[key] = failure
+            unavailable_pairs.append(failure)
 
+    status = "partial" if predicted_pairs and unavailable_pairs else "applied" if predicted_pairs else "not_applied"
     return {
         **candidate,
-        "mlStatus": "applied",
+        "mlStatus": status,
         "mlPrediction": {
-            "status": "applied",
+            "status": status,
             "pairs": predicted_pairs,
+            "unavailablePairs": unavailable_pairs,
+            **({"reason": unavailable_pairs[0]["reason"], "reasonCode": unavailable_pairs[0]["reasonCode"]} if unavailable_pairs else {}),
         },
     }
 
@@ -354,6 +413,13 @@ def _apply_pair_predictions(candidate: dict[str, Any]) -> dict[str, Any]:
 @app.post("/predict/candidate-sets", response_model=CandidateSetResponse)
 async def predict_candidate_sets(payload: CandidateSetRequest) -> CandidateSetResponse:
     """Return graph-derived multi-drug research candidate sets."""
+    try:
+        return await _bounded_analysis(_execute_candidate_sets, payload)
+    except CandidateBudgetExceeded as error:
+        raise HTTPException(status_code=422, detail="Analysis work limit exceeded; select fewer diseases or drugs") from error
+
+
+def _execute_candidate_sets(payload: CandidateSetRequest) -> CandidateSetResponse:
     result = _run_candidate_set_pipeline(
         payload.diseaseIds,
         payload.candidateSetConfig.model_dump(exclude_none=True),
@@ -364,7 +430,7 @@ async def predict_candidate_sets(payload: CandidateSetRequest) -> CandidateSetRe
             status_code=503,
             detail={
                 "error": "Graph service unavailable",
-                "warning": result["metadata"].get("warning"),
+                "warning": "Graph analysis is temporarily unavailable.",
             },
         )
     missing_disease_ids = result["metadata"].get("missingDiseases", [])
@@ -387,7 +453,7 @@ async def predict_combination(payload: CombinationRequest) -> CombinationRespons
     distinguishes real graph evidence from future model fields.
     """
     optimization_config = payload.optimizationConfig.model_dump(exclude_none=True)
-    result = _run_candidate_set_pipeline(
+    result = await _bounded_analysis(_run_candidate_set_pipeline,
         payload.diseases,
         optimization_config,
         optimization_config,

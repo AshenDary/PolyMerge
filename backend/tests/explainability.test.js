@@ -140,7 +140,7 @@ describe('Sprint 5 explainability adapters', () => {
     const comparison = buildCandidateComparison(acceptedDespiteNames);
 
     assert.equal(comparison.status, 'accepted');
-    assert.equal(comparison.deterministicRules[0].message, 'No configured deterministic hard-rule violation detected');
+    assert.equal(comparison.deterministicRules[0].message, 'Rule evaluation needs verified identity/category mappings');
   });
 
   it('presents rejected candidate reasons as deterministic rules', () => {

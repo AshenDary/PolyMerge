@@ -109,13 +109,16 @@ export function createRuleResults(candidateSet) {
   }));
 
   if (rules.length === 0 && candidateSet.status === 'accepted') {
+    const applicability = candidateSet.ruleEvaluation?.status ?? 'not_evaluable';
     rules.push({
       ruleId: 'rule-accepted',
       type: 'accepted',
-      status: 'accepted',
-      message: 'No configured deterministic hard-rule violation detected',
+      status: applicability,
+      message: applicability === 'evaluated' ? 'Configured research rules evaluated; none triggered'
+        : applicability === 'partially_evaluated' ? 'Rule evaluation has partial mapping coverage'
+          : 'Rule evaluation needs verified identity/category mappings',
       affectedDrugs: [],
-      source: 'PolyMerge Safety Rules',
+      source: candidateSet.ruleEvaluation?.source ?? 'PolyMerge research rules; clinical applicability not established',
       stage: 'precomputed',
     });
   }
@@ -125,7 +128,7 @@ export function createRuleResults(candidateSet) {
 
 export function createMLPredictions(candidateSet) {
   const prediction = candidateSet.mlPrediction;
-  if (!prediction || prediction.status !== 'applied') {
+  if (!prediction || !['applied', 'partial'].includes(prediction.status)) {
     return [];
   }
 
@@ -162,10 +165,12 @@ export function buildCandidateComparison(candidateSet) {
     status: candidateSet.status,
     graphEvidence: createGraphEvidence(candidateSet),
     deterministicRules: createRuleResults(candidateSet),
+    ruleEvaluation: candidateSet.ruleEvaluation,
     mlPrediction: {
-      status: candidateSet.mlStatus === 'applied' ? 'applied' : 'not_applied',
+      status: candidateSet.drugs?.length === 1 ? 'not_applicable' : candidateSet.mlStatus,
       pairs: createMLPredictions(candidateSet),
       reason: candidateSet.mlPrediction?.reason,
+      unavailablePairs: candidateSet.mlPrediction?.unavailablePairs ?? [],
     },
     presentation: createPresentationHints(candidateSet),
     dataStatus: candidateSet.dataStatus,

@@ -5,6 +5,23 @@ from app.services.set_cover_optimizer import (
 )
 
 
+def test_candidate_set_optimizer_checks_rules_across_merged_sets():
+    candidates = [
+        {"candidateSetId": "a", "drugs": ["maoi"], "drugCount": 1,
+         "treatedDiseaseIds": ["d1"], "coverage": 0.5, "status": "accepted"},
+        {"candidateSetId": "b", "drugs": ["ssri"], "drugCount": 1,
+         "treatedDiseaseIds": ["d2"], "coverage": 0.5, "status": "accepted"},
+        {"candidateSetId": "c", "drugs": ["other"], "drugCount": 1,
+         "treatedDiseaseIds": ["d2"], "coverage": 0.5, "status": "accepted"},
+    ]
+    result = optimize_candidate_sets(candidates, ["d1", "d2"])
+    assert result["selectedDrugs"] == ["maoi", "other"]
+    assert result["coverage"] == 1.0
+    limited = optimize_candidate_sets(candidates[:2], ["d1", "d2"])
+    assert limited["selectedDrugs"] == ["maoi"]
+    assert limited["uncoveredDiseaseIds"] == ["d2"]
+
+
 def test_optimizer_selects_one_drug_covering_multiple_diseases():
     result = optimize_set_cover(
         ["drug-a", "drug-b"],

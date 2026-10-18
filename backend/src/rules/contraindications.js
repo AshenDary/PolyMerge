@@ -1,17 +1,42 @@
-// Hard-coded safety fallback checks, independent of any model output.
-// These run on every combination result before it reaches a client.
-// Extend this list as new absolute contraindications are identified --
-// do NOT rely on the GNN to learn these; they must never be soft-overridden
-// by a model score.
+import { readFileSync } from 'node:fs';
 
-const ABSOLUTE_CONTRAINDICATION_PAIRS = [
-  ['maoi', 'ssri'],
-  ['warfarin', 'nsaid'],
-  ['ace_inhibitor', 'potassium_sparing_diuretic'],
-];
+const mapping = JSON.parse(readFileSync(new URL('../../../data/rules/research_rule_mapping.json', import.meta.url), 'utf8'));
+const ABSOLUTE_CONTRAINDICATION_PAIRS = mapping.pairs;
+const tokens = new Set(mapping.pairs.flat());
 
 function normalizeDrugSet(drugSet = []) {
-  return (Array.isArray(drugSet) ? drugSet : []).map((drug) => String(drug).trim().toLowerCase());
+  return (Array.isArray(drugSet) ? drugSet : []).map((drug) => {
+    const value = String(drug).trim();
+    return /^(compound::)?DB\d{5}$/i.test(value)
+      ? `Compound::${value.split('::').at(-1).toUpperCase()}` : value.toLowerCase();
+  });
+}
+
+export function resolveRuleIdentity(drug) {
+  const [drugId] = normalizeDrugSet([drug]);
+  return mapping.mappings[drugId] ? { drugId, ...mapping.mappings[drugId] }
+    : { drugId, tokens: tokens.has(drugId) ? [drugId] : [], complete: tokens.has(drugId),
+      source: tokens.has(drugId) ? 'legacy_literal' : null };
+}
+
+export function evaluateRuleApplicability(drugSet) {
+  const identities = drugSet.map(resolveRuleIdentity);
+  for (const identity of identities) {
+    identity.categoryEvidence = Object.fromEntries([...tokens].sort().map(token => [token, identity.tokens.includes(token) ? 'verified_member' : 'unknown']));
+  }
+  const known = new Set(identities.flatMap(identity => identity.tokens));
+  // Closed-world literals exist only for historical fixtures, never canonical compounds.
+  const complete = identities.length > 0 && identities.every(identity => identity.source === 'legacy_literal');
+  const rules = mapping.pairs.map(pair => {
+    const triggered = pair.every(token => known.has(token));
+    return { pair, status: triggered || complete ? 'evaluated'
+      : pair.some(token => known.has(token)) ? 'partially_evaluated' : 'not_evaluable', triggered };
+  });
+  return { status: rules.every(rule => rule.status === 'evaluated') ? 'evaluated'
+    : rules.some(rule => rule.status !== 'not_evaluable') ? 'partially_evaluated' : 'not_evaluable',
+  mappingVersion: mapping.version, scope: mapping.scope, clinicallyValidated: false,
+  source: mapping.ruleSource, rules, identities,
+  unmappedDrugIds: identities.filter(identity => !identity.tokens.length).map(identity => identity.drugId) };
 }
 
 /**
@@ -19,14 +44,14 @@ function normalizeDrugSet(drugSet = []) {
  * @returns {{ type: string, pair: string[], message: string } | null}
  */
 export function checkHardContraindications(drugSet) {
-  const normalized = normalizeDrugSet(drugSet);
+  const normalized = (drugSet ?? []).flatMap(drug => resolveRuleIdentity(drug).tokens);
 
   for (const [a, b] of ABSOLUTE_CONTRAINDICATION_PAIRS) {
     if (normalized.includes(a) && normalized.includes(b)) {
       return {
         type: 'hard_contraindication',
         pair: [a, b],
-        message: `Absolute contraindication: ${a} + ${b}`,
+        message: `Configured research exclusion: ${a} + ${b}`,
       };
     }
   }
