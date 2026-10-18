@@ -3,6 +3,7 @@ import argparse
 import importlib.util
 from pathlib import Path
 import socket
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -96,6 +97,20 @@ class LocalDemoTests(unittest.TestCase):
         for action in ('Start', 'Stop', 'Setup'):
             self.assertIn('cd /d "%~dp0"', (demo.ROOT / (action + '-PolyMerge.bat')).read_text())
             self.assertIn('cd "$(dirname "$0")"', (demo.ROOT / (action + '-PolyMerge.command')).read_text())
+
+    @unittest.skipUnless(sys.platform == 'win32', 'Native CMD execution requires Windows')
+    def test_windows_batch_entrypoints_from_path_with_spaces(self) -> None:
+        with tempfile.TemporaryDirectory(prefix='PolyMerge checkout with spaces ') as folder:
+            root = Path(folder)
+            (root / 'scripts').mkdir()
+            shutil.copyfile(demo.ROOT / 'scripts/local_demo.py', root / 'scripts/local_demo.py')
+            for action in ('Start', 'Stop', 'Setup'):
+                wrapper = root / (action + '-PolyMerge.bat')
+                shutil.copyfile(demo.ROOT / wrapper.name, wrapper)
+                result = subprocess.run(['cmd.exe', '/d', '/c', str(wrapper), '--help'],
+                                        input='', capture_output=True, text=True, timeout=20)
+                self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+                self.assertIn('--ml-port', result.stdout)
 
 
 if __name__ == '__main__':
