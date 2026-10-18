@@ -64,7 +64,7 @@ types are tested. No dashboard redesign was performed.
 | First-time isolated setup | PASS, both locked environments and npm installed |
 | Backend regression | 128 passed |
 | ML regression with private artifact | 133 passed; two dependency deprecation warnings |
-| Script regression before native-only batch test | 26 passed |
+| Script regression on macOS | 27 passed, 1 native-Windows-only skip |
 | Sprint 4 feature contract | PASS, 55 features; no cross-split pair leakage |
 | Release metadata | PASS |
 | JavaScript syntax and whitespace | PASS |
@@ -72,6 +72,8 @@ types are tested. No dashboard redesign was performed.
 | Five real scenarios | Exact candidate and optimization equality |
 | macOS terminal Start/Stop wrappers | PASS, all three readiness endpoints, clean shutdown |
 | Real checkout path containing spaces | PASS using explicit isolated interpreters/model |
+| Duplicate launch and managed-service failure | PASS, lock rejects duplicate; remaining services stop |
+| Existing Docker Neo4j integration | PASS, existing healthy container retained unchanged |
 | Streamlit AppTest | PASS, no script exceptions and correct iframe source |
 | Browser automation | Unavailable: connected browser list empty |
 | Finder double-click/default browser | Not verified |
@@ -79,10 +81,17 @@ types are tested. No dashboard redesign was performed.
 
 The native-only batch test is skipped on macOS; hosted Windows CI executes it.
 The earlier hosted run at application commit `f7e0ced` passed native Windows
-process-containment/path unit checks and Linux regression. Package-install and
-container jobs were still running when this audit was drafted; consult the PR
-checks and final review comment for the final CI outcome. Do not infer a complete
-Windows demo from unit/package checks.
+process-containment/path unit checks, both hash-locked Windows installs and pip
+integrity checks, and Linux regression. The later batch-entry test and final
+shutdown refinement run on subsequent commits; consult the PR checks and final
+review comment for their CI outcomes. Do not infer a complete Windows demo from
+unit/package checks. Superseded container jobs may be cancelled by newer pushes.
+
+Shutdown also covers a POSIX descendant whose service parent has already exited;
+a native macOS regression verifies the descendant is gone. macOS can report
+EPERM for a disappeared group, so cleanup tolerates that terminal state rather
+than escalating privileges. Launcher failures are recorded without raw dependency
+errors or credentials.
 
 The path-with-spaces test used a real repository copy under a private temporary
 directory, shared installed dependencies and the original model. It exposed an
@@ -132,9 +141,9 @@ tests, team and review status. Component guides are concise and link to the shar
 setup rather than duplicating instructions. Current API scope distinguishes
 disabled legacy routes. Graph/algorithm docs no longer deny existing pair inference.
 
-[Documentation inventory](../README.md) classifies every Markdown file.
+[Documentation inventory](../README.md) classifies all 80 Markdown files.
 Historical sprint plans, audits and deployment studies retain their dated
-findings. Relative file links are checked; external URLs and all historical
+findings. All 178 relative file links passed; external URLs and all historical
 heading anchors are not claimed as verified. Architecture and final demo guides
 include actual fallback/recovery steps and a fixture-supported multi-drug example.
 

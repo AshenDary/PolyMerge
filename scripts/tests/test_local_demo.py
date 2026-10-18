@@ -7,6 +7,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import time
 import unittest
 from unittest.mock import patch
 
@@ -68,6 +69,33 @@ class LocalDemoTests(unittest.TestCase):
         job.assign(child)
         demo.stop_children([child], job)
         self.assertIsNotNone(child.poll())
+
+    @unittest.skipIf(sys.platform == 'win32', 'POSIX process groups only')
+    def test_shutdown_contains_descendant_after_parent_exits(self) -> None:
+        descendant = 'import os,time; print(os.getpid(), flush=True); time.sleep(60)'
+        parent = subprocess.Popen([sys.executable, '-c',
+                                   f'import subprocess,sys; subprocess.Popen([sys.executable, "-c", {descendant!r}])'],
+                                  start_new_session=True, stdout=subprocess.PIPE, text=True)
+        group = parent.pid
+        try:
+            descendant_pid = int(parent.stdout.readline().strip())
+            parent.wait(timeout=5)
+            demo.stop_children([parent], demo.WindowsJob())
+            for _ in range(50):
+                try:
+                    demo.os.kill(descendant_pid, 0)
+                except ProcessLookupError:
+                    break
+                time.sleep(0.1)
+            else:
+                self.fail('Managed descendant process group survived shutdown')
+        finally:
+            try:
+                demo.os.killpg(group, demo.signal.SIGKILL)
+            except (ProcessLookupError, PermissionError):
+                pass
+            parent.wait()
+            parent.stdout.close()
 
     def test_preflight_failure_cleans_lock_without_starting_children(self) -> None:
         with tempfile.TemporaryDirectory() as folder, patch.object(demo, 'RUNTIME', Path(folder)):

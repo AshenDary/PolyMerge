@@ -183,7 +183,7 @@ class WindowsJob:
 
 def stop_children(children: list[subprocess.Popen], job: WindowsJob) -> None:
     for process in reversed(children):
-        if process.poll() is not None:
+        if os.name == 'nt' and process.poll() is not None:
             continue
         try:
             if os.name == 'nt':
@@ -202,6 +202,14 @@ def stop_children(children: list[subprocess.Popen], job: WindowsJob) -> None:
                     os.killpg(process.pid, signal.SIGKILL)
                 except ProcessLookupError:
                     pass
+    if os.name != 'nt':
+        # A service parent may have exited while descendants still own its group.
+        for process in children:
+            try:
+                os.killpg(process.pid, signal.SIGKILL)
+            except (ProcessLookupError, PermissionError):
+                # macOS may report EPERM for a group that has already disappeared.
+                pass
     job.close()
     for process in children:
         if process.poll() is None:
@@ -322,6 +330,12 @@ def launch(args: argparse.Namespace) -> None:
         while not stopped.wait(0.5):
             if any(process.poll() is not None for process in children):
                 raise DemoError('A managed service exited; stopping the remaining services. Inspect local logs.')
+    except (DemoError, OSError, ValueError, subprocess.SubprocessError) as error:
+        log = RUNTIME / 'logs/launcher.log'
+        if log.parent.is_dir():
+            with log.open('a') as stream:
+                stream.write('FAIL: ' + (str(error) if isinstance(error, DemoError) else 'Service operation failed.') + '\n')
+        raise
     finally:
         if job:
             stop_children(children, job)
