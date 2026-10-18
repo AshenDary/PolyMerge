@@ -1,89 +1,66 @@
-# Main Branch Release Readiness
+# Main Branch Release Record
 
-Review date: 2026-10-18. This checklist is for the local academic demonstration.
-The official demo baseline is the **post-merge main SHA**, which does not exist
-yet. Use [Local Setup](LOCAL_SETUP.md) and [Final Demo Guide](FINAL_DEMO_GUIDE.md)
-for operation. The [dated implementation audit](audits/local-demo-finalization.md)
-contains the complete changed-file inventory and earlier verification.
+Verified 2026-10-19 for the **local academic demonstration**. The application
+baseline is the main merge commit below. A later documentation-only commit does
+not replace the frozen model, graph or application baseline. No public deployment
+or clinical readiness is claimed.
 
-## Current Branch Chain
+## Integration Record
 
-| Item | Current state |
+| Item | Confirmed state |
 | --- | --- |
-| PR #58: security/local demo into integration | Open; review-start head `caebc375498e5e08b23361db7bdbd98fa09ba766`; mergeable; no reviews |
-| PR #57: integration into main | Open; head `d0a8df3b50d460ef5fd7cb59851338172e9c15ee`; mergeable; no reviews |
-| Main | `2edcc39bfe83296b00020e9d7894aa3d95889754`; finalization absent |
-| Worktree | Clean at review start; final state requires a post-commit check |
+| Original main | `2edcc39bfe83296b00020e9d7894aa3d95889754` |
+| Pre-merge backup | [`backup/pre-polymerge-final-demo`](https://github.com/AshenDary/PolyMerge/tree/backup/pre-polymerge-final-demo), same original-main SHA |
+| [PR #58](https://github.com/AshenDary/PolyMerge/pull/58) | Merged into integration as `3fa24b814994ed5234f857dfa1b9bbbb67293b7d` |
+| [PR #57](https://github.com/AshenDary/PolyMerge/pull/57) | Merged into main as `7fb6c0accad92790e63d5203aa8b73bb05bb1ec2` |
+| Final-demo backup | [`backup/polymerge-final-local-demo`](https://github.com/AshenDary/PolyMerge/tree/backup/polymerge-final-local-demo), same final-main SHA |
+| Release tag | None; no existing repository tag convention |
 
-PR #57 does not include PR #58's commits yet. Git history shows integration
-contains the validated frontend and research work; PR #58 descends from it and
-adds the local tooling, documentation, favicon and security changes. There is no
-merge conflict reported for either PR. No merge has been performed.
+Both merges used GitHub's normal merge-commit path with expected PR head SHAs;
+no administrator bypass or force-push was used. Main's file tree matched the
+reviewed integration tree. The two backup branches preserve distinct recovery
+points. The [pre-merge finalization audit](audits/local-demo-finalization.md)
+retains its original dates and branch-state evidence rather than being rewritten.
 
-## Release Criteria
+## Final-Main Verification
 
-| Criterion | Evidence or remaining action |
+| Criterion | Recorded result |
 | --- | --- |
-| Four-step simulation, views, pagination, takeaway, reset | Implemented; backend/frontend regression passed; browser visual acceptance pending |
-| Fastify, FastAPI, Streamlit and Neo4j | Live loopback services reached readiness; actual two-disease analysis returned 100 graph-backed candidates |
-| Frozen model and 55 features | SHA-256 `2b9ed9ca9a57a3eed256eb28d369df89403666a1c5ea1231c47ebe1e053ccc6d`; 313-row parity passed again on the review branch |
-| Five scenario parity | Exact full candidate/optimizer equality: 100/100/100/100/0; matching Research Takeaway for sampled candidates |
-| macOS launch and shutdown | Terminal wrappers and cleanup passed; Finder/browser opening pending |
-| Windows launch and shutdown | Native CI batch/path/process tests and both locked environments passed; real graph/model full stack pending |
-| Favicon and static assets | SVG/ICO/PNG bytes and MIME types verified; visible browser favicon pending |
-| Documentation | Root/component guides, architecture, setup and demo guide present; 81 Markdown files and 185 local links checked, zero broken |
-| Repository hygiene | No tracked secret/model binary; verify clean tree after final commit |
-| Regression | Backend 128, local ML 133, scripts 27 plus one Windows-only skip; hosted regression and Windows jobs passed at `caebc37` |
-| Security | sklearn 1.4.0 advisory and container HIGH findings remain; scanner gates continue to fail |
-| Main integration | Approval of #58 and #57, merges and post-merge validation pending |
+| Guided simulation, views, pagination, Research Takeaway and reset | Implemented; backend/frontend regression passed; browser visual acceptance remains pending |
+| Local stack | Fastify, FastAPI, Streamlit and the reviewed local Neo4j graph passed launcher and readiness checks |
+| Graph identity | Full source fragment verified, not counts alone: 3,415 nodes and 16,230 edges |
+| Frozen Random Forest | SHA-256 `2b9ed9ca9a57a3eed256eb28d369df89403666a1c5ea1231c47ebe1e053ccc6d`; 55 features; 313 prediction/probability rows matched the preserved baseline |
+| Five real scenarios | Exact candidates and optimizer state matched preserved fixtures: 100/100/100/100/0 |
+| Local regression | Backend 128 passed; ML 133 passed; scripts 27 passed, one Windows-only skip |
+| GitHub CI | [PR #57 run](https://github.com/AshenDary/PolyMerge/actions/runs/39146677722): regression and native Windows launcher jobs passed; security and three container scanner jobs failed |
+| Favicon/static assets | HTTP/MIME checks passed; browser-visible favicon acceptance pending |
+| Documentation | At merge, 81 Markdown files and 185 local links checked with zero broken targets; see the later [documentation audit](audits/final-documentation-audit.md) for the current count |
+| Shutdown | Launcher-owned app processes stopped; shared Neo4j left running |
 
-## GitHub Policy and Security
+These are dated results, not a guarantee about a future machine or changed
+dependency environment. Run [Local Setup](LOCAL_SETUP.md), the read-only
+`scripts/check_demo_readiness.py` check and the
+[Final Demo Guide](FINAL_DEMO_GUIDE.md) before presenting. Research Takeaway
+derives from the returned candidate data; it is not a separate model or a
+clinical conclusion. The held-out evaluation was not rerun.
 
-The last CI run for PR #58 passed regression and native Windows launcher jobs.
-The dependency audit failed on `PYSEC-2024-110` in both frozen ML locks. All
-three container builds and runtime checks passed, while Trivy and Grype HIGH
-policies failed. [CI evidence](https://github.com/AshenDary/PolyMerge/actions/runs/39115286727)
-and historical package analysis remain visible; no finding has been suppressed.
+## Remaining Gates and Limits
 
-GitHub reports both PRs as mergeable with an `UNSTABLE` check state. The classic
-main protection endpoint returned no rule; the active named main ruleset reports
-PR review and non-fast-forward rules but no required status-check rule in the
-API response. Its ref include list is empty, so actual enforcement needs owner
-confirmation. A failed CI job must still be presented to reviewers honestly;
-API output alone does not establish whether GitHub will block the merge.
+The frozen scikit-learn 1.4.0 dependency retains advisory
+`PYSEC-2024-110`. Trivy and Grype HIGH-severity container findings remain;
+the scanners continue to fail visibly. Local functional success is **not**
+cloud/production security clearance. See the
+[security audit](audits/sprint6-final-release-gate-assessment.md) and
+[container review](audits/sprint6-final-container-security-review.md) for the
+dated findings; neither report is superseded by this local release record.
 
-For a strictly local academic baseline, an owner may review a narrow release
-decision that keeps all security jobs running and visible, records the frozen
-runtime/container findings, prohibits public exposure, and accepts only the
-verified local demo scope. This document proposes no CI change or automatic
-exception. Security fixes or a documented owner decision remain review items.
+Native Windows launcher CI covered batch paths, process containment and locked
+environments, not a full graph/model demo on Windows. Terminal macOS launch and
+shutdown passed; Finder double-click, browser/iframe layout, keyboard/mobile
+behavior and visible favicon still require manual acceptance. Follow the
+[UI checklist](sprint6-guided-demo.md); do not represent HTTP/unit checks as
+visual acceptance.
 
-## Exact Integration Order
-
-1. Complete browser/iframe and real Windows acceptance, or record their explicit
-   limits in the review. Inspect the latest CI and scientific parity evidence.
-2. Review PR #58's full diff, findings and conversations; obtain explicit
-   approval, then merge it into `integration/pre-deployment-main-sync`.
-3. Confirm PR #57 now includes all PR #58 commits/files. Rerun PR #57 CI and
-   review its complete diff against main, including any conflict resolution.
-4. Obtain explicit approval for PR #57, then merge it into main. Do not push
-   directly to main or bypass GitHub rules.
-5. Fetch main, record the PR merge SHAs and exact new main SHA. On that commit,
-   rerun regression, readiness, original model parity and the five scenarios.
-   Verify no secrets, runtime logs, model binaries or temporary artifacts are
-   tracked. Record the official presentation SHA only after those checks pass.
-
-## Presentation Baseline Record
-
-| Field | Value after approved integration |
-| --- | --- |
-| PR #58 merge SHA | Pending |
-| PR #57 merge SHA | Pending |
-| Official main SHA | Pending |
-| Main regression and readiness | Pending |
-| Browser/iframe acceptance | Pending |
-| Windows full-stack acceptance | Pending |
-
-The review candidate is the latest pushed head of PR #58. It is not a main
-release SHA. Record its exact commit in the final handoff after the documentation
-commit and hosted CI complete.
+The approved scope is **loopback-only local academic demonstration** with the
+original trusted model and reviewed graph. Do not expose this stack publicly,
+interpret its candidates as prescriptions or claim paid/cloud deployment.

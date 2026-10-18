@@ -102,5 +102,5 @@ native Windows or browser acceptance is complete.
 - Rehearse the two-disease scenario and verify the selected pair is supported.
 - End with research limitations, reset the simulation, and stop the app services.
 
-The [main release checklist](RELEASE_READINESS.md) tracks approval and remaining
-platform checks before using a main-branch SHA as the official demo baseline.
+The [main release record](RELEASE_READINESS.md) identifies the verified
+main-branch application SHA and remaining platform acceptance limits.

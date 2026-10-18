@@ -1,27 +1,32 @@
 # Documentation Index and Audit
 
-Inventory dated 2026-10-18. Every tracked Markdown file and finalization addition
-is classified below. Historical records retain their original dates, test totals,
-branch states and findings; those statements are not current readiness claims.
+Inventory refreshed 2026-10-19. Every tracked Markdown file is classified below.
+Historical records retain their original dates, test totals, branch states and
+findings; those statements are not current readiness claims. The verified local
+demo application baseline is main commit
+`7fb6c0accad92790e63d5203aa8b73bb05bb1ec2`.
 
 ## Current Entry Points
 
 Start with [root README](../README.md), [Local Setup](LOCAL_SETUP.md),
 [architecture](ARCHITECTURE.md), [Final Demo Guide](FINAL_DEMO_GUIDE.md),
 [project status](project-status.md), [main release checklist](RELEASE_READINESS.md)
-and [finalization audit](audits/local-demo-finalization.md).
+and [documentation audit](audits/final-documentation-audit.md).
+The [pre-merge finalization audit](audits/local-demo-finalization.md) remains
+dated historical evidence.
 The [manual UI checklist](sprint6-guided-demo.md) distinguishes browser acceptance
 from HTTP/unit checks. Public deployment instructions are superseded for this
 presentation by local setup, but their research findings are preserved.
 
 ## Review Scope
 
-Active documentation was checked for runtime commands, architecture, API scope,
-Analyze navigation, rule counts, model availability, research boundaries and
-relative file links. Historical sprint TODOs and proposed work remain historical,
-not promised current capabilities. Scientific result reports are preserved inputs
-for Model Analysis and were not rewritten. Link checks cover local file targets;
-external URLs and every historical heading anchor are not automatically validated.
+Active documentation was checked against runtime commands, API routes, research
+boundaries and the final main integration. Historical sprint TODOs and proposed
+work remain historical, not promised current capabilities. Scientific result
+reports were not rewritten. Cloud deployment was investigated but not selected
+for the academic demonstration; unresolved security findings remain visible.
+Link checks cover local targets and documented anchors, not the availability of
+external sites.
 
 ## Complete Markdown Inventory
 
@@ -68,7 +73,8 @@ external URLs and every historical heading anchor are not automatically validate
 | [docs/RELEASE_READINESS.md](RELEASE_READINESS.md) | Current documentation |
 | [docs/algorithm-limitations.md](algorithm-limitations.md) | Research documentation |
 | [docs/api.md](api.md) | Current documentation |
-| [docs/audits/local-demo-finalization.md](audits/local-demo-finalization.md) | Current documentation |
+| [docs/audits/local-demo-finalization.md](audits/local-demo-finalization.md) | Historical development record |
+| [docs/audits/final-documentation-audit.md](audits/final-documentation-audit.md) | Current documentation |
 | [docs/audits/sprint6-academic-demo-assessment.md](audits/sprint6-academic-demo-assessment.md) | Deployment feasibility/audit evidence |
 | [docs/audits/sprint6-availability-remediation.md](audits/sprint6-availability-remediation.md) | Historical development record |
 | [docs/audits/sprint6-cloud-release-verification.md](audits/sprint6-cloud-release-verification.md) | Deployment feasibility/audit evidence |

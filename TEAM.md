@@ -8,10 +8,11 @@
 
 Sprint 5 records include Jared's Issue #40 / PR #44 (frozen model evaluation)
 and Issue #41 / PR #45 (graph provenance), Ranee's Issue #42 (serving),
-and Pamela's Issue #43 (explainability). These contributions are retained in
-the review branch chain; they should not be confused with main merge status.
+and Pamela's Issue #43 (explainability). These historical contributions are
+included in the final main integration; issue/PR status in sprint records is
+dated evidence, not the current release status.
 
-The current work is Sprint 6 local academic-demo finalization. See
+The current release is the Sprint 6 local academic demo. See
 [project status](docs/project-status.md), [contributor handoffs](docs/contributor-handoffs.md)
 and the dated records under `Sprints/` for historical ownership and evidence.
 Cloud deployment is no longer the presentation plan.
