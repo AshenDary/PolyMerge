@@ -660,12 +660,15 @@ app.get('/frontend/:file', async (request, reply) => {
   const filePath = path.join(__dirname, '../../frontend', safeFile);
 
   try {
-    const contents = await fs.readFile(filePath, 'utf8');
+    const contents = await fs.readFile(filePath);
     const extension = path.extname(safeFile);
     const types = {
       '.css': 'text/css',
       '.js': 'text/javascript',
       '.html': 'text/html',
+      '.svg': 'image/svg+xml',
+      '.ico': 'image/x-icon',
+      '.png': 'image/png',
     };
     return reply.type(types[extension] || 'text/plain').send(contents);
   } catch {

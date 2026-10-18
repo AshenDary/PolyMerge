@@ -8,6 +8,7 @@ RUN pip install --no-cache-dir --require-hashes -r requirements-streamlit.lock &
 RUN pip uninstall -y setuptools wheel pip
 RUN find / -xdev -type f -perm /6000 -exec chmod a-s {} +
 COPY streamlit_app.py ./
+COPY frontend/apple-touch-icon.png ./frontend/apple-touch-icon.png
 COPY .streamlit ./.streamlit
 USER app
 EXPOSE 8501

@@ -65,3 +65,12 @@ test('tracked Sprint 3 EDA figures are served for Model Analysis', async () => {
   assert.equal(response.headers['content-type'], 'image/svg+xml');
   assert.match(response.body, /<svg/);
 });
+
+test('favicon assets retain their bytes and image MIME types', async () => {
+  for (const [name, type] of [['favicon.svg', 'image/svg+xml'], ['favicon.ico', 'image/x-icon'], ['apple-touch-icon.png', 'image/png']]) {
+    const response = await app.inject(`/frontend/${name}`);
+    assert.equal(response.statusCode, 200);
+    assert.equal(response.headers['content-type'], type);
+    assert.deepEqual(response.rawPayload, readFileSync(new URL(`../../frontend/${name}`, import.meta.url)));
+  }
+});
