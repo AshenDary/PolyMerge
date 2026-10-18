@@ -1,8 +1,8 @@
 # Guided Simulation Manual Acceptance
 
-Local frontend: http://127.0.0.1:3002
-Local wrapper: http://127.0.0.1:8503
-Local ML health: http://127.0.0.1:8000/health
+Use the actual URLs printed by Start-PolyMerge. Defaults are frontend
+http://127.0.0.1:3000, wrapper http://127.0.0.1:8501 and ML readiness
+http://127.0.0.1:8000/ready. See [Local Setup](LOCAL_SETUP.md).
 
 Browser acceptance is PENDING: the browser tool reported no available browser.
 Static DOM tests and HTTP checks do not verify visual layout or iframe behavior.

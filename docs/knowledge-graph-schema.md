@@ -118,7 +118,8 @@ LIMIT $limit
 - Graph relationships become optional tabular features after explicit drug
   mapping. `CrC` remains resemblance context only.
 - Coverage means knowledge-graph treatment coverage for the selected disease set.
-- Predictive ML and clinical validation are not applied in this phase.
+- Graph coverage is not predictive ML or clinical validation. The separate
+  frozen Random Forest classifies supported drug-pair severity.
 - Side effects and gene relationships are returned as evidence/provenance context, not as safety predictions.
 
 ## Traceable Evidence Paths
@@ -170,7 +171,7 @@ clinical efficacy, prescribing suitability, or validated safety.
 
 Hard safety filtering happens before optimization. Candidate sets marked as
 rejected are excluded from optimizer selection. The current optimizer remains a
-greedy set-cover baseline; traditional supervised model inference is not applied.
+greedy set-cover baseline; separate drug-pair inference does not drive its objective.
 
 ## Role In Traditional ML
 

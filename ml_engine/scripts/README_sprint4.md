@@ -1,5 +1,9 @@
 # Sprint 4 Model Comparison
 
+Historical research procedure, not local-demo setup. The selected model and
+results are already frozen; do not rerun training for presentation readiness.
+See [current ML guide](../README.md).
+
 Sprint 4 has one canonical training-only comparison command, run from the
 repository root:
 
