@@ -1,5 +1,13 @@
 # Streamlit, Render and AuraDB Deployment
 
+**Current strict-$0 request supersedes this document's paid proposals.** Use the
+[free-tier runbook](FREE_TIER_ACADEMIC_DEMO.md); do not provision the paid Render
+blueprint, Aura Professional or metered storage under the zero-cost task.
+
+Temporary academic demonstration: see the separate [risk approval checkpoint](../audits/sprint6-academic-demo-assessment.md)
+and [operations guide](ACADEMIC_DEMO.md). Academic scope does not automatically
+waive security findings, authorize merges or approve external transfers.
+
 Latest release gate: [assessment](../audits/sprint6-final-release-gate-assessment.md).
 The private ML template requires `POLYMERGE_REQUIRE_NEO4J_TLS=true` and a
 certificate-verified `neo4j+s` URI without embedded credentials. The shared

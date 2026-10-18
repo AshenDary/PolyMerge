@@ -1,0 +1,191 @@
+{
+  "date": "2026-10-18",
+  "sourceSha": "cda2835863f1e1774bfb4b142f29a9cc2ab6e215",
+  "architecture": "linux/arm64",
+  "notes": [
+    "Local CPU quotas are not a provider benchmark",
+    "Real local Neo4j, no Aura import",
+    "Model mounted read-only, swap disabled",
+    "No provider image pull or artifact transfer included"
+  ],
+  "runs": [
+    {
+      "name": "polymerge-free-512-probe",
+      "state": {
+        "status": "exited",
+        "exitCode": 137,
+        "oomKilled": true,
+        "startedAt": "2026-10-18T04:41:14.894713636Z",
+        "finishedAt": "2026-10-18T04:42:07.947152466Z"
+      },
+      "stages": [
+        {
+          "stage": "python_started",
+          "elapsed_s": 0,
+          "rss_peak_kib": 14024,
+          "memory.current": "9363456",
+          "memory.peak": "9588736",
+          "memory.max": "536870912",
+          "cpu.stat": "usage_usec 70837\nuser_usec 48519\nsystem_usec 22318\nnice_usec 0\nnr_periods 6\nnr_throttled 5\nthrottled_usec 427870\nnr_bursts 0\nburst_usec 0"
+        },
+        {
+          "stage": "imports_complete",
+          "elapsed_s": 37.601,
+          "rss_peak_kib": 198352,
+          "memory.current": "147554304",
+          "memory.peak": "150413312",
+          "memory.max": "536870912",
+          "cpu.stat": "usage_usec 3832634\nuser_usec 2970754\nsystem_usec 861879\nnice_usec 0\nnr_periods 382\nnr_throttled 381\nthrottled_usec 57251716\nnr_bursts 0\nburst_usec 0"
+        }
+      ]
+    },
+    {
+      "name": "polymerge-free-512-clean",
+      "state": {
+        "status": "exited",
+        "exitCode": 137,
+        "oomKilled": true,
+        "startedAt": "2026-10-18T04:42:27.907850211Z",
+        "finishedAt": "2026-10-18T04:43:06.838007091Z"
+      },
+      "stages": [
+        {
+          "stage": "python_started",
+          "elapsed_s": 0,
+          "rss_peak_kib": 13300,
+          "memory.current": "9592832",
+          "memory.peak": "9592832",
+          "memory.max": "536870912",
+          "cpu.stat": "usage_usec 94088\nuser_usec 69543\nsystem_usec 24544\nnice_usec 0\nnr_periods 9\nnr_throttled 9\nthrottled_usec 789874\nnr_bursts 0\nburst_usec 0"
+        },
+        {
+          "stage": "imports_complete",
+          "elapsed_s": 28.502,
+          "rss_peak_kib": 198396,
+          "memory.current": "147402752",
+          "memory.peak": "147402752",
+          "memory.max": "536870912",
+          "cpu.stat": "usage_usec 2948248\nuser_usec 2415700\nsystem_usec 532547\nnice_usec 0\nnr_periods 294\nnr_throttled 294\nthrottled_usec 28380777\nnr_bursts 0\nburst_usec 0"
+        }
+      ]
+    },
+    {
+      "name": "polymerge-free-2g-probe",
+      "state": {
+        "status": "exited",
+        "exitCode": 0,
+        "oomKilled": false,
+        "startedAt": "2026-10-18T04:41:26.337110377Z",
+        "finishedAt": "2026-10-18T04:41:35.948814299Z"
+      },
+      "stages": [
+        {
+          "stage": "python_started",
+          "elapsed_s": 0,
+          "rss_peak_kib": 14048,
+          "memory.current": "9555968",
+          "memory.peak": "9781248",
+          "memory.max": "2147483648",
+          "cpu.stat": "usage_usec 63546\nuser_usec 47659\nsystem_usec 15886\nnice_usec 0\nnr_periods 1\nnr_throttled 0\nthrottled_usec 0\nnr_bursts 0\nburst_usec 0"
+        },
+        {
+          "stage": "imports_complete",
+          "elapsed_s": 1.14,
+          "rss_peak_kib": 198724,
+          "memory.current": "147365888",
+          "memory.peak": "147365888",
+          "memory.max": "2147483648",
+          "cpu.stat": "usage_usec 1200164\nuser_usec 989765\nsystem_usec 210399\nnice_usec 0\nnr_periods 13\nnr_throttled 9\nthrottled_usec 2635835\nnr_bursts 0\nburst_usec 0"
+        },
+        {
+          "stage": "model_loaded",
+          "elapsed_s": 4.19,
+          "rss_peak_kib": 689860,
+          "memory.current": "903950336",
+          "memory.peak": "903950336",
+          "memory.max": "2147483648",
+          "cpu.stat": "usage_usec 3006244\nuser_usec 1157721\nsystem_usec 1848522\nnice_usec 0\nnr_periods 43\nnr_throttled 9\nthrottled_usec 2635835\nnr_bursts 0\nburst_usec 0"
+        },
+        {
+          "stage": "hypertension",
+          "elapsed_s": 5.788,
+          "rss_peak_kib": 749532,
+          "memory.current": "937603072",
+          "memory.peak": "940527616",
+          "memory.max": "2147483648",
+          "cpu.stat": "usage_usec 4436174\nuser_usec 2344662\nsystem_usec 2091511\nnice_usec 0\nnr_periods 59\nnr_throttled 16\nthrottled_usec 2879743\nnr_bursts 0\nburst_usec 0",
+          "latency_s": 1.446,
+          "candidates": 100
+        },
+        {
+          "stage": "hypertension_diabetes",
+          "elapsed_s": 7.045,
+          "rss_peak_kib": 767412,
+          "memory.current": "958271488",
+          "memory.peak": "958271488",
+          "memory.max": "2147483648",
+          "cpu.stat": "usage_usec 5589661\nuser_usec 3385967\nsystem_usec 2203693\nnice_usec 0\nnr_periods 72\nnr_throttled 19\nthrottled_usec 2880946\nnr_bursts 0\nburst_usec 0",
+          "latency_s": 1.18,
+          "candidates": 100
+        },
+        {
+          "stage": "coronary_atherosclerosis",
+          "elapsed_s": 7.878,
+          "rss_peak_kib": 776700,
+          "memory.current": "963043328",
+          "memory.peak": "970104832",
+          "memory.max": "2147483648",
+          "cpu.stat": "usage_usec 6379699\nuser_usec 4117751\nsystem_usec 2261948\nnice_usec 0\nnr_periods 80\nnr_throttled 21\nthrottled_usec 2884058\nnr_bursts 0\nburst_usec 0",
+          "latency_s": 0.796,
+          "candidates": 100
+        },
+        {
+          "stage": "four_diseases",
+          "elapsed_s": 9.305,
+          "rss_peak_kib": 793032,
+          "memory.current": "986730496",
+          "memory.peak": "990486528",
+          "memory.max": "2147483648",
+          "cpu.stat": "usage_usec 7727521\nuser_usec 5399313\nsystem_usec 2328208\nnice_usec 0\nnr_periods 94\nnr_throttled 21\nthrottled_usec 2884058\nnr_bursts 0\nburst_usec 0",
+          "latency_s": 1.373,
+          "candidates": 100
+        },
+        {
+          "stage": "no_treatments",
+          "elapsed_s": 9.316,
+          "rss_peak_kib": 793032,
+          "memory.current": "974426112",
+          "memory.peak": "990486528",
+          "memory.max": "2147483648",
+          "cpu.stat": "usage_usec 7734916\nuser_usec 5404286\nsystem_usec 2330630\nnice_usec 0\nnr_periods 94\nnr_throttled 21\nthrottled_usec 2884058\nnr_bursts 0\nburst_usec 0",
+          "latency_s": 0.008,
+          "candidates": 0
+        },
+        {
+          "stage": "complete",
+          "elapsed_s": 9.318,
+          "rss_peak_kib": 793032,
+          "memory.current": "974331904",
+          "memory.peak": "990486528",
+          "memory.max": "2147483648",
+          "cpu.stat": "usage_usec 7736904\nuser_usec 5404286\nsystem_usec 2332617\nnice_usec 0\nnr_periods 94\nnr_throttled 21\nthrottled_usec 2884058\nnr_bursts 0\nburst_usec 0"
+        }
+      ]
+    }
+  ],
+  "fastify": {
+    "memoryLimitBytes": 536870912,
+    "cpuQuota": 0.1,
+    "peakCgroupBytes": 61681664,
+    "listenSeconds": 3.541,
+    "scenarioLatencySeconds": [
+      2.162,
+      2.709,
+      1.866,
+      2.108,
+      0.073
+    ],
+    "parity": "exact",
+    "upstream": "Existing unconstrained local ML service"
+  }
+}
