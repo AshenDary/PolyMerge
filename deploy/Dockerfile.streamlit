@@ -1,9 +1,14 @@
-FROM python:3.11-slim-bookworm
+FROM python:3.11-slim-trixie@sha256:e88e9763f943ec1834f992a4b51e0f24500486803e8bc534e5767af9ea65f6ce
 ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 PORT=8501
 WORKDIR /app
-COPY requirements-streamlit.txt ./
-RUN pip install --no-cache-dir -r requirements-streamlit.txt && useradd --uid 10001 --create-home app
+RUN apt-get update && apt-get install -y --no-install-recommends liblzma5=5.8.1-1+deb13u2 \
+    && rm -rf /var/lib/apt/lists/*
+COPY requirements-streamlit.lock ./
+RUN pip install --no-cache-dir --require-hashes -r requirements-streamlit.lock && useradd --uid 10001 --create-home app
+RUN pip uninstall -y setuptools wheel pip
+RUN find / -xdev -type f -perm /6000 -exec chmod a-s {} +
 COPY streamlit_app.py ./
+COPY frontend/apple-touch-icon.png ./frontend/apple-touch-icon.png
 COPY .streamlit ./.streamlit
 USER app
 EXPOSE 8501

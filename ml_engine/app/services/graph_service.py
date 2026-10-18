@@ -7,7 +7,7 @@ import json
 import re
 from typing import Any, Optional, Protocol
 
-from app.utils.neo4j_client import Neo4jClient, Neo4jConnectionError
+from app.utils.neo4j_client import Neo4jConnectionError, get_neo4j_client
 
 
 HETIONET_SOURCE = "Hetionet"
@@ -29,7 +29,7 @@ class QueryClient(Protocol):
 
 class GraphService:
     def __init__(self, client: Optional[QueryClient] = None) -> None:
-        self.client = client or Neo4jClient()
+        self.client = client or get_neo4j_client()
 
     def verify_connection(self) -> bool:
         if hasattr(self.client, "verify_connectivity"):

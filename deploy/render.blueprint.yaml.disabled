@@ -1,0 +1,61 @@
+# Review template only. Creating these services incurs costs and exposes Fastify.
+# Activate only after approved main SHA, security acceptance and cloud approval.
+services:
+  - type: pserv
+    name: polymerge-ml
+    runtime: docker
+    plan: 1c-2g
+    region: singapore
+    branch: main
+    autoDeployTrigger: "off"
+    dockerfilePath: ./deploy/Dockerfile.ml
+    healthCheckPath: /ready
+    numInstances: 1
+    envVars:
+      - key: PORT
+        value: "8000"
+      - key: POLYMERGE_REQUIRE_MODEL
+        value: "true"
+      - key: POLYMERGE_DDI_MODEL_PATH
+        value: /home/app/model/random_forest_ddi_pipeline.joblib
+      - key: POLYMERGE_MODEL_DOWNLOAD_URL
+        sync: false
+      - key: POLYMERGE_MODEL_DOWNLOAD_HOST
+        sync: false
+      - key: NEO4J_URI
+        sync: false
+      - key: NEO4J_USER
+        sync: false
+      - key: NEO4J_PASSWORD
+        sync: false
+      - key: NEO4J_DATABASE
+        value: neo4j
+      - key: POLYMERGE_REQUIRE_NEO4J_TLS
+        value: "true"
+  - type: web
+    name: polymerge-web
+    runtime: docker
+    plan: 0.5c-512mb
+    region: singapore
+    branch: main
+    autoDeployTrigger: "off"
+    dockerfilePath: ./deploy/Dockerfile.backend
+    healthCheckPath: /ready
+    numInstances: 1
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "3000"
+      - key: ML_SERVICE_URL
+        sync: false
+      - key: CORS_ORIGIN
+        sync: false
+      - key: STREAMLIT_ORIGIN
+        sync: false
+      - key: RATE_LIMIT_MAX
+        value: "120"
+      - key: ANALYSIS_RATE_LIMIT_MAX
+        value: "6"
+      - key: ML_CANDIDATE_TIMEOUT_MS
+        value: "120000"

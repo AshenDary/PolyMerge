@@ -5,6 +5,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from itertools import combinations
 from heapq import nsmallest
+from math import comb
 from typing import Any, Optional
 
 from app.services.graph_service import (
@@ -20,6 +21,12 @@ DEFAULT_CANDIDATE_SET_CONFIG = {
     "maxDrugCount": 3,
     "maxCandidateSets": 100,
 }
+
+MAX_COMBINATION_EVALUATIONS = 250000
+
+
+class CandidateBudgetExceeded(ValueError):
+    """Reject excessive search work without silently truncating candidate order."""
 
 
 def build_graph_candidates(
@@ -91,6 +98,9 @@ def generate_candidate_sets(
     target_disease_set = set(target_diseases)
     unique_candidates = _unique_candidates(single_drug_candidates)
     max_size = min(max(1, int(max_drug_count)), len(unique_candidates))
+    work = sum(comb(len(unique_candidates), size) for size in range(1, max_size + 1))
+    if work > MAX_COMBINATION_EVALUATIONS:
+        raise CandidateBudgetExceeded("Analysis work limit exceeded; select fewer diseases or drugs")
     def ordering(combo: tuple[dict[str, Any], ...]) -> tuple:
         drug_ids = [candidate["drugId"] for candidate in combo]
         covered = set().union(*(set(candidate.get("treatedDiseaseIds", [])) for candidate in combo))

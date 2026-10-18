@@ -15,7 +15,8 @@ PolyMerge's current multi-drug candidate generation and optimization is a resear
 - The optimizer does not find the clinically safest or clinically optimal polypill.
 - Coverage means represented knowledge-graph treatment coverage, not clinical efficacy.
 - Hard safety rules are deterministic and incomplete. Passing the hard filter is not a clinical safety guarantee.
-- No learned DDI model is implemented in this baseline.
+- A frozen Random Forest classifies supported drug pairs separately from this
+  optimizer. Its severity prediction is not the optimization objective.
 - No learned synergy model is implemented in this baseline.
 - Sprint 3 labels are DDInter 2.0 severity annotations for known interactions.
   Unknown is excluded, and absence from DDInter is not a safety label.

@@ -1,5 +1,13 @@
 # PolyMerge Data
 
+## Local Demo Data Policy
+
+Daily demonstration uses the reviewed existing graph, mappings and frozen model.
+The data preparation commands below document research provenance; they are not
+first-time demo setup steps. Do not regenerate datasets, retrain, or rerun the
+held-out final evaluation to start the application. See [Local Setup](../docs/LOCAL_SETUP.md).
+
+
 ## Primary Sprint 3 Source
 
 The primary supervised dataset is DDInter 2.0. Its official eight category CSVs
