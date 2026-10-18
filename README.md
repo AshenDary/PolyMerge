@@ -3,6 +3,7 @@
 PolyMerge is a biomedical research decision-support prototype that explores
 existing-drug combinations using represented graph evidence, configured research
 rules, deterministic optimization, and traditional machine learning.
+It runs locally for the academic demonstration; there is no public demo URL.
 
 The research goal is to identify combinations worth further investigation for
 multiple selected diseases, explain why they appear in the results, and expose
@@ -184,6 +185,9 @@ until the approved integration is merged and verified.
 [Jared, Ranee and Pamela](TEAM.md) own graph/data, backend/ML integration and
 optimization/explainability work. Historical deployment documents preserve
 feasibility findings; they are not evidence of a live public service.
+
+The [main release checklist](docs/RELEASE_READINESS.md) records the remaining
+review and platform acceptance steps before an official presentation SHA exists.
 
 Known frozen-runtime/container vulnerability findings remain separate from local
 functional verification. Scanner gates are not disabled or represented as green.

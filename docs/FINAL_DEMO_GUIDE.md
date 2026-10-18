@@ -2,8 +2,11 @@
 
 ## Before Presentation
 
-1. Use [Local Setup](LOCAL_SETUP.md); start the existing reviewed Neo4j database.
-2. Run Start-PolyMerge. Wait for **PolyMerge is ready.** and note its actual URLs.
+1. On a new machine, follow [Local Setup](LOCAL_SETUP.md): supply the trusted
+   frozen model and reviewed Neo4j graph, then run `Setup-PolyMerge.command` on
+   macOS or `Setup-PolyMerge.bat` on Windows. Daily startup does not reinstall.
+2. Start the existing reviewed Neo4j database. Run `Start-PolyMerge.command`
+   or `Start-PolyMerge.bat`. Wait for **PolyMerge is ready.** and note its URLs.
 3. Run `python3.11 scripts/check_demo_readiness.py` (Windows: `py -3.11`).
    This verifies dependencies, model SHA-256, complete graph identity and services.
 4. Open Streamlit and confirm the iframe actually renders. Check the disease
@@ -40,6 +43,10 @@
     evaluation; the page does not train or reevaluate on the test set.
 12. Finish with limitations. Reset with New Simulation and show the previous
     selection/result disappears. Never present an accepted candidate as safe.
+
+After the demonstration, run `Stop-PolyMerge.command` on macOS or
+`Stop-PolyMerge.bat` on Windows. The app services stop; the shared Neo4j database
+stays running. Keep the printed direct frontend URL available as the fallback.
 
 ## Short Defense Answers
 
@@ -86,3 +93,14 @@ Final desktop/mobile, keyboard, console, favicon and iframe acceptance follows
 [the UI checklist](sprint6-guided-demo.md). Read
 [the finalization audit](audits/local-demo-finalization.md) before claiming that
 native Windows or browser acceptance is complete.
+
+## Presentation-Day Check
+
+- Confirm Neo4j and the trusted model are available, then start the application.
+- Confirm readiness PASS and visually check Streamlit's embedded frontend.
+- Keep the direct Fastify URL and private logs available for recovery.
+- Rehearse the two-disease scenario and verify the selected pair is supported.
+- End with research limitations, reset the simulation, and stop the app services.
+
+The [main release checklist](RELEASE_READINESS.md) tracks approval and remaining
+platform checks before using a main-branch SHA as the official demo baseline.

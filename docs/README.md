@@ -8,7 +8,8 @@ branch states and findings; those statements are not current readiness claims.
 
 Start with [root README](../README.md), [Local Setup](LOCAL_SETUP.md),
 [architecture](ARCHITECTURE.md), [Final Demo Guide](FINAL_DEMO_GUIDE.md),
-[project status](project-status.md) and [finalization audit](audits/local-demo-finalization.md).
+[project status](project-status.md), [main release checklist](RELEASE_READINESS.md)
+and [finalization audit](audits/local-demo-finalization.md).
 The [manual UI checklist](sprint6-guided-demo.md) distinguishes browser acceptance
 from HTTP/unit checks. Public deployment instructions are superseded for this
 presentation by local setup, but their research findings are preserved.
@@ -64,6 +65,7 @@ external URLs and every historical heading anchor are not automatically validate
 | [docs/FINAL_DEMO_GUIDE.md](FINAL_DEMO_GUIDE.md) | Current documentation |
 | [docs/LOCAL_SETUP.md](LOCAL_SETUP.md) | Current documentation |
 | [docs/README.md](README.md) | Current documentation |
+| [docs/RELEASE_READINESS.md](RELEASE_READINESS.md) | Current documentation |
 | [docs/algorithm-limitations.md](algorithm-limitations.md) | Research documentation |
 | [docs/api.md](api.md) | Current documentation |
 | [docs/audits/local-demo-finalization.md](audits/local-demo-finalization.md) | Current documentation |
