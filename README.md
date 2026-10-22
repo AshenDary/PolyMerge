@@ -158,36 +158,43 @@ After setup, from the repository root on macOS:
 
 ```bash
 npm --prefix backend test
-(cd ml_engine && ../.venv-demo-ml/bin/python -m pytest -q)
+.venv-demo-ml/bin/python -m pytest -q ml_engine/tests
+.venv-demo-ml/bin/python -m pytest -q scripts/tests
 .venv-demo-ml/bin/python scripts/validate_sprint4_contract.py
 .venv-demo-ml/bin/python scripts/check_release_metadata.py
-.venv-demo-ml/bin/python -m unittest discover -s scripts/tests -v
 node --check frontend/app.js
 node --check frontend/explainability.js
 git diff --check
 ```
 
-Windows uses `.venv-demo-ml\Scripts\python.exe`; run pytest from `ml_engine`.
-Private-model prediction parity and real Neo4j scenarios require the owner's
-preserved fixtures and local assets. Tests do not replace browser acceptance.
+Windows uses `.venv-demo-ml\Scripts\python.exe` from the repository root.
+With the trusted model and reviewed Neo4j graph available, run
+`python3.11 scripts/check_demo_readiness.py --preflight` before launch and
+`python3.11 scripts/check_demo_readiness.py` after launch (Windows: `py -3.11`).
+`scripts/verify_frozen_runtime.py` compares prediction rows and probabilities
+with an owner-supplied baseline and optional preserved scenario fixtures;
+see [the script guide](scripts/README.md). It does not rerun held-out evaluation.
+Tests and HTTP readiness do not replace browser acceptance.
 Use the [final demonstration guide](docs/FINAL_DEMO_GUIDE.md) and
 [manual UI acceptance checklist](docs/sprint6-guided-demo.md).
 
 ## Status, Team and Security
 
-Current direction: **local academic demonstration**, not public deployment.
-PR #58 targets the integration branch; PR #57 targets main. Main synchronization
-requires review and explicit approval. See [project status](docs/project-status.md)
-and the [finalization audit](docs/audits/local-demo-finalization.md) for dated evidence,
-platform checks and outstanding work. No official main demo baseline is declared
-until the approved integration is merged and verified.
+The application is finalized on main for a **local academic demonstration**, not
+public deployment. PR #58 and PR #57 merged through GitHub; the verified
+application baseline is `7fb6c0accad92790e63d5203aa8b73bb05bb1ec2`.
+Later documentation-only commits do not change that scientific/runtime baseline.
+See [project status](docs/project-status.md), the
+[release record](docs/RELEASE_READINESS.md) and the dated
+[pre-merge finalization audit](docs/audits/local-demo-finalization.md) for
+verification evidence and remaining platform checks.
 
 [Jared, Ranee and Pamela](TEAM.md) own graph/data, backend/ML integration and
 optimization/explainability work. Historical deployment documents preserve
 feasibility findings; they are not evidence of a live public service.
 
-The [main release checklist](docs/RELEASE_READINESS.md) records the remaining
-review and platform acceptance steps before an official presentation SHA exists.
+The [main release record](docs/RELEASE_READINESS.md) records the merge SHAs,
+local checks, unresolved security findings and manual acceptance limits.
 
 Known frozen-runtime/container vulnerability findings remain separate from local
 functional verification. Scanner gates are not disabled or represented as green.
